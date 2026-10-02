@@ -298,8 +298,8 @@ main:focus {
 /* =========================================================
    Responsivo
    ========================================================= */
-@media (max-width: 960px) {
-  .nav__link span {
+@media (max-width: 900px) {
+  .nav__link .nav__label {
     display: none;
   }
 
@@ -359,7 +359,7 @@ main:focus {
     font-size: 0.6875rem;
   }
 
-  .nav__link span {
+  .nav__link .nav__label {
     display: block;
   }
 

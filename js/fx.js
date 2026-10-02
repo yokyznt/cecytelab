@@ -80,42 +80,6 @@
     document.querySelectorAll('.tile--3d').forEach(function (tile) {
       makeTilt(tile, { max: 6, glare: true });
     });
-
-    document.querySelectorAll('.s-card').forEach(function (card) {
-      makeTilt(card, { max: 5 });
-    });
-  }
-
-  /* ---------- Brillo en tarjetas de seguridad ---------- */
-  function initSafetyCardGlare() {
-    if (reduceMotion.matches || !hasFinePointer.matches) return;
-
-    document.querySelectorAll('.s-card').forEach(function (card) {
-      var glare = document.createElement('div');
-      glare.className = 's-card__glare';
-      glare.style.cssText = [
-        'position:absolute',
-        'inset:0',
-        'border-radius:inherit',
-        'opacity:0',
-        'pointer-events:none',
-        'transition:opacity 300ms var(--ease-out)',
-        'z-index:0'
-      ].join(';');
-      card.style.position = 'relative';
-      card.insertBefore(glare, card.firstChild);
-
-      card.addEventListener('pointermove', function (e) {
-        var rect = card.getBoundingClientRect();
-        var x = e.clientX - rect.left;
-        var y = e.clientY - rect.top;
-        glare.style.background = 'radial-gradient(300px 200px at ' + x + 'px ' + y + 'px, rgba(255,255,255,0.14), transparent 60%)';
-        glare.style.opacity = '1';
-      });
-      card.addEventListener('pointerleave', function () {
-        glare.style.opacity = '0';
-      });
-    });
   }
 
   /* ---------- Parallax suave del fondo ---------- */
@@ -161,49 +125,6 @@
       }
       requestAnimationFrame(tick);
     });
-  }
-
-  /* ---------- Búsqueda global del inicio ----------
-     Lleva a la tabla con más coincidencias y deja la búsqueda escrita. */
-  function initGlobalSearch() {
-    var form = document.getElementById('globalSearchForm');
-    var input = document.getElementById('globalSearch');
-    var msg = document.getElementById('globalSearchMsg');
-    if (!form || !input || !window.Store || !window.Tables) return;
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var raw = input.value.trim();
-      var q = Tables.norm(raw);
-      if (!q) { input.focus(); return; }
-
-      var best = null;
-      var bestN = 0;
-      ['reactivos', 'materiales', 'practicas'].forEach(function (cat) {
-        var n = Store.getDB(cat).filter(function (row) {
-          var hay = Tables.norm(Object.keys(row).map(function (k) { return row[k]; }).join(' '));
-          return q.split(/\s+/).every(function (w) { return hay.indexOf(w) > -1; });
-        }).length;
-        if (n > bestN) { bestN = n; best = cat; }
-      });
-
-      if (!best) {
-        msg.textContent = 'No hay resultados para “' + raw + '”. Prueba con otra palabra.';
-        input.focus();
-        return;
-      }
-
-      msg.textContent = '';
-      location.hash = '#' + best;
-      setTimeout(function () {
-        var target = document.querySelector('[data-search="' + best + '"]');
-        if (!target) return;
-        target.value = raw;
-        target.dispatchEvent(new Event('input'));
-      }, 0);
-    });
-
-    input.addEventListener('input', function () { msg.textContent = ''; });
   }
 
   /* ---------- Tamaño de texto (normal / grande / muy grande) ---------- */
@@ -316,11 +237,9 @@
     }
 
     initTips();
-    initGlobalSearch();
     initTextSize();
     initToTop();
     initTilt();
-    initSafetyCardGlare();
     initAmbientParallax();
 
     var homeView = document.getElementById('sec-inicio');

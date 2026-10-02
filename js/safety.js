@@ -1,74 +1,142 @@
 /* =========================================================
    CECyTE Lab · Sección de seguridad
-   Pestañas segmentadas, hoja de protocolo y estante interactivo.
+   Manual con índice por capítulos y lector en la misma página
+   (sin ventanas emergentes). En móvil el índice y el lector
+   se alternan.
    ========================================================= */
 (function () {
   'use strict';
 
   var SAFETY = window.CECYTE_SAFETY || {};
   var SHELF = window.CECYTE_SHELF || {};
+  var host = document.getElementById('manual');
+  if (!host) return;
 
-  /* ---------- Pestañas ---------- */
-  var tablist = document.querySelector('#sec-seguridad [role="tablist"]');
-  var tabs = tablist ? Array.prototype.slice.call(tablist.querySelectorAll('[role="tab"]')) : [];
+  var esc = UI.escapeHTML;
 
-  function selectTab(tab, focus) {
-    tabs.forEach(function (t) {
-      var on = t === tab;
-      t.setAttribute('aria-selected', String(on));
-      t.tabIndex = on ? 0 : -1;
-      var panel = document.getElementById(t.getAttribute('aria-controls'));
-      if (panel) {
-        panel.hidden = !on;
-        if (on) {
-          panel.classList.remove('is-entering');
-          void panel.offsetWidth;
-          panel.classList.add('is-entering');
-        }
-      }
-    });
-    if (focus) tab.focus();
-    UI.positionSlider(tablist);
-  }
+  var CHAPTERS = [
+    { title: 'Normas básicas', keys: ['equipo', 'autorizacion', 'disciplina', 'alimentos', 'limpieza', 'accidentes'] },
+    { title: 'Almacenamiento', keys: ['colores', 'estanteria', 'senaletica'] },
+    { title: 'Etiquetado y carpetas', keys: ['carpeta1', 'carpeta2', 'carpeta3', 'etiquetas'] },
+    { title: 'Residuos', keys: ['normativa', 'neutralizacion', 'pozo'] }
+  ];
 
-  tabs.forEach(function (tab, i) {
-    tab.addEventListener('click', function () { selectTab(tab); });
-    tab.addEventListener('keydown', function (e) {
-      var next = null;
-      if (e.key === 'ArrowRight') next = tabs[(i + 1) % tabs.length];
-      else if (e.key === 'ArrowLeft') next = tabs[(i - 1 + tabs.length) % tabs.length];
-      else if (e.key === 'Home') next = tabs[0];
-      else if (e.key === 'End') next = tabs[tabs.length - 1];
-      if (!next) return;
-      e.preventDefault();
-      selectTab(next, true);
-      next.scrollIntoView({ block: 'nearest', inline: 'nearest' });
-    });
+  var order = [];
+  CHAPTERS.forEach(function (c) {
+    c.keys = c.keys.filter(function (k) { return SAFETY[k]; });
+    order = order.concat(c.keys);
   });
 
-  /* ---------- Hoja de protocolo ---------- */
-  var sheet = document.getElementById('safetySheet');
-  var sheetIcon = document.getElementById('safetyIcon');
-  var sheetTitle = document.getElementById('safetyTitle');
-  var sheetBody = document.getElementById('safetyBody');
+  /* ---------- Estructura ---------- */
+  host.innerHTML =
+    '<nav class="manual__index" aria-label="Índice de seguridad">' +
+      CHAPTERS.map(function (c) {
+        return '<section class="mi-chapter">' +
+          '<h3 class="mi-chapter__title">' + esc(c.title) + '</h3>' +
+          '<ul class="mi-list">' +
+            c.keys.map(function (k) {
+              return '<li><button type="button" class="mi-item tone-' + SAFETY[k].tone + '" data-safety="' + k + '">' +
+                esc(SAFETY[k].title) + '</button></li>';
+            }).join('') +
+          '</ul></section>';
+      }).join('') +
+    '</nav>' +
+    '<article class="manual__reader" id="manualReader" aria-live="polite">' +
+      '<button type="button" class="reader__back" data-reader-back><i class="ph ph-arrow-left" aria-hidden="true"></i> Índice</button>' +
+      '<header class="reader__head">' +
+        '<span class="reader__blob" aria-hidden="true"><i class="ph" id="readerIcon"></i></span>' +
+        '<h3 class="reader__title" id="readerTitle" tabindex="-1"></h3>' +
+      '</header>' +
+      '<div class="reader__body" id="readerBody"></div>' +
+      '<footer class="reader__nav">' +
+        '<button type="button" class="reader__step reader__step--prev" data-step="-1"></button>' +
+        '<button type="button" class="reader__step reader__step--next" data-step="1"></button>' +
+      '</footer>' +
+    '</article>';
 
-  function openSafety(key, trigger) {
-    var data = SAFETY[key];
-    if (!data) return;
-    sheet.className = 'sheet tone-' + data.tone;
-    sheetIcon.className = 'ph ph-' + data.icon;
-    sheetTitle.textContent = data.title;
-    sheetBody.innerHTML = data.content;
-    sheetBody.scrollTop = 0;
-    UI.openDialog(sheet, trigger);
+  var reader = document.getElementById('manualReader');
+  var icon = document.getElementById('readerIcon');
+  var title = document.getElementById('readerTitle');
+  var body = document.getElementById('readerBody');
+  var prevBtn = host.querySelector('.reader__step--prev');
+  var nextBtn = host.querySelector('.reader__step--next');
+  var current = null;
+
+  function step(btn, key, dir) {
+    if (!key) { btn.hidden = true; return; }
+    btn.hidden = false;
+    btn.setAttribute('data-key', key);
+    btn.innerHTML =
+      '<small>' + (dir < 0 ? '← Anterior' : 'Siguiente →') + '</small>' +
+      '<strong>' + esc(SAFETY[key].title) + '</strong>';
   }
 
-  document.addEventListener('click', function (e) {
-    var card = e.target.closest('[data-safety]');
-    if (card) { openSafety(card.getAttribute('data-safety'), card); return; }
+  function select(key, opts) {
+    var data = SAFETY[key];
+    if (!data) return;
+    opts = opts || {};
+    var idx = order.indexOf(key);
+    var dir = current ? (idx >= order.indexOf(current) ? 'next' : 'back') : 'next';
+    current = key;
+
+    host.querySelectorAll('.mi-item').forEach(function (b) {
+      var on = b.getAttribute('data-safety') === key;
+      if (on) b.setAttribute('aria-current', 'true');
+      else b.removeAttribute('aria-current');
+    });
+
+    reader.className = 'manual__reader tone-' + data.tone;
+    icon.className = 'ph ph-' + data.icon;
+    title.textContent = data.title;
+    body.innerHTML = data.content;
+    step(prevBtn, order[idx - 1], -1);
+    step(nextBtn, order[idx + 1], 1);
+
+    if (!UI.reduceMotion.matches) {
+      reader.setAttribute('data-dir', dir);
+      reader.classList.remove('is-swapping');
+      void reader.offsetWidth;
+      reader.classList.add('is-swapping');
+    }
+
+    if (opts.drill) {
+      host.classList.add('is-reading');
+      window.scrollTo({ top: host.getBoundingClientRect().top + window.scrollY - 90, behavior: UI.reduceMotion.matches ? 'auto' : 'smooth' });
+      title.focus({ preventScroll: true });
+    }
+  }
+
+  /* ---------- Eventos ---------- */
+  host.addEventListener('click', function (e) {
+    var item = e.target.closest('[data-safety]');
+    if (item) { select(item.getAttribute('data-safety'), { drill: true }); return; }
+
+    var stepBtn = e.target.closest('[data-step]');
+    if (stepBtn) {
+      select(stepBtn.getAttribute('data-key'), { drill: true });
+      return;
+    }
+
+    if (e.target.closest('[data-reader-back]')) {
+      host.classList.remove('is-reading');
+      var active = host.querySelector('.mi-item[aria-current="true"]');
+      if (active) active.focus({ preventScroll: true });
+      return;
+    }
 
     var flask = e.target.closest('[data-shelf]');
     if (flask) updateShelf(flask);
+  });
+
+  // Flechas arriba/abajo recorren el índice
+  host.querySelector('.manual__index').addEventListener('keydown', function (e) {
+    if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+    var items = Array.prototype.slice.call(host.querySelectorAll('.mi-item'));
+    var i = items.indexOf(document.activeElement);
+    if (i < 0) return;
+    e.preventDefault();
+    var next = items[i + (e.key === 'ArrowDown' ? 1 : -1)];
+    if (next) next.focus();
   });
 
   /* ---------- Estante interactivo ---------- */
@@ -78,14 +146,14 @@
     var box = document.getElementById('shelfInfo');
     if (!info || !box) return;
 
-    sheetBody.querySelectorAll('[data-shelf]').forEach(function (f) {
+    body.querySelectorAll('[data-shelf]').forEach(function (f) {
       f.setAttribute('aria-pressed', String(f.getAttribute('data-shelf') === code));
     });
 
     box.className = 'shelf-info shelf-info--' + code;
     box.innerHTML =
-      '<p class="shelf-info__title"><span class="swatch-dot swatch-dot--' + code + '" aria-hidden="true"></span> ' + UI.escapeHTML(info.title) + '</p>' +
-      '<p>' + UI.escapeHTML(info.text) + '</p>';
+      '<p class="shelf-info__title"><span class="swatch-dot swatch-dot--' + code + '" aria-hidden="true"></span> ' + esc(info.title) + '</p>' +
+      '<p>' + esc(info.text) + '</p>';
 
     if (!UI.reduceMotion.matches) {
       box.classList.remove('is-pop');
@@ -94,49 +162,7 @@
     }
   }
 
-  // Swipe-down para cerrar la hoja en móvil
-  (function enableSwipe() {
-    var panel = sheet && sheet.querySelector('.sheet__panel');
-    var hero = sheet && sheet.querySelector('.sheet__hero');
-    if (!panel || !hero) return;
-    var startY = 0, dy = 0, dragging = false, startT = 0;
+  if (order.length) select(order[0]);
 
-    hero.addEventListener('pointerdown', function (e) {
-      if (e.pointerType === 'mouse' || e.target.closest('button')) return;
-      if (!window.matchMedia('(max-width: 720px)').matches) return;
-      dragging = true;
-      startY = e.clientY;
-      startT = performance.now();
-      dy = 0;
-      panel.style.transition = 'none';
-      hero.setPointerCapture(e.pointerId);
-    });
-    hero.addEventListener('pointermove', function (e) {
-      if (!dragging) return;
-      dy = e.clientY - startY;
-      // Resistencia al arrastrar hacia arriba
-      var y = dy > 0 ? dy : dy / 6;
-      panel.style.transform = 'translateY(' + y + 'px)';
-    });
-    function end() {
-      if (!dragging) return;
-      dragging = false;
-      var velocity = dy / Math.max(1, performance.now() - startT);
-      panel.style.transition = '';
-      if (dy > 120 || velocity > 0.5) {
-        // Continúa el gesto desde donde quedó hasta salir de la pantalla
-        panel.style.transform = 'translateY(100%)';
-        setTimeout(function () {
-          UI.closeNow(sheet);
-          panel.style.transform = '';
-        }, UI.reduceMotion.matches ? 0 : 240);
-      } else {
-        panel.style.transform = '';
-      }
-    }
-    hero.addEventListener('pointerup', end);
-    hero.addEventListener('pointercancel', end);
-  })();
-
-  window.Safety = { open: openSafety, selectTab: selectTab };
+  window.Safety = { select: select };
 })();

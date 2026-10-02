@@ -77,6 +77,13 @@
     return n + ' ' + (n === 1 ? one : many);
   }
 
+  function setNavBadge(id, n, text) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.hidden = !n;
+    el.innerHTML = n + '<span class="sr-only"> ' + text + '</span>';
+  }
+
   function renderHome() {
     var mat = Store.getDB('materiales');
     var reac = Store.getDB('reactivos');
@@ -112,6 +119,8 @@
       alerts.push('<p class="alert alert--ok"><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span><strong>Todo en orden</strong></span></p>');
     }
     document.getElementById('homeAlerts').innerHTML = alerts.join('');
+    setNavBadge('navBadgeReac', expired.length, 'caducados');
+    setNavBadge('navBadgeMat', bad.length, 'en mal estado');
   }
 
   // Alertas del inicio: navegar y aplicar filtro

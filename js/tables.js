@@ -346,6 +346,30 @@
   }
 
   /* ---------- Datos filtrados ---------- */
+  // ¿La fila contiene todas las palabras buscadas (o alguno de sus sinónimos)?
+  function textMatches(cat, row, expTerms) {
+    if (!expTerms.length) return true;
+    var hay = norm(Object.keys(row).map(function (k) { return row[k]; }).join(' ') +
+      (cat === 'materiales' ? ' ' + materialType(row.material).label : ''));
+    return expTerms.every(function (group) {
+      return group.some(function (t, idx) {
+        // Lo que la persona escribe (idx 0) coincide por fragmento, para poder buscar mientras teclea.
+        // Los símbolos de 1–2 letras que vienen de sinónimos (Na, K, Cl…) solo cuentan como palabra completa.
+        if (idx > 0 && t.length <= 2 && /^[a-z]+$/.test(t)) {
+          return new RegExp('(^|[^a-z0-9])' + t + '([^a-z0-9]|$)').test(hay);
+        }
+        return hay.indexOf(t) > -1;
+      });
+    });
+  }
+
+  // Búsqueda sin tocar el estado de las tablas (sugerencias del inicio)
+  function search(cat, query) {
+    var terms = norm(String(query).trim()).split(/\s+/).filter(Boolean);
+    var expTerms = expandSearchTerms(terms);
+    return Store.getDB(cat).filter(function (row) { return textMatches(cat, row, expTerms); });
+  }
+
   // `filterValue` permite contar cada chip respetando la búsqueda activa.
   function getFiltered(cat, filterValue) {
     var conf = CONFIG[cat];
@@ -367,18 +391,7 @@
             return false;
           }
         }
-        if (!expTerms.length) return true;
-        var hay = norm(Object.keys(item.row).map(function (k) { return item.row[k]; }).join(' ') +
-          (cat === 'materiales' ? ' ' + materialType(item.row.material).label : ''));
-        return expTerms.every(function (group) {
-          return group.some(function (t) {
-            // Símbolos de 1–2 letras (Na, K, Cl…) solo cuentan como palabra completa
-            if (t.length <= 2 && /^[a-z]+$/.test(t)) {
-              return new RegExp('(^|[^a-z0-9])' + t + '([^a-z0-9]|$)').test(hay);
-            }
-            return hay.indexOf(t) > -1;
-          });
-        });
+        return textMatches(cat, item.row, expTerms);
       });
   }
 
@@ -579,6 +592,8 @@
     colorSlug: colorSlug,
     estadoTone: estadoTone,
     formatDate: formatDate,
-    norm: norm
+    norm: norm,
+    search: search,
+    materialType: materialType
   };
 })();
