@@ -74,6 +74,29 @@
         return Object.keys(seen).sort(function (a, b) { return a.localeCompare(b, 'es'); })
           .map(function (m) { return { value: m, label: m }; });
       }
+    },
+    inventario: {
+      noun: 'artículos',
+      emptyIcon: 'list-checks',
+      readonly: true,
+      perPage: 25,
+      columns: [
+        { key: 'n', label: 'N.º', type: 'id' },
+        { key: 'nombre', label: 'Tipo', type: 'tipoinv' },
+        { key: 'nombre', label: 'Artículo', type: 'strong' },
+        { key: 'unidad', label: 'Medida' },
+        { key: 'cantidad', label: 'Cantidad', type: 'qty' },
+        { key: 'caducidad', label: 'Caducidad', type: 'caducidad' },
+        { key: 'estado', label: 'Estado', type: 'estadoinv' }
+      ],
+      filterKey: 'estado',
+      filterLabel: 'Estado',
+      filters: function () {
+        return [
+          { value: '__caducado', label: 'Caducados', dot: 'bad' },
+          { value: '__obs', label: 'Con observaciones', dot: 'warn' }
+        ];
+      }
     }
   };
 
@@ -219,28 +242,46 @@
      categoría cuyo texto aparezca en el nombre (ya sin acentos ni mayúsculas). */
   var MAT_TYPES = [
     { id: 'seguridad', label: 'Seguridad y protección', icon: 'shield-check',
-      keys: ['gafa', 'mascarilla', 'asbesto', 'guante'] },
+      keys: ['gafa', 'lente', 'seguridad', 'mascarilla', 'asbesto', 'guante'] },
     { id: 'didactico', label: 'Didáctico y consumibles', icon: 'graduation-cap',
-      keys: ['didactic', 'poster', 'modelo', 'domino', 'papel', 'manguera', 'tapon', 'alambre', 'magnesio', 'titrisol'] },
+      keys: ['didactic', 'poster', 'modelo', 'domino', 'papel', 'manguera', 'tapon', 'alambre', 'magnesio', 'titrisol', 'kit de', 'set para'] },
     { id: 'optica', label: 'Microscopía y óptica', icon: 'microscope',
       keys: ['microscop', 'lupa', 'objetos', 'optic'] },
     { id: 'electricidad', label: 'Electricidad y magnetismo', icon: 'lightning',
-      keys: ['multimetro', 'osciloscopio', 'adaptador', 'eliminador', 'electrodo', 'resistencia', 'foco', 'motor', 'caiman', 'iman', 'brujula'] },
+      keys: ['multimetro', 'osciloscopio', 'adaptador', 'eliminador', 'electrodo', 'resistencia', 'foco', 'motor', 'caiman', 'iman', 'brujula', 'fuente de poder'] },
     { id: 'calor', label: 'Calentamiento', icon: 'fire',
-      keys: ['mechero', 'estufa', 'parrilla', 'bano maria', 'olla'] },
+      keys: ['mechero', 'estufa', 'parrilla', 'bano maria', 'olla', 'equipo de calor'] },
     { id: 'medicion', label: 'Medición', icon: 'ruler',
-      keys: ['balanza', 'termometro', 'cronometro', 'flexometro', 'regla', 'transportador', 'calibrador', 'potenciometro', 'pechimetro'] },
+      keys: ['balanza', 'termometro', 'cronometro', 'flexometro', 'regla', 'transportador', 'calibrador', 'potenciometro', 'pechimetro', 'bascula', 'vernier'] },
     { id: 'fisica', label: 'Mecánica y física', icon: 'atom',
       keys: ['carrito', 'riel', 'polea', 'plomada', 'balines', 'pelota'] },
     { id: 'herramientas', label: 'Soportes y herramientas', icon: 'wrench',
       keys: ['pinza', 'sujetador', 'soporte', 'nuez', 'tripie', 'gradilla', 'horadador', 'espatula', 'cuchara', 'tijera', 'bisturi',
-             'aguja', 'lanceta', 'jeringa', 'colador', 'charola', 'escobillon', 'mortero', 'bomba', 'centrifuga'] },
+             'aguja', 'lanceta', 'jeringa', 'colador', 'charola', 'escobillon', 'mortero', 'pistilo', 'bomba', 'centrifug'] },
     { id: 'vidrio', label: 'Vidrio y volumetría', icon: 'flask',
-      keys: ['matraz', 'vaso', 'probeta', 'pipeta', 'bureta', 'embudo', 'tubo', 'petri', 'reloj', 'capsula', 'refrigerante',
+      keys: ['matraz', 'vaso', 'vasito', 'probeta', 'pipeta', 'bureta', 'embudo', 'tubo', 'petri', 'reloj', 'capsula', 'refrigerante',
              'frasco', 'gotero', 'pizeta', 'perilla', 'filtro de vidrio'] }
   ];
 
   var MAT_OTHER = { id: 'otros', label: 'Otros', icon: 'package' };
+  var INV_REAGENT = { id: 'reactivo', label: 'Reactivo químico', icon: 'test-tube' };
+
+  // En el inventario completo no hay columna de tipo: se deduce de la medida y la cantidad.
+  // Reactivo = se mide en peso/volumen y viene en frasco, bote o paquete (o está agotado).
+  function inventoryType(row) {
+    var name = norm(row.nombre);
+    var cant = norm(row.cantidad);
+    var uni = norm(row.unidad);
+    var reactivo = /frasco|bote|paquete/.test(cant) ||
+      /(^|\s)(gr|kl|kg|litros?|tiras)(\s|$)/.test(uni) ||
+      (cant === '0' && uni !== 'pieza' && uni !== 'piezas');
+    if (reactivo && name.indexOf('papel') !== 0) return INV_REAGENT;
+    return materialType(row.nombre);
+  }
+
+  function hasObservation(row) {
+    return String(row.estado || '').trim() !== '';
+  }
 
   function materialType(name) {
     var n = norm(name);
@@ -317,6 +358,17 @@
           ' aria-label="Tipo: ' + esc(mt.label) + '" data-tip="' + esc(mt.label) + '">' +
           '<i class="ph ph-' + mt.icon + '" aria-hidden="true"></i></span>';
         break;
+      case 'tipoinv':
+        var it = inventoryType(row);
+        content = '<span class="cell-icon cell-icon--' + it.id + '" tabindex="0" role="img"' +
+          ' aria-label="Tipo: ' + esc(it.label) + '" data-tip="' + esc(it.label) + '">' +
+          '<i class="ph ph-' + it.icon + '" aria-hidden="true"></i></span>';
+        break;
+      case 'estadoinv':
+        content = val
+          ? '<span class="badge badge--warn"><span class="badge__dot" aria-hidden="true"></span>' + esc(val) + '</span>'
+          : '<span class="badge badge--ok"><span class="badge__dot" aria-hidden="true"></span>Buen estado</span>';
+        break;
       case 'estado':
         content = '<span class="badge badge--' + estadoTone(val) + '"><span class="badge__dot" aria-hidden="true"></span>' + esc(val) + '</span>';
         break;
@@ -350,7 +402,8 @@
   function textMatches(cat, row, expTerms) {
     if (!expTerms.length) return true;
     var hay = norm(Object.keys(row).map(function (k) { return row[k]; }).join(' ') +
-      (cat === 'materiales' ? ' ' + materialType(row.material).label : ''));
+      (cat === 'materiales' ? ' ' + materialType(row.material).label : '') +
+      (cat === 'inventario' ? ' ' + inventoryType(row).label : ''));
     return expTerms.every(function (group) {
       return group.some(function (t, idx) {
         // Lo que la persona escribe (idx 0) coincide por fragmento, para poder buscar mientras teclea.
@@ -385,6 +438,8 @@
         if (active) {
           if (active === '__caducado') {
             if (!isExpired(item.row.caducidad)) return false;
+          } else if (active === '__obs') {
+            if (!hasObservation(item.row)) return false;
           } else if (cat === 'reactivos') {
             if (colorSlug(item.row.almacen) !== colorSlug(active)) return false;
           } else if (norm(item.row[conf.filterKey]) !== norm(active)) {
@@ -442,17 +497,18 @@
     if (!card) return;
     var conf = CONFIG[cat];
     var st = state[cat];
-    var isAdmin = document.body.classList.contains('is-admin');
+    var isAdmin = document.body.classList.contains('is-admin') && !conf.readonly;
+    var perPage = conf.perPage || ROWS_PER_PAGE;
 
     renderFilters(cat);
 
     var data = getFiltered(cat);
-    var totalPages = Math.max(1, Math.ceil(data.length / ROWS_PER_PAGE));
+    var totalPages = Math.max(1, Math.ceil(data.length / perPage));
     if (st.page > totalPages) st.page = totalPages;
     if (st.page < 1) st.page = 1;
 
-    var start = (st.page - 1) * ROWS_PER_PAGE;
-    var pageRows = data.slice(start, start + ROWS_PER_PAGE);
+    var start = (st.page - 1) * perPage;
+    var pageRows = data.slice(start, start + perPage);
 
     var head = conf.columns.map(function (c) {
       return '<th scope="col">' + esc(c.label) + '</th>';
@@ -594,6 +650,7 @@
     formatDate: formatDate,
     norm: norm,
     search: search,
-    materialType: materialType
+    materialType: materialType,
+    inventoryType: inventoryType
   };
 })();

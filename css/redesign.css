@@ -1021,6 +1021,7 @@ main { overflow-x: clip; }
 .cell-icon--seguridad    { --t: #15803d; }
 .cell-icon--didactico    { --t: #84cc16; }
 .cell-icon--otros        { --t: #78716c; }
+.cell-icon--reactivo     { --t: #b7791f; }
 
 @media (hover: hover) and (pointer: fine) {
   .cell-icon:hover { transform: scale(1.12); }
@@ -1136,7 +1137,7 @@ main { overflow-x: clip; }
 [data-theme="dark"] .nav__badge { background: #f87171; color: #1a0605; }
 [data-theme="dark"] .nav__badge--warn { background: #fbbf24; color: #2a1800; }
 
-@media (max-width: 900px) {
+@media (max-width: 1160px) {
   .nav__link i { display: inline-block; }
   .nav__link { padding-inline: 0.8rem; }
   .nav .slider-indicator::after { left: 0.4rem; right: 0.4rem; }
@@ -1175,7 +1176,7 @@ main { overflow-x: clip; }
   .nav__link {
     height: 56px;
     padding-inline: 0;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
   }
 
   .nav__link[aria-current="page"],
@@ -1559,6 +1560,16 @@ main { overflow-x: clip; }
   background: var(--accent-soft-2);
   color: var(--accent-text);
 }
+
+/* Menú de 6 entradas: más compacto para que quepa sin pisar la marca ni los botones */
+@media (min-width: 721px) {
+  .nav__link {
+    padding-inline: 0.7rem;
+    font-size: 1rem;
+  }
+}
+
+.brand__text small { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   .sg { animation: none; }

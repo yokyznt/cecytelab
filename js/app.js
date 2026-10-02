@@ -6,12 +6,13 @@
   'use strict';
 
   var esc = UI.escapeHTML;
-  var VIEWS = ['inicio', 'materiales', 'reactivos', 'practicas', 'seguridad'];
+  var VIEWS = ['inicio', 'materiales', 'reactivos', 'inventario', 'practicas', 'seguridad'];
   var TITLES = {
     inicio: 'CECyTE Lab · Sistema integral de laboratorio',
     materiales: 'Materiales · CECyTE Lab',
     reactivos: 'Reactivos · CECyTE Lab',
     practicas: 'Prácticas · CECyTE Lab',
+    inventario: 'Inventario completo · CECyTE Lab',
     seguridad: 'Seguridad · CECyTE Lab'
   };
 

@@ -28,6 +28,7 @@
   <link rel="stylesheet" href="css/redesign.css">
 
   <script src="js/data.js" defer></script>
+  <script src="js/inventario.js" defer></script>
   <script src="js/safety-content.js" defer></script>
   <script src="js/store.js" defer></script>
   <script src="js/ui.js" defer></script>
@@ -118,6 +119,7 @@
           <li><a class="nav__link" href="#inicio" data-nav="inicio"><i class="ph ph-house" aria-hidden="true"></i><span class="nav__label">Inicio</span></a></li>
           <li><a class="nav__link" href="#materiales" data-nav="materiales"><i class="ph ph-package" aria-hidden="true"></i><span class="nav__label">Materiales</span><span class="nav__badge nav__badge--warn" id="navBadgeMat" hidden></span></a></li>
           <li><a class="nav__link" href="#reactivos" data-nav="reactivos"><i class="ph ph-test-tube" aria-hidden="true"></i><span class="nav__label">Reactivos</span><span class="nav__badge" id="navBadgeReac" hidden></span></a></li>
+          <li><a class="nav__link" href="#inventario" data-nav="inventario"><i class="ph ph-list-checks" aria-hidden="true"></i><span class="nav__label">Inventario</span></a></li>
           <li><a class="nav__link" href="#practicas" data-nav="practicas"><i class="ph ph-microscope" aria-hidden="true"></i><span class="nav__label">Prácticas</span></a></li>
           <li><a class="nav__link" href="#seguridad" data-nav="seguridad"><i class="ph ph-shield-check" aria-hidden="true"></i><span class="nav__label">Seguridad</span></a></li>
           <li class="slider-indicator" aria-hidden="true"></li>
@@ -343,6 +345,25 @@
       </header>
       <div class="filters" data-filters="reactivos" role="group" aria-label="Filtrar reactivos"></div>
       <div class="table-card" data-table-card="reactivos"></div>
+    </section>
+
+    <!-- ===================== INVENTARIO COMPLETO ===================== -->
+    <section class="view" id="sec-inventario" data-view="inventario" aria-labelledby="t-inventario" hidden>
+      <header class="view-head">
+        <div>
+          <h2 class="view-title" id="t-inventario"><span class="view-title__icon"><i class="ph ph-list-checks" aria-hidden="true"></i></span> Inventario completo</h2>
+        </div>
+        <div class="view-actions">
+          <label class="search">
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+            <input type="search" data-search="inventario" placeholder="Buscar" aria-label="Buscar en el inventario completo" autocomplete="off" enterkeyhint="search">
+            <kbd aria-hidden="true">/</kbd>
+          </label>
+        </div>
+        <svg class="view-head__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-materiales"/></svg>
+      </header>
+      <div class="filters" data-filters="inventario" role="group" aria-label="Filtrar el inventario"></div>
+      <div class="table-card" data-table-card="inventario"></div>
     </section>
 
     <!-- ===================== PRÁCTICAS ===================== -->
