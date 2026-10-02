@@ -8,51 +8,39 @@
   var ROWS_PER_PAGE = 10;
 
   var CONFIG = {
-    materiales: {
-      noun: 'materiales',
-      emptyIcon: 'package',
+    inventario: {
+      noun: 'artículos',
+      emptyIcon: 'list-checks',
+      perPage: 25,
+      nameKey: 'articulo',
       columns: [
-        { key: 'id', label: 'ID', type: 'id' },
-        { key: 'material', label: 'Tipo', type: 'icon' },
-        { key: 'material', label: 'Material', type: 'strong' },
-        { key: 'cantidad', label: 'Cantidad', type: 'qty' },
-        { key: 'estado', label: 'Estado', type: 'estado' },
-        { key: 'ubicacion', label: 'Ubicación' }
+        { key: 'articulo', label: 'Tipo', type: 'tipoinv' },
+        { key: 'articulo', label: 'Artículo', type: 'articulo' },
+        { key: 'presentaciones', label: 'Existencia', type: 'existencia' },
+        { key: 'presentaciones', label: 'Caducidad', type: 'caducidadinv' },
+        { key: 'presentaciones', label: 'Estado', type: 'estadoinv' }
       ],
-      filterKey: 'estado',
-      filterLabel: 'Estado',
-      filters: function () {
-        return [
-          { value: 'Bueno', label: 'Bueno', dot: 'ok' },
-          { value: 'Regular', label: 'Regular', dot: 'warn' },
-          { value: 'Malo', label: 'Malo', dot: 'bad' }
-        ];
-      }
-    },
-    reactivos: {
-      noun: 'reactivos',
-      emptyIcon: 'test-tube',
-      columns: [
-        { key: 'id', label: 'ID', type: 'id' },
-        { key: 'reactivo', label: 'Sustancia / fórmula', type: 'strong' },
-        { key: 'cantidad', label: 'Cant. / lote', type: 'qty' },
-        { key: 'caducidad', label: 'Caducidad', type: 'caducidad' },
-        { key: 'riesgo', label: 'Riesgo (SGA)', type: 'riesgo' },
-        { key: 'almacen', label: 'Almacenaje', type: 'almacen' }
-      ],
-      filterKey: 'almacen',
-      filterLabel: 'Color',
-      filters: function () {
-        return [
-          { value: 'Verde', label: 'Verde', swatch: 'verde' },
-          { value: 'Azul', label: 'Azul', swatch: 'azul' },
-          { value: 'Amarillo', label: 'Amarillo', swatch: 'amarillo' },
-          { value: 'Rojo', label: 'Rojo', swatch: 'rojo' },
-          { value: 'Blanco', label: 'Blanco', swatch: 'blanco' },
-          { value: 'Rayas', label: 'Rayas', swatch: 'rayas' },
-          { value: '__caducado', label: 'Caducados', dot: 'bad' }
-        ];
-      }
+      // Dos grupos de filtros combinables: tipo y alertas
+      groups: [
+        {
+          key: 'tipo', label: 'Tipo', all: 'Todos', keepZero: true,
+          options: function () {
+            return [
+              { value: 'reactivo', label: 'Reactivos' },
+              { value: 'material', label: 'Materiales' }
+            ];
+          }
+        },
+        {
+          key: 'alerta', label: 'Alertas', keepZero: true,
+          options: function () {
+            return [
+              { value: 'caducado', label: 'Caducados', dot: 'bad' },
+              { value: 'obs', label: 'Con observaciones', dot: 'warn' }
+            ];
+          }
+        }
+      ]
     },
     practicas: {
       noun: 'prácticas',
@@ -63,46 +51,28 @@
         { key: 'fecha', label: 'Fecha', type: 'fecha' },
         { key: 'rec', label: 'Reactivos / material' }
       ],
-      filterKey: 'mat',
-      filterLabel: 'Materia',
-      filters: function () {
-        var seen = {};
-        Store.getDB('practicas').forEach(function (r) {
-          var m = String(r.mat || '').trim();
-          if (m) seen[m] = true;
-        });
-        return Object.keys(seen).sort(function (a, b) { return a.localeCompare(b, 'es'); })
-          .map(function (m) { return { value: m, label: m }; });
-      }
-    },
-    inventario: {
-      noun: 'artículos',
-      emptyIcon: 'list-checks',
-      readonly: true,
-      perPage: 25,
-      columns: [
-        { key: 'n', label: 'N.º', type: 'id' },
-        { key: 'nombre', label: 'Tipo', type: 'tipoinv' },
-        { key: 'nombre', label: 'Artículo', type: 'strong' },
-        { key: 'unidad', label: 'Medida' },
-        { key: 'cantidad', label: 'Cantidad', type: 'qty' },
-        { key: 'caducidad', label: 'Caducidad', type: 'caducidad' },
-        { key: 'estado', label: 'Estado', type: 'estadoinv' }
-      ],
-      filterKey: 'estado',
-      filterLabel: 'Estado',
-      filters: function () {
-        return [
-          { value: '__caducado', label: 'Caducados', dot: 'bad' },
-          { value: '__obs', label: 'Con observaciones', dot: 'warn' }
-        ];
-      }
+      groups: [
+        {
+          key: 'mat', label: 'Materia', all: 'Todos',
+          options: function () {
+            var seen = {};
+            Store.getDB('practicas').forEach(function (r) {
+              var m = String(r.mat || '').trim();
+              if (m) seen[m] = true;
+            });
+            return Object.keys(seen).sort(function (a, b) { return a.localeCompare(b, 'es'); })
+              .map(function (m) { return { value: m, label: m }; });
+          }
+        }
+      ]
     }
   };
 
   var state = {};
   Object.keys(CONFIG).forEach(function (cat) {
-    state[cat] = { page: 1, query: '', filter: '' };
+    var filters = {};
+    CONFIG[cat].groups.forEach(function (g) { filters[g.key] = ''; });
+    state[cat] = { page: 1, query: '', filters: filters };
   });
 
   /* ---------- Normalización para búsqueda sin acentos ---------- */
@@ -225,14 +195,6 @@
     return 'neutral';
   }
 
-  function estadoTone(value) {
-    var v = norm(value);
-    if (v.indexOf('malo') > -1) return 'bad';
-    if (v.indexOf('regular') > -1) return 'warn';
-    if (v.indexOf('bueno') > -1) return 'ok';
-    return 'neutral';
-  }
-
   function isExpired(value) {
     return String(value || '').toUpperCase().indexOf('CADUCADO') > -1;
   }
@@ -266,21 +228,87 @@
   var MAT_OTHER = { id: 'otros', label: 'Otros', icon: 'package' };
   var INV_REAGENT = { id: 'reactivo', label: 'Reactivo químico', icon: 'test-tube' };
 
-  // En el inventario completo no hay columna de tipo: se deduce de la medida y la cantidad.
-  // Reactivo = se mide en peso/volumen y viene en frasco, bote o paquete (o está agotado).
+  // Cada artículo trae su tipo (reactivo o material); el icono de los materiales sale de su nombre.
   function inventoryType(row) {
-    var name = norm(row.nombre);
-    var cant = norm(row.cantidad);
-    var uni = norm(row.unidad);
-    var reactivo = /frasco|bote|paquete/.test(cant) ||
-      /(^|\s)(gr|kl|kg|litros?|tiras)(\s|$)/.test(uni) ||
-      (cant === '0' && uni !== 'pieza' && uni !== 'piezas');
-    if (reactivo && name.indexOf('papel') !== 0) return INV_REAGENT;
-    return materialType(row.nombre);
+    return row.tipo === 'reactivo' ? INV_REAGENT : materialType(row.articulo);
+  }
+
+  function presList(row) {
+    return Array.isArray(row.presentaciones) ? row.presentaciones : [];
+  }
+
+  function rowExpired(row) {
+    return presList(row).some(function (p) { return isExpired(p.caducidad); });
   }
 
   function hasObservation(row) {
-    return String(row.estado || '').trim() !== '';
+    return presList(row).some(function (p) { return String(p.nota || '').trim() !== ''; });
+  }
+
+  /* ---------- Existencia: presentaciones compactas y total ---------- */
+  function countUnit(row, p) {
+    return p.unidad || (row.tipo === 'reactivo' ? 'frasco' : 'pieza');
+  }
+
+  function unitLabel(unit, n) {
+    return n === 1 ? unit : (/s$/.test(unit) ? unit : unit + 's');
+  }
+
+  function qtyText(n) {
+    return String(Math.round(n * 100) / 100);
+  }
+
+  // "250 gr" / "1.5 kg" / "500 ml" / "2 L" -> { fam, v } en gr o ml; otra medida -> null
+  function parseMeasure(m) {
+    var x = /^([\d.,]+)\s*(gr|g|kg|ml|l)$/i.exec(String(m || '').trim());
+    if (!x) return null;
+    var v = parseFloat(x[1].replace(',', '.'));
+    var u = x[2].toLowerCase();
+    if (u === 'kg') return { fam: 'g', v: v * 1000 };
+    if (u === 'l') return { fam: 'ml', v: v * 1000 };
+    return { fam: u === 'ml' ? 'ml' : 'g', v: v };
+  }
+
+  function fmtAmount(v, fam) {
+    var big = v >= 1000;
+    return qtyText(big ? v / 1000 : v) + ' ' + (fam === 'g' ? (big ? 'kg' : 'gr') : (big ? 'L' : 'ml'));
+  }
+
+  // Total por unidad de conteo y, en reactivos con medidas de peso o de volumen, el total acumulado
+  function stockInfo(row) {
+    var pres = presList(row);
+    var units = [], byUnit = {};
+    var fam = null, amount = 0, measurable = pres.length > 0;
+    pres.forEach(function (p) {
+      var n = Number(p.cantidad) || 0;
+      var u = countUnit(row, p);
+      if (!(u in byUnit)) { byUnit[u] = 0; units.push(u); }
+      byUnit[u] += n;
+      var pm = parseMeasure(p.medida);
+      if (!pm || (fam && pm.fam !== fam)) measurable = false;
+      else { fam = pm.fam; amount += pm.v * n; }
+    });
+    var parts = units.map(function (u) { return { n: byUnit[u], label: unitLabel(u, byUnit[u]) }; });
+    var count = parts.reduce(function (s, p) { return s + p.n; }, 0);
+    return { parts: parts, count: count, amount: row.tipo === 'reactivo' && measurable && fam && count > 1 ? fmtAmount(amount, fam) : '' };
+  }
+
+  function presItem(row, p) {
+    var n = Number(p.cantidad) || 0;
+    return p.medida
+      ? qtyText(n) + ' × ' + p.medida
+      : qtyText(n) + ' ' + unitLabel(countUnit(row, p), n);
+  }
+
+  function stats() {
+    var all = Store.getDB('inventario');
+    return {
+      total: all.length,
+      reactivos: all.filter(function (a) { return a.tipo === 'reactivo'; }).length,
+      materiales: all.filter(function (a) { return a.tipo !== 'reactivo'; }).length,
+      expired: all.filter(rowExpired).length,
+      observed: all.filter(hasObservation).length
+    };
   }
 
   function materialType(name) {
@@ -311,12 +339,6 @@
     return 'ph ph-shield-warning';
   }
 
-  function parseQty(q) {
-    var m = q.match(/^([\d.,]+)\s*(.*)/);
-    if (!m) return { num: q, unit: '' };
-    return { num: m[1], unit: m[2] || '' };
-  }
-
   var dateFmt = new Intl.DateTimeFormat('es-MX', { day: '2-digit', month: 'short', year: 'numeric' });
 
   function formatDate(value) {
@@ -326,37 +348,29 @@
     return '<time datetime="' + esc(value) + '">' + esc(dateFmt.format(d).replace('.', '')) + '</time>';
   }
 
+  // Indicador compacto de reactivos: color de almacenaje + icono de riesgo, con tooltip
+  function tagsHtml(row) {
+    if (row.tipo !== 'reactivo' || (!row.riesgo && !row.almacen)) return '';
+    var tip = [row.riesgo && 'Riesgo: ' + row.riesgo, row.almacen && 'Almacenaje: ' + row.almacen]
+      .filter(Boolean).join(' · ');
+    return '<span class="cell-tags" tabindex="0" role="img" aria-label="' + esc(tip) + '" data-tip="' + esc(tip) + '">' +
+      (row.almacen ? '<span class="swatch-dot swatch-dot--' + colorSlug(row.almacen) + '" aria-hidden="true"></span>' : '') +
+      (row.riesgo ? '<span class="cell-riesgo"><i class="' + riskIcon(row.riesgo) + '" aria-hidden="true"></i></span>' : '') +
+      '</span>';
+  }
+
   function renderCell(col, row) {
     var raw = row[col.key];
-    var val = raw == null ? '' : String(raw);
+    var val = raw == null || typeof raw === 'object' ? '' : String(raw);
     var content;
+    var pres = presList(row);
 
     switch (col.type) {
-      case 'id':
-        content = '<span class="cell-id mono">' + esc(val) + '</span>';
-        break;
       case 'strong':
         content = '<span class="cell-strong">' + esc(val) + '</span>';
         break;
-      case 'mono':
-        content = '<span class="mono">' + esc(val) + '</span>';
-        break;
-      case 'muted':
-        content = '<span class="cell-muted">' + (val ? esc(val) : '—') + '</span>';
-        break;
-      case 'qty':
-        var q = parseQty(val);
-        content = '<span class="cell-qty"><strong class="cell-qty__num">' + esc(q.num) + '</strong>' + (q.unit ? '<span class="cell-qty__unit">' + esc(q.unit) + '</span>' : '') + '</span>';
-        break;
-      case 'riesgo':
-        var icon = riskIcon(val);
-        content = '<span class="cell-riesgo"><i class="' + icon + '" aria-hidden="true"></i><span>' + esc(val) + '</span></span>';
-        break;
-      case 'icon':
-        var mt = materialType(val);
-        content = '<span class="cell-icon cell-icon--' + mt.id + '" tabindex="0" role="img"' +
-          ' aria-label="Tipo: ' + esc(mt.label) + '" data-tip="' + esc(mt.label) + '">' +
-          '<i class="ph ph-' + mt.icon + '" aria-hidden="true"></i></span>';
+      case 'articulo':
+        content = '<span class="cell-name"><span class="cell-strong">' + esc(val) + '</span>' + tagsHtml(row) + '</span>';
         break;
       case 'tipoinv':
         var it = inventoryType(row);
@@ -364,23 +378,48 @@
           ' aria-label="Tipo: ' + esc(it.label) + '" data-tip="' + esc(it.label) + '">' +
           '<i class="ph ph-' + it.icon + '" aria-hidden="true"></i></span>';
         break;
+      case 'existencia':
+        var st = stockInfo(row);
+        var total = st.parts.map(function (p) {
+          return '<span class="cell-qty"><strong class="cell-qty__num">' + esc(qtyText(p.n)) + '</strong>' +
+            '<span class="cell-qty__unit">' + esc(p.label) + '</span></span>';
+        }).join('<span class="cell-stock__sep" aria-hidden="true">·</span>');
+        var showList = pres.length > 1 || (pres[0] && pres[0].medida);
+        content = '<span class="cell-stock"><span class="cell-stock__total">' + total +
+          (st.amount ? '<span class="cell-stock__amt">' + esc(st.amount) + '</span>' : '') +
+          (st.count === 0 ? '<span class="badge badge--bad">Agotado</span>' : '') + '</span>' +
+          (showList ? '<span class="cell-stock__list">' +
+            pres.map(function (p) { return '<span>' + esc(presItem(row, p)) + '</span>'; }).join('') + '</span>' : '') +
+          '</span>';
+        break;
+      case 'caducidadinv':
+        var exp = pres.filter(function (p) { return isExpired(p.caducidad); });
+        var dates = [];
+        pres.forEach(function (p) {
+          var c = String(p.caducidad || '').trim();
+          if (c && c !== 'N/A' && !isExpired(c) && dates.indexOf(c) < 0) dates.push(c);
+        });
+        if (exp.length) {
+          var label = exp.length === 1 ? exp[0].caducidad : 'CADUCADOS (' + exp.map(function (p) {
+            var m = /\((.*)\)/.exec(p.caducidad);
+            return m ? m[1] : p.caducidad;
+          }).join(', ') + ')';
+          content = '<span class="expired"><i class="ph-fill ph-warning" aria-hidden="true"></i>' + esc(label) + '</span>';
+        } else if (dates.length) {
+          content = '<span class="mono cell-muted">' + esc(dates.join(', ')) + '</span>';
+        } else {
+          content = '<span class="cell-none" aria-hidden="true">—</span><span class="sr-only">Sin caducidad</span>';
+        }
+        break;
       case 'estadoinv':
-        content = val
-          ? '<span class="badge badge--warn"><span class="badge__dot" aria-hidden="true"></span>' + esc(val) + '</span>'
+        var notes = pres.filter(function (p) { return String(p.nota || '').trim(); }).map(function (p) {
+          return (pres.length > 1 && p.medida ? p.medida + ': ' : '') + p.nota;
+        });
+        content = notes.length
+          ? '<span class="cell-notes">' + notes.map(function (n) {
+              return '<span class="badge badge--warn"><span class="badge__dot" aria-hidden="true"></span>' + esc(n) + '</span>';
+            }).join('') + '</span>'
           : '<span class="badge badge--ok"><span class="badge__dot" aria-hidden="true"></span>Buen estado</span>';
-        break;
-      case 'estado':
-        content = '<span class="badge badge--' + estadoTone(val) + '"><span class="badge__dot" aria-hidden="true"></span>' + esc(val) + '</span>';
-        break;
-      case 'almacen':
-        content = '<span class="badge badge--color"><span class="swatch-dot swatch-dot--' + colorSlug(val) + '" aria-hidden="true"></span>' + esc(val) + '</span>';
-        break;
-      case 'caducidad':
-        content = isExpired(val)
-          ? '<span class="expired"><i class="ph-fill ph-warning" aria-hidden="true"></i>' + esc(val) + '</span>'
-          : (val === 'N/A'
-            ? '<span class="cell-none" aria-hidden="true">—</span><span class="sr-only">Sin caducidad</span>'
-            : '<span class="mono cell-muted">' + esc(val) + '</span>');
         break;
       case 'materia':
         content = '<span class="badge badge--subject">' + esc(val) + '</span>';
@@ -389,21 +428,28 @@
         content = '<span class="mono">' + formatDate(val) + '</span>';
         break;
       default:
-        content = isExpired(val)
-          ? '<span class="expired">' + esc(val) + '</span>'
-          : esc(val);
+        content = esc(val);
     }
 
     return '<td data-label="' + esc(col.label) + '" class="td-' + (col.type || 'text') + '">' + content + '</td>';
   }
 
   /* ---------- Datos filtrados ---------- */
+  // Texto donde se busca: todo lo que se ve del registro, más el tipo
+  function haystack(cat, row) {
+    if (cat === 'inventario') {
+      return [row.id, row.articulo, row.tipo === 'reactivo' ? 'reactivo reactivos' : 'material materiales',
+        inventoryType(row).label, row.riesgo, row.almacen, row.ubicacion, row.obs]
+        .concat(presList(row).map(function (p) { return [p.medida, p.cantidad, p.unidad, p.caducidad, p.nota].join(' '); }))
+        .join(' ');
+    }
+    return Object.keys(row).map(function (k) { return row[k]; }).join(' ');
+  }
+
   // ¿La fila contiene todas las palabras buscadas (o alguno de sus sinónimos)?
   function textMatches(cat, row, expTerms) {
     if (!expTerms.length) return true;
-    var hay = norm(Object.keys(row).map(function (k) { return row[k]; }).join(' ') +
-      (cat === 'materiales' ? ' ' + materialType(row.material).label : '') +
-      (cat === 'inventario' ? ' ' + inventoryType(row).label : ''));
+    var hay = norm(haystack(cat, row));
     return expTerms.every(function (group) {
       return group.some(function (t, idx) {
         // Lo que la persona escribe (idx 0) coincide por fragmento, para poder buscar mientras teclea.
@@ -416,6 +462,17 @@
     });
   }
 
+  // Cómo se aplica cada grupo de filtros a una fila
+  var MATCHERS = {
+    inventario: {
+      tipo: function (row, v) { return (row.tipo === 'reactivo' ? 'reactivo' : 'material') === v; },
+      alerta: function (row, v) { return v === 'caducado' ? rowExpired(row) : hasObservation(row); }
+    },
+    practicas: {
+      mat: function (row, v) { return norm(row.mat) === norm(v); }
+    }
+  };
+
   // Búsqueda sin tocar el estado de las tablas (sugerencias del inicio)
   function search(cat, query) {
     var terms = norm(String(query).trim()).split(/\s+/).filter(Boolean);
@@ -423,11 +480,10 @@
     return Store.getDB(cat).filter(function (row) { return textMatches(cat, row, expTerms); });
   }
 
-  // `filterValue` permite contar cada chip respetando la búsqueda activa.
-  function getFiltered(cat, filterValue) {
-    var conf = CONFIG[cat];
+  // `override` ({grupo: valor}) permite contar cada chip respetando la búsqueda y los demás grupos activos.
+  function getFiltered(cat, override) {
     var st = state[cat];
-    var active = filterValue === undefined ? st.filter : filterValue;
+    var active = Object.assign({}, st.filters, override || {});
     var q = norm(st.query.trim());
     var terms = q ? q.split(/\s+/) : [];
     var expTerms = expandSearchTerms(terms);
@@ -435,60 +491,56 @@
     return Store.getDB(cat)
       .map(function (row, index) { return { row: row, index: index }; })
       .filter(function (item) {
-        if (active) {
-          if (active === '__caducado') {
-            if (!isExpired(item.row.caducidad)) return false;
-          } else if (active === '__obs') {
-            if (!hasObservation(item.row)) return false;
-          } else if (cat === 'reactivos') {
-            if (colorSlug(item.row.almacen) !== colorSlug(active)) return false;
-          } else if (norm(item.row[conf.filterKey]) !== norm(active)) {
-            return false;
-          }
-        }
-        return textMatches(cat, item.row, expTerms);
+        var ok = CONFIG[cat].groups.every(function (g) {
+          return !active[g.key] || MATCHERS[cat][g.key](item.row, active[g.key]);
+        });
+        return ok && textMatches(cat, item.row, expTerms);
       });
+  }
+
+  function anyFilter(cat) {
+    var f = state[cat].filters;
+    return Object.keys(f).some(function (k) { return f[k]; });
   }
 
   /* ---------- Filtros (chips) ---------- */
   function renderFilters(cat) {
     var host = document.querySelector('[data-filters="' + cat + '"]');
     if (!host) return;
-    var conf = CONFIG[cat];
     var st = state[cat];
-    var all = Store.getDB(cat);
-    var opts = conf.filters();
 
-    // Si el filtro activo ya no existe (p. ej. se borró la materia), se limpia
-    if (st.filter && st.filter !== '__caducado' && !opts.some(function (o) { return o.value === st.filter; })) {
-      st.filter = '';
-    }
+    host.innerHTML = CONFIG[cat].groups.map(function (g) {
+      var opts = g.options();
+      // Si el filtro activo ya no existe (p. ej. se borró la materia), se limpia
+      if (st.filters[g.key] && !opts.some(function (o) { return o.value === st.filters[g.key]; })) {
+        st.filters[g.key] = '';
+      }
+      var current = st.filters[g.key];
+      function count(value) {
+        var o = {};
+        o[g.key] = value;
+        return getFiltered(cat, o).length;
+      }
 
-    function count(value) {
-      return getFiltered(cat, value).length;
-    }
-
-    var html = '';
-    html += chip('', 'Todos', count(''), !st.filter);
-    opts.forEach(function (o) {
-      var n = count(o.value);
-      if (!n && o.value !== st.filter) return;
-      html += chip(o.value, o.label, n, st.filter === o.value, o);
-    });
-    host.innerHTML = html;
+      var chips = '';
+      if (g.all) chips += chip(g.key, '', g.all, count(''), !current);
+      opts.forEach(function (o) {
+        var n = count(o.value);
+        if (!n && o.value !== current && !g.keepZero) return;
+        chips += chip(g.key, o.value, o.label, n, current === o.value, o);
+      });
+      return chips
+        ? '<div class="filters__group" role="group" aria-label="' + esc(g.label) + '">' + chips + '</div>'
+        : '';
+    }).join('');
   }
 
-  function chip(value, label, n, active, opt) {
+  function chip(group, value, label, n, active, opt) {
     var lead = '';
-    var dotOnly = !!(opt && opt.swatch);
-    if (opt && opt.swatch) lead = '<span class="swatch-dot swatch-dot--' + opt.swatch + '" aria-hidden="true"></span>';
-    else if (opt && opt.dot) lead = '<span class="badge__dot badge__dot--' + opt.dot + '" aria-hidden="true"></span>';
-    var text = dotOnly
-      ? '<span class="sr-only">' + esc(label) + '</span>'
-      : '<span>' + esc(label) + '</span>';
-    return '<button type="button" class="chip' + (dotOnly ? ' chip--dot' : '') + '" data-filter="' + esc(value) + '"' +
+    if (opt && opt.dot) lead = '<span class="badge__dot badge__dot--' + opt.dot + '" aria-hidden="true"></span>';
+    return '<button type="button" class="chip" data-group="' + esc(group) + '" data-filter="' + esc(value) + '"' +
       ' aria-pressed="' + active + '" title="' + esc(label) + ': ' + n + '">' +
-      lead + text + '<span class="chip__count mono">' + n + '</span></button>';
+      lead + '<span>' + esc(label) + '</span><span class="chip__count mono">' + n + '</span></button>';
   }
 
   /* ---------- Tabla ---------- */
@@ -517,7 +569,7 @@
 
     var body;
     if (!pageRows.length) {
-      var hasQuery = st.query.trim() || st.filter;
+      var hasQuery = st.query.trim() || anyFilter(cat);
       body = '<tr class="empty-row"><td colspan="' + (conf.columns.length + (isAdmin ? 1 : 0)) + '">' +
         '<div class="empty">' +
           '<span class="empty__icon" aria-hidden="true"><i class="ph ph-' + (hasQuery ? 'magnifying-glass' : conf.emptyIcon) + '"></i></span>' +
@@ -529,10 +581,10 @@
         '</div></td></tr>';
     } else {
       body = pageRows.map(function (item, i) {
-        var expired = cat === 'reactivos' && isExpired(item.row.caducidad);
+        var expired = cat === 'inventario' && rowExpired(item.row);
         var cells = conf.columns.map(function (c) { return renderCell(c, item.row); }).join('');
         if (isAdmin) {
-          var name = esc(item.row[conf.columns[cat === 'practicas' ? 0 : 1].key] || 'registro');
+          var name = esc(item.row[conf.nameKey || conf.columns[0].key] || 'registro');
           cells += '<td class="td-actions" data-label="Acciones"><div class="row-actions">' +
             '<button type="button" class="icon-btn icon-btn--sm" data-edit="' + cat + '" data-index="' + item.index + '" aria-label="Editar ' + name + '"><i class="ph ph-pencil-simple" aria-hidden="true"></i></button>' +
             '<button type="button" class="icon-btn icon-btn--sm icon-btn--danger" data-delete="' + cat + '" data-index="' + item.index + '" aria-label="Eliminar ' + name + '"><i class="ph ph-trash" aria-hidden="true"></i></button>' +
@@ -570,6 +622,35 @@
     Object.keys(CONFIG).forEach(build);
   }
 
+  // Cambia un filtro desde fuera (tarjetas del inicio, alertas, redirecciones, buscador)
+  function setFilter(cat, group, value) {
+    var st = state[cat];
+    if (!st || !(group in st.filters)) return;
+    st.filters[group] = value || '';
+    st.page = 1;
+    build(cat);
+  }
+
+  // Deja la tabla como nueva y aplica solo estos filtros (y sin búsqueda)
+  function show(cat, filters) {
+    var st = state[cat];
+    if (!st) return;
+    st.query = '';
+    var input = document.querySelector('[data-search="' + cat + '"]');
+    if (input) input.value = '';
+    Object.keys(st.filters).forEach(function (k) { st.filters[k] = (filters && filters[k]) || ''; });
+    st.page = 1;
+    build(cat);
+  }
+
+  function resetFilters(cat) {
+    var st = state[cat];
+    if (!st) return;
+    Object.keys(st.filters).forEach(function (k) { st.filters[k] = ''; });
+    st.page = 1;
+    build(cat);
+  }
+
   /* ---------- Eventos ---------- */
   var searchTimers = {};
   document.querySelectorAll('[data-search]').forEach(function (input) {
@@ -598,12 +679,13 @@
     if (f) {
       var host = f.closest('[data-filters]');
       var cat = host && host.getAttribute('data-filters');
-      if (!cat) return;
+      var group = f.getAttribute('data-group');
+      if (!cat || !state[cat] || !group) return;
       var val = f.getAttribute('data-filter');
-      state[cat].filter = state[cat].filter === val ? '' : val;
+      state[cat].filters[group] = state[cat].filters[group] === val ? '' : val;
       state[cat].page = 1;
       build(cat);
-      var again = document.querySelector('[data-filters="' + cat + '"] [data-filter="' + CSS.escape(state[cat].filter) + '"]');
+      var again = document.querySelector('[data-filters="' + cat + '"] [data-group="' + group + '"][data-filter="' + CSS.escape(state[cat].filters[group]) + '"]');
       if (again) again.focus();
       return;
     }
@@ -628,11 +710,9 @@
     if (c) {
       var cc = c.getAttribute('data-clear');
       state[cc].query = '';
-      state[cc].filter = '';
-      state[cc].page = 1;
       var input = document.querySelector('[data-search="' + cc + '"]');
       if (input) { input.value = ''; input.focus(); }
-      build(cc);
+      resetFilters(cc);
     }
   });
 
@@ -645,11 +725,17 @@
     build: build,
     buildAll: buildAll,
     isExpired: isExpired,
+    rowExpired: rowExpired,
+    hasObservation: hasObservation,
     colorSlug: colorSlug,
-    estadoTone: estadoTone,
     formatDate: formatDate,
     norm: norm,
     search: search,
+    stats: stats,
+    stockInfo: stockInfo,
+    setFilter: setFilter,
+    show: show,
+    resetFilters: resetFilters,
     materialType: materialType,
     inventoryType: inventoryType
   };

@@ -6,21 +6,27 @@
   'use strict';
 
   var esc = UI.escapeHTML;
-  var VIEWS = ['inicio', 'materiales', 'reactivos', 'inventario', 'practicas', 'seguridad'];
+  var VIEWS = ['inicio', 'inventario', 'practicas', 'seguridad'];
   var TITLES = {
     inicio: 'CECyTE Lab · Sistema integral de laboratorio',
-    materiales: 'Materiales · CECyTE Lab',
-    reactivos: 'Reactivos · CECyTE Lab',
     practicas: 'Prácticas · CECyTE Lab',
-    inventario: 'Inventario completo · CECyTE Lab',
+    inventario: 'Inventario · CECyTE Lab',
     seguridad: 'Seguridad · CECyTE Lab'
   };
+
+  // Enlaces de las versiones anteriores: abren el inventario con su tipo ya elegido
+  var LEGACY_VIEWS = { materiales: 'material', reactivos: 'reactivo' };
 
   /* ---------- Enrutador ---------- */
   var currentView = null;
 
   function route(initial) {
     var hash = (location.hash || '').replace('#', '');
+    if (LEGACY_VIEWS[hash]) {
+      Tables.show('inventario', { tipo: LEGACY_VIEWS[hash] });
+      history.replaceState(null, '', '#inventario');
+      hash = 'inventario';
+    }
     var view = VIEWS.indexOf(hash) > -1 ? hash : 'inicio';
     if (view === currentView) return;
     var prevView = currentView;
@@ -86,32 +92,29 @@
   }
 
   function renderHome() {
-    var mat = Store.getDB('materiales');
-    var reac = Store.getDB('reactivos');
+    var inv = Tables.stats();
     var prac = Store.getDB('practicas');
 
-    animateNumber(document.getElementById('tile-mat'), mat.length);
-    animateNumber(document.getElementById('tile-reac'), reac.length);
+    animateNumber(document.getElementById('tile-mat'), inv.materiales);
+    animateNumber(document.getElementById('tile-reac'), inv.reactivos);
     animateNumber(document.getElementById('tile-prac'), prac.length);
 
     // Alertas
-    var expired = reac.filter(function (r) { return Tables.isExpired(r.caducidad); });
-    var bad = mat.filter(function (m) { return Tables.estadoTone(m.estado) === 'bad'; });
     var alerts = [];
-    if (expired.length) {
+    if (inv.expired) {
       alerts.push(
-        '<a class="alert alert--bad" href="#reactivos" data-goto-filter="reactivos:__caducado">' +
+        '<a class="alert alert--bad" href="#inventario" data-goto-filter="inventario:alerta=caducado">' +
           '<i class="ph-fill ph-warning" aria-hidden="true"></i>' +
-          '<span><strong>' + plural(expired.length, 'reactivo con lote caducado', 'reactivos con lotes caducados') + '</strong>' +
+          '<span><strong>' + plural(inv.expired, 'artículo con lote caducado', 'artículos con lotes caducados') + '</strong>' +
           '</span>' +
           '<i class="ph ph-arrow-right alert__go" aria-hidden="true"></i>' +
         '</a>');
     }
-    if (bad.length) {
+    if (inv.observed) {
       alerts.push(
-        '<a class="alert alert--warn" href="#materiales" data-goto-filter="materiales:Malo">' +
+        '<a class="alert alert--warn" href="#inventario" data-goto-filter="inventario:alerta=obs">' +
           '<i class="ph-fill ph-wrench" aria-hidden="true"></i>' +
-          '<span><strong>' + plural(bad.length, 'material en mal estado', 'materiales en mal estado') + '</strong>' +
+          '<span><strong>' + plural(inv.observed, 'artículo con observaciones', 'artículos con observaciones') + '</strong>' +
           '</span>' +
           '<i class="ph ph-arrow-right alert__go" aria-hidden="true"></i>' +
         '</a>');
@@ -120,22 +123,20 @@
       alerts.push('<p class="alert alert--ok"><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span><strong>Todo en orden</strong></span></p>');
     }
     document.getElementById('homeAlerts').innerHTML = alerts.join('');
-    setNavBadge('navBadgeReac', expired.length, 'caducados');
-    setNavBadge('navBadgeMat', bad.length, 'en mal estado');
+    setNavBadge('navBadgeCad', inv.expired, 'caducados');
+    setNavBadge('navBadgeObs', inv.observed, 'con observaciones');
   }
 
-  // Alertas del inicio: navegar y aplicar filtro
+  // Tarjetas y alertas del inicio: al navegar, el inventario abre con ese filtro solo
+  // ("inventario:tipo=material" limpia búsqueda y demás filtros y deja únicamente ese).
   document.addEventListener('click', function (e) {
     var a = e.target.closest('[data-goto-filter]');
     if (!a) return;
-    var parts = a.getAttribute('data-goto-filter').split(':');
-    var btn = function () {
-      return document.querySelector('[data-filters="' + parts[0] + '"] [data-filter="' + parts[1] + '"]');
-    };
-    setTimeout(function () {
-      var b = btn();
-      if (b && b.getAttribute('aria-pressed') !== 'true') b.click();
-    }, 0);
+    var m = /^([^:]+):([^=]+)=(.*)$/.exec(a.getAttribute('data-goto-filter'));
+    if (!m) return;
+    var f = {};
+    f[m[2]] = m[3];
+    Tables.show(m[1], f);
   });
 
   /* ---------- Fecha de hoy ---------- */

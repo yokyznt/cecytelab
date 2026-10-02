@@ -1,148 +1,10 @@
 /* ==========================================================================
-   CECyTE Lab - Datos iniciales del inventario
+   CECyTE Lab - Datos iniciales (prácticas)
    Se usan solo si no hay datos guardados en localStorage (claves cecyte_db_*).
+   El inventario (materiales y reactivos) vive en js/inventario.js.
    ========================================================================== */
 
 window.CECYTE_INITIAL_DB = {
-  materiales: [
-    { id: "M001", material: "Adaptadores y Eliminadores", cantidad: "10 piezas", estado: "Bueno", ubicacion: "Gabinete Eléctrico", desc: "Fuentes de poder y adaptadores varios" },
-    { id: "M002", material: "Agujas de disección", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Disección y obsorción" },
-    { id: "M003", material: "Alambre cal. 30", cantidad: "5 mts", estado: "Bueno", ubicacion: "Gabinete General", desc: "Material metálico en rollo" },
-    { id: "M004", material: "Anillo con nuez", cantidad: "16 piezas", estado: "Bueno", ubicacion: "Herrajes", desc: "Para soporte universal" },
-    { id: "M005", material: "Balanzas (Granataria y Electrónica)", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Mesa de pesaje", desc: "Medición de precisión" },
-    { id: "M006", material: "Balines", cantidad: "18 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Prácticas de mecánica" },
-    { id: "M007", material: "Baño María Electrónico", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Calentamiento regulado" },
-    { id: "M008", material: "Bisturí (Mangos y hojas)", cantidad: "21 piezas", estado: "Bueno", ubicacion: "Estuche de disección", desc: "Corte biológico" },
-    { id: "M009", material: "Bomba de vacío CEESA", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Mecánica de fluidos" },
-    { id: "M010", material: "Brújula magnética", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Prácticas de magnetismo" },
-    { id: "M011", material: "Buretas (50ml y 100ml)", cantidad: "13 piezas", estado: "Malo", ubicacion: "Cristalería", desc: "Varias dañadas" },
-    { id: "M012", material: "Cajas Petri", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Cultivo bacteriológico" },
-    { id: "M013", material: "Calibrador Vernier / Micrómetro", cantidad: "11 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Medición exacta" },
-    { id: "M014", material: "Cápsulas de porcelana", cantidad: "15 piezas", estado: "Bueno", ubicacion: "Cristalería Térmica", desc: "Evaporación / Combustión" },
-    { id: "M015", material: "Carrito Hall cv015", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Prácticas de dinámica" },
-    { id: "M016", material: "Centrífugas (Combot y Mini)", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Separación de mezclas" },
-    { id: "M017", material: "Colador / Charolas", cantidad: "17 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Procesamiento y contención" },
-    { id: "M018", material: "Cronómetro", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Medición de tiempo" },
-    { id: "M019", material: "Cubre objetos 22x22", cantidad: "2 cajas", estado: "Bueno", ubicacion: "Microscopía", desc: "Preparaciones porta-objetos" },
-    { id: "M020", material: "Cuchara de ebullición", cantidad: "24 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Toma de reactivos y combustión" },
-    { id: "M021", material: "Electrodos (Pb, Cu, Al, Zn)", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Electroquímica", desc: "Placas 8x10cm" },
-    { id: "M022", material: "Embudo de separación", cantidad: "9 piezas", estado: "Regular", ubicacion: "Cristalería", desc: "2 piezas dañadas" },
-    { id: "M023", material: "Equipos didácticos (Calor y Óptica)", cantidad: "3 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Kits de demostración completos" },
-    { id: "M024", material: "Escobillones", cantidad: "11 piezas", estado: "Bueno", ubicacion: "Área de Limpieza", desc: "Lavado de material de vidrio" },
-    { id: "M025", material: "Espátulas", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Manejo de reactivos sólidos" },
-    { id: "M026", material: "Estufa clínica de cultivo", cantidad: "1 pieza", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Incubación bacteriana" },
-    { id: "M027", material: "Filtro de vidrio 30ml", cantidad: "3 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Filtración fina" },
-    { id: "M028", material: "Flexómetro y Reglas", cantidad: "5 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Medición de longitud" },
-    { id: "M029", material: "Focos 2.2", cantidad: "10 piezas", estado: "Bueno", ubicacion: "Electricidad", desc: "Armado de circuitos" },
-    { id: "M030", material: "Frascos (Goteros y Guardado)", cantidad: "117 piezas", estado: "Bueno", ubicacion: "Almacén General", desc: "Almacenaje secundario" },
-    { id: "M031", material: "Gafas / Lentes de seguridad y mascarillas", cantidad: "51 piezas", estado: "Bueno", ubicacion: "EPP", desc: "Equipo de protección personal" },
-    { id: "M032", material: "Gradillas", cantidad: "17 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Soporte de tubos de ensaye" },
-    { id: "M033", material: "Horadador mecánico", cantidad: "1 pieza", estado: "Bueno", ubicacion: "Herramientas", desc: "Corte / Perforación de tapones" },
-    { id: "M034", material: "Imanes (Herradura y Rectangulares)", cantidad: "17 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Campos magnéticos" },
-    { id: "M035", material: "Jeringas 50ml", cantidad: "9 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Inyección de fluidos / Volumen" },
-    { id: "M036", material: "Juego de caimanes", cantidad: "20 piezas", estado: "Bueno", ubicacion: "Electricidad", desc: "Cables con pinzas para circuitos" },
-    { id: "M037", material: "Lancetas", cantidad: "250 piezas", estado: "Bueno", ubicacion: "Biología", desc: "Muestras de sangre" },
-    { id: "M038", material: "Lámina de asbesto", cantidad: "18 piezas", estado: "Bueno", ubicacion: "Material Térmico", desc: "Distribución de calor en tripié" },
-    { id: "M039", material: "Lupas", cantidad: "8 piezas", estado: "Bueno", ubicacion: "Óptica", desc: "Aumento simple" },
-    { id: "M040", material: "Magnesio en cinta", cantidad: "1 paquete", estado: "Bueno", ubicacion: "Metales", desc: "Combustión luminosa" },
-    { id: "M041", material: "Mangueras (Látex y Transparente)", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Conexiones de gas y líquidos" },
-    { id: "M042", material: "Matraz aforado (Varios Vol.)", cantidad: "60 piezas", estado: "Bueno", ubicacion: "Cristalería Volumétrica", desc: "Preparación exacta de soluciones" },
-    { id: "M043", material: "Matraz de bola", cantidad: "26 piezas", estado: "Bueno", ubicacion: "Cristalería Térmica", desc: "Calentamiento y ebullición" },
-    { id: "M044", material: "Matraz de destilación", cantidad: "10 piezas", estado: "Bueno", ubicacion: "Cristalería Térmica", desc: "Separación de líquidos" },
-    { id: "M045", material: "Matraz Erlenmeyer (125-500ml)", cantidad: "77 piezas", estado: "Bueno", ubicacion: "Cristalería Térmica", desc: "Titulación y agitación" },
-    { id: "M046", material: "Matraz Kitazato", cantidad: "18 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Filtración al vacío" },
-    { id: "M047", material: "Mecheros (Bunsen y Alcohol)", cantidad: "51 piezas", estado: "Bueno", ubicacion: "Equipos de Calor", desc: "Incluye 1m de mecha de repuesto" },
-    { id: "M048", material: "Microscopios (Binocular, Óptico, Digital)", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Microscopía", desc: "Equipos de alta precisión" },
-    { id: "M049", material: "Modelos Químicos y Kit de Esferas", cantidad: "11 piezas", estado: "Bueno", ubicacion: "Didáctica", desc: "Química orgánica e inorgánica" },
-    { id: "M050", material: "Morteros con pistilo", cantidad: "74 piezas", estado: "Bueno", ubicacion: "Trituración", desc: "Diferentes tamaños" },
-    { id: "M051", material: "Multímetros y Osciloscopio", cantidad: "5 piezas", estado: "Bueno", ubicacion: "Electrónica", desc: "Medición eléctrica / Señales" },
-    { id: "M052", material: "Olla de presión", cantidad: "1 pieza", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Esterilización de material" },
-    { id: "M053", material: "Papel (Filtro, pH, Tornasol)", cantidad: "34 cajas", estado: "Bueno", ubicacion: "Consumibles", desc: "Medición de acidez y separación" },
-    { id: "M054", material: "Parrilla eléctrica redonda", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Calentamiento sin llama" },
-    { id: "M055", material: "Potenciómetro / Pechímetro de pluma", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Medición", desc: "Medición digital de pH" },
-    { id: "M056", material: "Pelotas de golf", cantidad: "12 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Prácticas de caída libre" },
-    { id: "M057", material: "Perillas de succión", cantidad: "15 piezas", estado: "Regular", ubicacion: "Cristalería Volumétrica", desc: "3 piezas dañadas" },
-    { id: "M058", material: "Pinzas varias (Crisol, Tubo, Universal, Bureta)", cantidad: "125 piezas", estado: "Regular", ubicacion: "Herrajes", desc: "Varias dañadas por desgaste" },
-    { id: "M059", material: "Pipetas (Volumétricas y Serológicas)", cantidad: "47 piezas", estado: "Bueno", ubicacion: "Cristalería Volumétrica", desc: "Transferencia exacta de líquidos" },
-    { id: "M060", material: "Pizetas", cantidad: "11 piezas", estado: "Bueno", ubicacion: "Área de Limpieza", desc: "Lavado con agua destilada" },
-    { id: "M061", material: "Poleas (Simple/Doble/Triple) y Plomada", cantidad: "17 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Mecánica y fuerzas" },
-    { id: "M062", material: "Porta objetos", cantidad: "4 cajas", estado: "Bueno", ubicacion: "Microscopía", desc: "Láminas de cristal para muestras" },
-    { id: "M063", material: "Pósters Didácticos Plastificados", cantidad: "5 piezas", estado: "Bueno", ubicacion: "Didáctica", desc: "Anatomía, ITS, Fotosíntesis" },
-    { id: "M064", material: "Probetas (100ml y 250ml)", cantidad: "20 piezas", estado: "Bueno", ubicacion: "Cristalería Volumétrica", desc: "Medición de volumen" },
-    { id: "M065", material: "Resistencias eléctricas", cantidad: "122 piezas", estado: "Bueno", ubicacion: "Electricidad", desc: "Armado de circuitos" },
-    { id: "M066", material: "Riel de física (1.50m)", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Cinemática y movimiento" },
-    { id: "M067", material: "Refrigerante", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Condensación en destilación" },
-    { id: "M068", material: "Sujetadores y Nueces universales", cantidad: "39 piezas", estado: "Bueno", ubicacion: "Herrajes", desc: "Armado de soportes" },
-    { id: "M069", material: "Tapones de hule (Números 2 al 6)", cantidad: "169 piezas", estado: "Malo", ubicacion: "Almacén General", desc: "Mayoría reportados como gastados" },
-    { id: "M070", material: "Termómetros 260°", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Medición Térmica", desc: "Control de temperatura" },
-    { id: "M071", material: "Tijeras curvas 14 cm", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Estuche de disección", desc: "Corte" },
-    { id: "M072", material: "Titrisol", cantidad: "1 pieza", estado: "Bueno", ubicacion: "Gabinete General", desc: "Solución estándar" },
-    { id: "M073", material: "Transportador", cantidad: "5 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Medición de ángulos" },
-    { id: "M074", material: "Tripié blanco", cantidad: "10 piezas", estado: "Bueno", ubicacion: "Herrajes", desc: "Soporte para calentamiento" },
-    { id: "M075", material: "Tubos de ensaye (Medianos, 9800, ELC)", cantidad: "316 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Reacciones a pequeña escala" },
-    { id: "M076", material: "Vasos de precipitado (100ml a 800ml)", cantidad: "130 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Contenedor general" },
-    { id: "M077", material: "Vasitos varios / Vaso de Pascal", cantidad: "31 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Presión y almacenamiento" },
-    { id: "M078", material: "Vidrio de reloj", cantidad: "15 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Pesaje y cristalización" },
-    { id: "M079", material: "Dominó de química orgánica", cantidad: "3 piezas", estado: "Bueno", ubicacion: "Didáctica", desc: "Juego de grupos funcionales" },
-    { id: "M080", material: "Goteros", cantidad: "3 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Dosificación por gotas" },
-    { id: "M081", material: "Motores eléctricos", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Electricidad", desc: "Prácticas de electromagnetismo" }
-  ],
-  reactivos: [
-    { id: "R001", reactivo: "Aceite de inmersión", cantidad: "275 ml (4 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R002", reactivo: "Acetato de bario, calcio, magnesio y sodio", cantidad: "400 g (5 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R003", reactivo: "Acetato-Orceína", cantidad: "125 ml (1 frasco)", caducidad: "CADUCADO (Mar 2015)", riesgo: "Tóxico / Irritante", almacen: "Azul" },
-    { id: "R004", reactivo: "Ácido acético", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Corrosivo", almacen: "Blanco (Piso)" },
-    { id: "R005", reactivo: "Ácidos orgánicos (ascórbico, benzoico, bórico, cítrico, salicílico)", cantidad: "1.6 kg (16 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
-    { id: "R006", reactivo: "Ácido clorhídrico 50%", cantidad: "2 L (7 frascos)", caducidad: "N/A", riesgo: "Corrosivo", almacen: "Blanco (Piso)" },
-    { id: "R007", reactivo: "Ácido fosfórico 85%", cantidad: "500 ml (1 frasco)", caducidad: "N/A", riesgo: "Corrosivo", almacen: "Blanco (Piso)" },
-    { id: "R008", reactivo: "Ácido nítrico 50%", cantidad: "2 L (2 frascos)", caducidad: "N/A", riesgo: "Corrosivo / Oxidante", almacen: "Blanco (Piso)" },
-    { id: "R009", reactivo: "Ácido sulfúrico 30% a 90%", cantidad: "2.6 L (4 frascos)", caducidad: "2 lotes CADUCADOS (Jul 2012, Ene 2014)", riesgo: "Corrosivo Severo", almacen: "Blanco (Piso)" },
-    { id: "R010", reactivo: "Acetona", cantidad: "1.5 L (5 frascos)", caducidad: "N/A", riesgo: "Inflamable", almacen: "Rojo" },
-    { id: "R011", reactivo: "Agua destilada", cantidad: "42.5 L (3 botes)", caducidad: "N/A", riesgo: "Inocuo", almacen: "Verde" },
-    { id: "R012", reactivo: "Alcohol etílico 70% y 96°", cantidad: "8 L (4 frascos)", caducidad: "1 lote CADUCADO (Feb 2016)", riesgo: "Inflamable", almacen: "Rojo" },
-    { id: "R013", reactivo: "Alginato de sodio", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R014", reactivo: "Aluminio granular", cantidad: "100 g (1 frasco)", caducidad: "N/A", riesgo: "Inflamable sólido", almacen: "Rojo" },
-    { id: "R015", reactivo: "Azufre (polvo y resublimado)", cantidad: "400 g (10 frascos)", caducidad: "N/A", riesgo: "Inflamable sólido", almacen: "Rojo" },
-    { id: "R016", reactivo: "Colorantes (Bromofenol, Metileno, Fucsina, Sudán, Cristalina)", cantidad: "4 L (7 frascos)", caducidad: "2 lotes CADUCADOS (Ago 2012, Ago 2015)", riesgo: "Tóxico / Irritante", almacen: "Azul" },
-    { id: "R017", reactivo: "Benceno", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Inflamable / Tóxico", almacen: "Rojo" },
-    { id: "R018", reactivo: "Reactivo Benedict", cantidad: "125 ml (1 frasco)", caducidad: "N/A", riesgo: "Tóxico", almacen: "Azul" },
-    { id: "R019", reactivo: "Bicarbonato de sodio y potasio", cantidad: "2.3 kg (7 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R020", reactivo: "Bisulfito de sodio", cantidad: "1.2 kg (4 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
-    { id: "R021", reactivo: "Bórax / Borato de sodio", cantidad: "1.1 kg (2 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R022", reactivo: "Soluciones Buffer / Tampón pH4 y Ref.", cantidad: "4 L (8 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R023", reactivo: "Calcio metálico viruta", cantidad: "75 g (2 frascos)", caducidad: "N/A", riesgo: "Reactivo con agua", almacen: "Amarillo" },
-    { id: "R024", reactivo: "Carbopol y Carbón vegetal", cantidad: "450 g (10 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R025", reactivo: "Carbonatos (Bario, Magnesio, Potasio)", cantidad: "450 g (3 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
-    { id: "R026", reactivo: "Carburo de calcio", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Reactivo con agua", almacen: "Amarillo" },
-    { id: "R027", reactivo: "Cloroformo", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Tóxico / Volátil", almacen: "Azul" },
-    { id: "R028", reactivo: "Cloruros (Cúprico, Al, NH4, Ba, Ca, Sr, Mg, K, Zn)", cantidad: "2.1 kg (26 frascos)", caducidad: "N/A", riesgo: "Irritante / Tóxico", almacen: "Azul" },
-    { id: "R029", reactivo: "Cloruro de sodio", cantidad: "1.8 kg (22 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R030", reactivo: "Cromato de potasio", cantidad: "500 g (1 frasco)", caducidad: "N/A", riesgo: "Oxidante / Tóxico", almacen: "Amarillo" },
-    { id: "R031", reactivo: "Dióxido de manganeso", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Oxidante", almacen: "Amarillo" },
-    { id: "R032", reactivo: "Fenolftaleína", cantidad: "250 ml + 250 g (2 frascos)", caducidad: "N/A", riesgo: "Inflamable (en solución)", almacen: "Rojo" },
-    { id: "R033", reactivo: "Fosfatos (Amonio, Potasio, Sodio)", cantidad: "300 g (3 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R034", reactivo: "Glicerina / Glicerol", cantidad: "1.25 L (2 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R035", reactivo: "Glucosa ANH", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R036", reactivo: "Hidróxidos (Al, Ba, Ca, K, Na, NH4)", cantidad: "4.6 kg + 2 L (31 frascos)", caducidad: "N/A", riesgo: "Corrosivo (Base fuerte)", almacen: "Blanco (Piso)" },
-    { id: "R037", reactivo: "Hierro limadura", cantidad: "200 g (15 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R038", reactivo: "Lecitina de soya", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R039", reactivo: "Lugol / Yodo resublimado", cantidad: "925 ml + 50 g (5 frascos)", caducidad: "1 lote CADUCADO (Mayo 2019)", riesgo: "Tóxico / Irritante", almacen: "Azul" },
-    { id: "R040", reactivo: "Metanol", cantidad: "6 frascos", caducidad: "N/A", riesgo: "Inflamable / Tóxico", almacen: "Rojo" },
-    { id: "R041", reactivo: "Nitratos (NH4, Ca, Mg, K, Na, Zn)", cantidad: "600 g (6 frascos)", caducidad: "N/A", riesgo: "Oxidante fuerte", almacen: "Amarillo" },
-    { id: "R042", reactivo: "Óxidos (Calcio, Cobre)", cantidad: "200 g (5 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
-    { id: "R043", reactivo: "Permanganato de potasio", cantidad: "100 g (1 frasco)", caducidad: "N/A", riesgo: "Oxidante", almacen: "Amarillo" },
-    { id: "R044", reactivo: "Silicato de sodio", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
-    { id: "R045", reactivo: "Sulfatos (Al, Cu, Mg, Na, Zn, Fe)", cantidad: "1.1 kg (7 frascos)", caducidad: "N/A", riesgo: "Irritante / Tóxico acuático", almacen: "Verde" },
-    { id: "R046", reactivo: "Tetraborato de sodio", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R047", reactivo: "Tiocianato de amonio", cantidad: "100 g (1 frasco)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
-    { id: "R048", reactivo: "Trietanolamina", cantidad: "10 ml (1 frasco)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
-    { id: "R049", reactivo: "Vaselina sólida", cantidad: "500 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
-    { id: "R050", reactivo: "Yoduro de potasio 20%", cantidad: "750 ml (2 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
-    { id: "R051", reactivo: "Zinc granalla", cantidad: "750 g (11 frascos)", caducidad: "N/A", riesgo: "Reactivo sólido", almacen: "Amarillo" },
-    { id: "R052", reactivo: "Anhídrido acético", cantidad: "500 ml (1 frasco)", caducidad: "N/A", riesgo: "Corrosivo / Inflamable", almacen: "Blanco (Piso)" },
-    { id: "R053", reactivo: "Rojo de metilo 1% (indicador)", cantidad: "125 ml (1 frasco)", caducidad: "N/A", riesgo: "Inflamable (en solución)", almacen: "Rojo" },
-    { id: "R054", reactivo: "Solución 0.1 (etiqueta incompleta)", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Por identificar", almacen: "Por identificar" }
-  ],
   practicas: [
     { prac: "Ensaye a la flama", mat: "Química II", fecha: "2026-09-10", rec: "Cloruro de estroncio, Sales", obs: "Identificación de iones metálicos" },
     { prac: "Combustión del Magnesio", mat: "Química II", fecha: "2026-09-15", rec: "Magnesio cinta, Mechero, Cápsula", obs: "Reacción con Oxígeno" },
@@ -156,22 +18,11 @@ window.CECYTE_INITIAL_DB = {
 /* --------------------------------------------------------------------------
    Actualizaciones del inventario para datos YA guardados en el navegador.
    Cada revisión se aplica una sola vez (clave cecyte_data_rev):
-   - add:   agrega el registro si no existe otro con el mismo nombre.
+   - add:   agrega el artículo (por id de js/inventario.js) si no existe otro
+            con el mismo nombre.
    - patch: cambia un campo solo si aún tiene el valor anterior
             (no pisa ediciones hechas por el administrador).
+   Ejemplo: { rev: 1, note: "...", add: { inventario: ["I254"] },
+              patch: [{ table: "inventario", id: "I010", field: "obs", from: "a", to: "b" }] }
    -------------------------------------------------------------------------- */
-window.CECYTE_DATA_UPDATES = [
-  {
-    rev: 1,
-    note: "Inventario físico (PDF, 325 artículos): faltantes y lotes caducados",
-    add: {
-      materiales: ["M079", "M080", "M081"],
-      reactivos: ["R052", "R053", "R054"]
-    },
-    patch: [
-      { table: "reactivos", id: "R009", field: "caducidad", from: "1 lote CADUCADO (Ene 2014)", to: "2 lotes CADUCADOS (Jul 2012, Ene 2014)" },
-      { table: "reactivos", id: "R012", field: "caducidad", from: "N/A", to: "1 lote CADUCADO (Feb 2016)" },
-      { table: "reactivos", id: "R016", field: "caducidad", from: "1 lote CADUCADO (Ago 2015)", to: "2 lotes CADUCADOS (Ago 2012, Ago 2015)" }
-    ]
-  }
-];
+window.CECYTE_DATA_UPDATES = [];

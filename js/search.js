@@ -1,7 +1,7 @@
 /* =========================================================
    CECyTE Lab · Buscador del inicio con sugerencias en vivo
-   Mientras escribes muestra las coincidencias de reactivos,
-   materiales y prácticas; al elegir una, abre su tabla ya
+   Mientras escribes muestra las coincidencias del inventario
+   (reactivos y materiales) y de las prácticas; al elegir una, abre su tabla ya
    filtrada. Patrón combobox/listbox (teclado y lector de
    pantalla).
    ========================================================= */
@@ -16,11 +16,9 @@
 
   var esc = UI.escapeHTML;
   var CATS = [
-    { id: 'reactivos', label: 'Reactivos' },
-    { id: 'materiales', label: 'Materiales' },
-    { id: 'practicas', label: 'Prácticas' }
+    { id: 'inventario', label: 'Inventario', perGroup: 6 },
+    { id: 'practicas', label: 'Prácticas', perGroup: 3 }
   ];
-  var PER_GROUP = 3;
   var ACCENTS = { a: 'áàäâ', e: 'éèëê', i: 'íìïî', o: 'óòöô', u: 'úùüû', n: 'ñ' };
   var options = [];
   var active = -1;
@@ -55,21 +53,18 @@
 
   /* ---------- Cómo se ve cada coincidencia ---------- */
   function describe(cat, r) {
-    if (cat === 'reactivos') {
+    if (cat === 'inventario') {
+      var type = Tables.inventoryType(r);
+      var total = Tables.stockInfo(r).parts.map(function (p) {
+        return Math.round(p.n * 100) / 100 + ' ' + p.label;
+      }).join(' · ');
       return {
-        title: r.reactivo,
-        ico: '<span class="sg__ico"><span class="swatch-dot swatch-dot--' + Tables.colorSlug(r.almacen) + '"></span></span>',
-        meta: [r.almacen, r.cantidad].filter(Boolean).join(' · '),
-        tag: Tables.isExpired(r.caducidad) ? 'Caducado' : ''
-      };
-    }
-    if (cat === 'materiales') {
-      var mt = Tables.materialType(r.material);
-      return {
-        title: r.material,
-        ico: '<span class="sg__ico cell-icon--' + mt.id + '"><i class="ph ph-' + mt.icon + '"></i></span>',
-        meta: mt.label + (r.estado ? ' · ' + r.estado : ''),
-        tag: ''
+        title: r.articulo,
+        ico: r.tipo === 'reactivo'
+          ? '<span class="sg__ico"><span class="swatch-dot swatch-dot--' + Tables.colorSlug(r.almacen) + '"></span></span>'
+          : '<span class="sg__ico cell-icon--' + type.id + '"><i class="ph ph-' + type.icon + '"></i></span>',
+        meta: [r.tipo === 'reactivo' ? 'Reactivo' : type.label, total].filter(Boolean).join(' · '),
+        tag: Tables.rowExpired(r) ? 'Caducado' : ''
       };
     }
     return {
@@ -124,7 +119,7 @@
         .map(function (x) { return x.r; });
       total += rows.length;
       if (!rows.length) return '';
-      var shown = rows.slice(0, PER_GROUP);
+      var shown = rows.slice(0, c.perGroup);
 
       var opts = shown.map(function (r) {
         var d = describe(c.id, r);
@@ -159,6 +154,7 @@
   /* ---------- Ir a la tabla con la búsqueda aplicada ---------- */
   function goTo(cat, query) {
     close();
+    Tables.show(cat); // sin búsqueda ni chips de antes
     location.hash = '#' + cat;
     setTimeout(function () {
       var target = document.querySelector('[data-search="' + cat + '"]');
