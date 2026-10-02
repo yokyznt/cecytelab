@@ -1,0 +1,415 @@
+/* =========================================================
+   CECyTE Lab · Layout
+   Barra superior, navegación, barra admin, vistas y pie.
+   ========================================================= */
+
+/* ---------- Barra superior ---------- */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding-top: env(safe-area-inset-top);
+  border-bottom: 1px solid transparent;
+  transition: border-color var(--dur-3) var(--ease-out), box-shadow var(--dur-3) var(--ease-out);
+}
+
+/* El desenfoque vive en un pseudo-elemento: si estuviera en .topbar,
+   crearía un bloque contenedor y la nav fija de móvil quedaría atrapada arriba. */
+.topbar::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--glass);
+  -webkit-backdrop-filter: saturate(1.6) blur(16px);
+  backdrop-filter: saturate(1.6) blur(16px);
+}
+
+.topbar.is-scrolled {
+  border-bottom-color: var(--line);
+  box-shadow: 0 8px 24px -20px rgba(0, 0, 0, 0.35);
+}
+
+.topbar__inner {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  height: var(--topbar-h);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-shrink: 0;
+  border-radius: var(--r-sm);
+}
+
+.brand__mark {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--accent) 80%, white), var(--accent));
+  color: var(--on-accent);
+  font-size: 1.15rem;
+  box-shadow: var(--inner-hi), 0 1px 2px rgba(0, 0, 0, 0.15), 0 6px 16px -6px var(--accent-ring);
+}
+
+.brand__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.brand__text strong {
+  font-size: 0.98rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.brand__text small {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+
+/* ---------- Navegación ---------- */
+.nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.nav__list {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+  border-radius: var(--r-full);
+  background: var(--surface-3);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+
+.nav__link {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 34px;
+  padding-inline: 0.9rem;
+  border-radius: var(--r-full);
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  white-space: nowrap;
+  transition: color var(--dur-2) var(--ease-out);
+}
+
+.nav__link i {
+  font-size: 1.05rem;
+}
+
+.nav__link[aria-current="page"] {
+  color: var(--text);
+}
+
+.nav__link[aria-current="page"] i {
+  color: var(--accent);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nav__link:hover {
+    color: var(--text);
+  }
+}
+
+.slider-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 0;
+  border-radius: var(--r-full);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--line);
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    transform var(--dur-4) var(--ease-out),
+    width var(--dur-4) var(--ease-out),
+    opacity var(--dur-2) var(--ease-out);
+}
+
+html:not(.is-ready) .slider-indicator {
+  transition: none;
+}
+
+.topbar__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  flex-shrink: 0;
+}
+
+/* ---------- Barra de administrador ---------- */
+.admin-bar {
+  position: sticky;
+  top: calc(var(--topbar-h) + env(safe-area-inset-top));
+  z-index: 35;
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+  border-bottom: 1px solid var(--accent-soft-2);
+  animation: fade-in var(--dur-3) var(--ease-out);
+}
+
+.admin-bar__inner {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: 0.5rem var(--gutter);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.admin-bar__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: var(--fs-sm);
+  font-weight: 500;
+  color: var(--accent-text);
+}
+
+.admin-bar__actions {
+  display: flex;
+  gap: var(--sp-2);
+  flex-wrap: wrap;
+}
+
+.admin-only {
+  display: none !important;
+}
+
+body.is-admin .admin-only {
+  display: inline-flex !important;
+}
+
+/* ---------- Contenido principal ---------- */
+main {
+  flex: 1;
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: clamp(1.5rem, 1rem + 2.5vw, 3rem) var(--gutter) var(--sp-16);
+}
+
+main:focus {
+  outline: none;
+}
+
+.view.is-entering {
+  animation: fade-up 420ms var(--ease-out);
+}
+
+/* Encabezado de vista */
+.view-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-5) var(--sp-8);
+  flex-wrap: wrap;
+  margin-bottom: var(--sp-5);
+}
+
+.view-title {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  font-size: var(--fs-2xl);
+  letter-spacing: -0.03em;
+}
+
+.view-title__icon {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 1.3rem;
+  box-shadow: inset 0 0 0 1px var(--accent-soft-2);
+}
+
+.view-sub {
+  margin-top: var(--sp-2);
+  color: var(--text-3);
+  max-width: 60ch;
+}
+
+.view-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+/* ---------- Pie ---------- */
+.footer {
+  border-top: 1px solid var(--line);
+  background: var(--bg-elev);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.footer__inner {
+  max-width: var(--container);
+  margin-inline: auto;
+  padding: var(--sp-8) var(--gutter);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: var(--sp-6);
+  flex-wrap: wrap;
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+
+.footer__inner p + p {
+  margin-top: 2px;
+}
+
+.footer__title {
+  color: var(--text);
+  font-weight: 600;
+  margin-bottom: var(--sp-1);
+}
+
+.footer__credit {
+  color: var(--text-4);
+}
+
+/* =========================================================
+   Responsivo
+   ========================================================= */
+@media (max-width: 1020px) {
+  .nav__link span {
+    display: none;
+  }
+
+  .nav__link {
+    padding-inline: 0.75rem;
+  }
+}
+
+/* Barra de pestañas inferior en móvil */
+@media (max-width: 720px) {
+  :root {
+    --topbar-h: 56px;
+  }
+
+  .topbar__inner {
+    justify-content: space-between;
+  }
+
+  .brand__text small {
+    display: none;
+  }
+
+  .nav {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 45;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom));
+    background: var(--glass);
+    -webkit-backdrop-filter: saturate(1.6) blur(16px);
+    backdrop-filter: saturate(1.6) blur(16px);
+    border-top: 1px solid var(--line);
+  }
+
+  .nav__list {
+    width: 100%;
+    max-width: 480px;
+    justify-content: space-between;
+    background: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  .nav__list li:not(.slider-indicator) {
+    flex: 1;
+  }
+
+  .nav__link {
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    width: 100%;
+    height: 52px;
+    padding: 0;
+    border-radius: var(--r-md);
+    font-size: 0.6875rem;
+  }
+
+  .nav__link span {
+    display: block;
+  }
+
+  .nav__link i {
+    font-size: 1.35rem;
+  }
+
+  .nav .slider-indicator {
+    border-radius: var(--r-md);
+    background: var(--accent-soft);
+    box-shadow: none;
+  }
+
+  .nav__link[aria-current="page"] {
+    color: var(--accent-text);
+  }
+
+  .auth-btn span {
+    display: none;
+  }
+
+  .auth-btn {
+    width: 40px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  body {
+    padding-bottom: calc(64px + env(safe-area-inset-bottom));
+  }
+
+  .footer {
+    padding-bottom: 0;
+  }
+
+  .admin-bar__status {
+    font-size: var(--fs-xs);
+  }
+
+  .view-title {
+    font-size: var(--fs-xl);
+  }
+
+  .view-title__icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.15rem;
+  }
+
+  .view-actions {
+    width: 100%;
+  }
+}
