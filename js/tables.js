@@ -13,8 +13,8 @@
       emptyIcon: 'package',
       columns: [
         { key: 'id', label: 'ID', type: 'id' },
-        { key: 'material', label: 'Material', type: 'strong' },
         { key: 'material', label: 'Tipo', type: 'icon' },
+        { key: 'material', label: 'Material', type: 'strong' },
         { key: 'cantidad', label: 'Cantidad', type: 'qty' },
         { key: 'estado', label: 'Estado', type: 'estado' },
         { key: 'ubicacion', label: 'Ubicación' }
@@ -214,40 +214,43 @@
     return String(value || '').toUpperCase().indexOf('CADUCADO') > -1;
   }
 
-  /* ---------- Helpers nuevos ---------- */
-  var ICON_MAP_MAT = {
-    'matraz': 'flask', 'vaso': 'beaker', 'probeta': 'cylinder', 'pipeta': 'pipette',
-    'bureta': 'pipette', 'embudo': 'funnel', 'gradilla': 'test-tube', 'tubo': 'test-tube',
-    'caja petri': 'petri-dish', 'cubre': 'square', 'cuchara': 'spoon', 'espátula': 'spoon',
-    'balanza': 'scales', 'báscula': 'scales', 'pesaje': 'scales', 'termómetro': 'thermometer',
-    'cronómetro': 'timer', 'mechero': 'fire', 'bunsen': 'fire', 'alcohol': 'fire',
-    'estufa': 'fire', 'baño': 'bowl-food', 'horno': 'fire', 'centrífuga': 'cube',
-    'microscopio': 'microscope', 'lupa': 'magnifying-glass', 'óptica': 'eye',
-    'imán': 'magnet', 'magnet': 'magnet', 'brújula': 'compass',
-    'multímetro': 'lightning', 'osciloscopio': 'waveform', 'fuente': 'plug', 'eliminador': 'plug',
-    'motor': 'engine', 'resistencia': 'cpu', 'foco': 'lightbulb', 'caiman': 'hand-grabbing',
-    'jeringa': 'syringe', 'lanceta': 'droplet', 'aguja': 'droplet', 'pinza': 'wrench',
-    'soporte': 'rows', 'anillo': 'circle', 'nuez': 'hexagon', 'tornillo': 'wrench',
-    'regla': 'ruler', 'flexómetro': 'ruler', 'transportador': 'ruler', 'tripié': 'triangle',
-    'carrito': 'truck', 'riel': 'minus', 'polea': 'circle-half', 'plomada': 'plumb-bob',
-    'mascarilla': 'mask-happy', 'gafa': 'eyeglasses', 'lente': 'eyeglasses',
-    'guante': 'hand', 'bata': 'user', 'botas': 'footprint',
-    'papel': 'file-text', 'filtro': 'filter', 'ph': 'gauge', 'tornasol': 'gauge',
-    'colador': 'funnel', 'charola': 'tray', 'capsula': 'bowl', 'mortero': 'bowl-food',
-    'pistilo': 'pestle', 'escobillón': 'broom', 'pizeta': 'spray-bottle',
-    'frasco': 'bottle', 'gotero': 'eyedropper', 'guardado': 'package',
-    'pelota': 'circle', 'golf': 'circle', 'perilla': 'circle-half',
-    'poster': 'image', 'tijeras': 'scissors', 'bisturí': 'scalpel',
-    'lamina': 'square', 'asbesto': 'shield', 'pascal': 'cube',
-    'vernier': 'ruler', 'calibrador': 'ruler', 'micrómetro': 'ruler',
-    'horadador': 'drill', 'titrisol': 'flask', 'vaselina': 'bottle',
-    'dominó': 'dice-five', 'dominó': 'dice-six'
-  };
+  /* ---------- Tipos de material ----------
+     Cada material pertenece a un tipo. El orden importa: gana la primera
+     categoría cuyo texto aparezca en el nombre (ya sin acentos ni mayúsculas). */
+  var MAT_TYPES = [
+    { id: 'seguridad', label: 'Seguridad y protección', icon: 'shield-check',
+      keys: ['gafa', 'mascarilla', 'asbesto', 'guante'] },
+    { id: 'didactico', label: 'Didáctico y consumibles', icon: 'graduation-cap',
+      keys: ['didactic', 'poster', 'modelo', 'domino', 'papel', 'manguera', 'tapon', 'alambre', 'magnesio', 'titrisol'] },
+    { id: 'optica', label: 'Microscopía y óptica', icon: 'microscope',
+      keys: ['microscop', 'lupa', 'objetos', 'optic'] },
+    { id: 'electricidad', label: 'Electricidad y magnetismo', icon: 'lightning',
+      keys: ['multimetro', 'osciloscopio', 'adaptador', 'eliminador', 'electrodo', 'resistencia', 'foco', 'motor', 'caiman', 'iman', 'brujula'] },
+    { id: 'calor', label: 'Calentamiento', icon: 'fire',
+      keys: ['mechero', 'estufa', 'parrilla', 'bano maria', 'olla'] },
+    { id: 'medicion', label: 'Medición', icon: 'ruler',
+      keys: ['balanza', 'termometro', 'cronometro', 'flexometro', 'regla', 'transportador', 'calibrador', 'potenciometro', 'pechimetro'] },
+    { id: 'fisica', label: 'Mecánica y física', icon: 'atom',
+      keys: ['carrito', 'riel', 'polea', 'plomada', 'balines', 'pelota'] },
+    { id: 'herramientas', label: 'Soportes y herramientas', icon: 'wrench',
+      keys: ['pinza', 'sujetador', 'soporte', 'nuez', 'tripie', 'gradilla', 'horadador', 'espatula', 'cuchara', 'tijera', 'bisturi',
+             'aguja', 'lanceta', 'jeringa', 'colador', 'charola', 'escobillon', 'mortero', 'bomba', 'centrifuga'] },
+    { id: 'vidrio', label: 'Vidrio y volumetría', icon: 'flask',
+      keys: ['matraz', 'vaso', 'probeta', 'pipeta', 'bureta', 'embudo', 'tubo', 'petri', 'reloj', 'capsula', 'refrigerante',
+             'frasco', 'gotero', 'pizeta', 'perilla', 'filtro de vidrio'] }
+  ];
 
-  function materialIcon(name) {
+  var MAT_OTHER = { id: 'otros', label: 'Otros', icon: 'package' };
+
+  function materialType(name) {
     var n = norm(name);
-    for (var k in ICON_MAP_MAT) if (n.indexOf(k) > -1) return 'ph ph-' + ICON_MAP_MAT[k];
-    return 'ph ph-package';
+    for (var i = 0; i < MAT_TYPES.length; i++) {
+      var keys = MAT_TYPES[i].keys;
+      for (var j = 0; j < keys.length; j++) {
+        if (n.indexOf(keys[j]) > -1) return MAT_TYPES[i];
+      }
+    }
+    return MAT_OTHER;
   }
 
   var RISK_ICONS = {
@@ -309,8 +312,10 @@
         content = '<span class="cell-riesgo"><i class="' + icon + '" aria-hidden="true"></i><span>' + esc(val) + '</span></span>';
         break;
       case 'icon':
-        var iconClass = materialIcon(val);
-        content = '<span class="cell-icon" aria-hidden="true"><i class="' + iconClass + '"></i></span>';
+        var mt = materialType(val);
+        content = '<span class="cell-icon cell-icon--' + mt.id + '" tabindex="0" role="img"' +
+          ' aria-label="Tipo: ' + esc(mt.label) + '" data-tip="' + esc(mt.label) + '">' +
+          '<i class="ph ph-' + mt.icon + '" aria-hidden="true"></i></span>';
         break;
       case 'estado':
         content = '<span class="badge badge--' + estadoTone(val) + '"><span class="badge__dot" aria-hidden="true"></span>' + esc(val) + '</span>';
@@ -363,7 +368,8 @@
           }
         }
         if (!expTerms.length) return true;
-        var hay = norm(Object.keys(item.row).map(function (k) { return item.row[k]; }).join(' '));
+        var hay = norm(Object.keys(item.row).map(function (k) { return item.row[k]; }).join(' ') +
+          (cat === 'materiales' ? ' ' + materialType(item.row.material).label : ''));
         return expTerms.every(function (group) {
           return group.some(function (t) {
             // Símbolos de 1–2 letras (Na, K, Cl…) solo cuentan como palabra completa

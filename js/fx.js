@@ -260,6 +260,52 @@
     update();
   }
 
+  /* ---------- Tooltips ([data-tip]) ----------
+     Un solo globo flotante: no lo recorta el scroll de las tablas y
+     aparece con mouse, teclado (foco) o al tocar. */
+  function initTips() {
+    var tip = document.createElement('div');
+    tip.className = 'tip';
+    tip.setAttribute('role', 'tooltip');
+    tip.id = 'tipBubble';
+    document.body.appendChild(tip);
+    var current = null;
+
+    function show(el) {
+      var text = el.getAttribute('data-tip');
+      if (!text) return;
+      current = el;
+      tip.textContent = text;
+      tip.classList.remove('is-below');
+      var r = el.getBoundingClientRect();
+      var w = tip.offsetWidth;
+      var h = tip.offsetHeight;
+      var left = Math.max(8, Math.min(window.innerWidth - w - 8, r.left + r.width / 2 - w / 2));
+      var top = r.top - h - 10;
+      if (top < 8) { top = r.bottom + 10; tip.classList.add('is-below'); }
+      tip.style.left = left + 'px';
+      tip.style.top = top + 'px';
+      tip.style.setProperty('--arrow-x', (r.left + r.width / 2 - left) + 'px');
+      el.setAttribute('aria-describedby', 'tipBubble');
+      tip.classList.add('is-on');
+    }
+
+    function hide() {
+      if (current) current.removeAttribute('aria-describedby');
+      current = null;
+      tip.classList.remove('is-on');
+    }
+
+    function target(e) { return e.target.closest && e.target.closest('[data-tip]'); }
+
+    document.addEventListener('mouseover', function (e) { var el = target(e); if (el) show(el); });
+    document.addEventListener('mouseout', function (e) { if (target(e)) hide(); });
+    document.addEventListener('focusin', function (e) { var el = target(e); if (el) show(el); });
+    document.addEventListener('focusout', function (e) { if (target(e)) hide(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hide(); });
+    window.addEventListener('scroll', hide, { passive: true });
+  }
+
   /* ---------- Inicialización ---------- */
   function init() {
     // Los átomos orbitales usan animación SMIL: respetar "menos movimiento".
@@ -269,6 +315,7 @@
       });
     }
 
+    initTips();
     initGlobalSearch();
     initTextSize();
     initToTop();

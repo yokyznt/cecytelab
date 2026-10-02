@@ -58,16 +58,6 @@
 
   window.addEventListener('hashchange', function () { route(false); });
 
-  /* ---------- Panel de inicio ---------- */
-  var DIST_ORDER = [
-    { slug: 'verde', label: 'Verde' },
-    { slug: 'azul', label: 'Azul' },
-    { slug: 'amarillo', label: 'Amarillo' },
-    { slug: 'rojo', label: 'Rojo' },
-    { slug: 'blanco', label: 'Blanco' },
-    { slug: 'rayas', label: 'Rayas' }
-  ];
-
   function animateNumber(el, to) {
     if (!el) return;
     var from = parseInt(el.textContent, 10) || 0;
@@ -92,37 +82,9 @@
     var reac = Store.getDB('reactivos');
     var prac = Store.getDB('practicas');
 
-    animateNumber(document.getElementById('stat-mat'), mat.length);
-    animateNumber(document.getElementById('stat-reac'), reac.length);
-    animateNumber(document.getElementById('stat-prac'), prac.length);
-
     animateNumber(document.getElementById('tile-mat'), mat.length);
     animateNumber(document.getElementById('tile-reac'), reac.length);
     animateNumber(document.getElementById('tile-prac'), prac.length);
-
-    // Distribución por color de almacenaje
-    var counts = {};
-    reac.forEach(function (r) {
-      var s = Tables.colorSlug(r.almacen);
-      counts[s] = (counts[s] || 0) + 1;
-    });
-    var total = reac.length || 1;
-    var bar = document.getElementById('distBar');
-    var legend = document.getElementById('distLegend');
-    var parts = DIST_ORDER.filter(function (d) { return counts[d.slug]; });
-
-    bar.innerHTML = parts.map(function (d) {
-      return '<span class="dist__seg swatch-bg--' + d.slug + '" style="flex-grow:' + counts[d.slug] + '" title="' + d.label + ': ' + counts[d.slug] + '"></span>';
-    }).join('');
-    bar.setAttribute('aria-label', 'Distribución de reactivos: ' + parts.map(function (d) {
-      return d.label + ' ' + counts[d.slug];
-    }).join(', '));
-
-    legend.innerHTML = parts.map(function (d) {
-      var pct = Math.round((counts[d.slug] / total) * 100);
-      return '<li><span class="swatch-dot swatch-dot--' + d.slug + '" aria-hidden="true"></span>' + d.label +
-        ' <span class="mono dist-legend__n">' + counts[d.slug] + '</span><span class="sr-only"> (' + pct + '%)</span></li>';
-    }).join('');
 
     // Alertas
     var expired = reac.filter(function (r) { return Tables.isExpired(r.caducidad); });
@@ -150,55 +112,6 @@
       alerts.push('<p class="alert alert--ok"><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span><strong>Todo en orden</strong></span></p>');
     }
     document.getElementById('homeAlerts').innerHTML = alerts.join('');
-
-    renderAgenda(prac);
-  }
-
-  function renderAgenda(prac) {
-    var list = document.getElementById('agendaList');
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    var dated = prac
-      .map(function (p) {
-        var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(p.fecha || ''));
-        return m ? { p: p, d: new Date(+m[1], +m[2] - 1, +m[3]) } : null;
-      })
-      .filter(Boolean)
-      .sort(function (a, b) { return a.d - b.d; });
-
-    var upcoming = dated.filter(function (x) { return x.d >= today; });
-    var showingPast = false;
-    if (!upcoming.length) {
-      upcoming = dated.slice(-4).reverse();
-      showingPast = true;
-    }
-    upcoming = upcoming.slice(0, 4);
-
-    if (!upcoming.length) {
-      list.innerHTML = '<li class="agenda__empty"><i class="ph ph-calendar-blank" aria-hidden="true"></i> No hay prácticas con fecha registrada.</li>';
-      return;
-    }
-
-    var dayFmt = new Intl.DateTimeFormat('es-MX', { day: '2-digit' });
-    var monFmt = new Intl.DateTimeFormat('es-MX', { month: 'short' });
-    var wkFmt = new Intl.DateTimeFormat('es-MX', { weekday: 'long' });
-
-    list.innerHTML = upcoming.map(function (x) {
-      var diff = Math.round((x.d - today) / 86400000);
-      var rel = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana' : diff > 1 ? 'En ' + diff + ' días' : 'Hace ' + Math.abs(diff) + ' días';
-      return '<li class="agenda__item' + (diff === 0 ? ' is-today' : '') + (diff < 0 ? ' is-past' : '') + '">' +
-        '<time class="agenda__date" datetime="' + esc(x.p.fecha) + '">' +
-          '<span class="agenda__day mono">' + dayFmt.format(x.d) + '</span>' +
-          '<span class="agenda__mon">' + monFmt.format(x.d).replace('.', '') + '</span>' +
-        '</time>' +
-        '<div class="agenda__body">' +
-          '<p class="agenda__title">' + esc(x.p.prac) + '</p>' +
-          '<p class="agenda__meta"><span class="badge badge--subject">' + esc(x.p.mat) + '</span></p>' +
-        '</div>' +
-        '<span class="agenda__rel"><span class="mono">' + rel + '</span></span>' +
-      '</li>';
-    }).join('') + '';
   }
 
   // Alertas del inicio: navegar y aplicar filtro

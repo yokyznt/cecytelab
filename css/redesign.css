@@ -994,3 +994,77 @@ main { overflow-x: clip; }
   font-size: var(--fs-sm);
   color: var(--text-2);
 }
+
+/* ---------- Tipos de material: icono por categoría + tooltip ---------- */
+.cell-icon {
+  --t: var(--accent);
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--t) 16%, var(--surface));
+  color: color-mix(in srgb, var(--t) 72%, #000);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--t) 28%, transparent);
+  font-size: 1.3rem;
+  cursor: help;
+  transition: transform var(--dur-2) var(--ease-out), box-shadow var(--dur-2) var(--ease-out);
+}
+
+[data-theme="dark"] .cell-icon { color: color-mix(in srgb, var(--t) 45%, #fff); }
+
+.cell-icon--vidrio       { --t: #65a30d; }
+.cell-icon--medicion     { --t: #3f7a0b; }
+.cell-icon--calor        { --t: #ea580c; }
+.cell-icon--optica       { --t: #ca8a04; }
+.cell-icon--electricidad { --t: #d4a017; }
+.cell-icon--fisica       { --t: #4d7c0f; }
+.cell-icon--herramientas { --t: #6b7280; }
+.cell-icon--seguridad    { --t: #15803d; }
+.cell-icon--didactico    { --t: #84cc16; }
+.cell-icon--otros        { --t: #78716c; }
+
+@media (hover: hover) and (pointer: fine) {
+  .cell-icon:hover { transform: scale(1.12); }
+}
+
+.cell-icon:focus-visible { outline-offset: 2px; }
+
+/* Tooltip flotante (un solo elemento, lo coloca js/fx.js) */
+.tip {
+  position: fixed;
+  z-index: 200;
+  max-width: 260px;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--r-sm);
+  background: var(--foot-bg);
+  color: #f1f8e6;
+  font-size: var(--fs-sm);
+  font-weight: 550;
+  line-height: 1.3;
+  white-space: nowrap;
+  box-shadow: var(--shadow-lg);
+  pointer-events: none;
+  opacity: 0;
+  translate: 0 4px;
+  transition: opacity 140ms var(--ease-out), translate 140ms var(--ease-out);
+}
+
+.tip.is-on {
+  opacity: 1;
+  translate: 0 0;
+}
+
+.tip::after {
+  content: "";
+  position: absolute;
+  left: var(--arrow-x, 50%);
+  top: 100%;
+  width: 10px;
+  height: 10px;
+  background: inherit;
+  rotate: 45deg;
+  translate: -50% -50%;
+}
+
+.tip.is-below::after { top: 0; }
+
+.td-icon { width: 72px; }
