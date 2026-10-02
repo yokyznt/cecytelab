@@ -1,0 +1,548 @@
+/* =========================================================
+   CECyTE Lab · Rediseño
+   Ilustraciones, profundidad 3D, movimiento y acabados.
+   Se carga al final: afina lo existente sin tocar la paleta
+   verde y blanca.
+   ========================================================= */
+
+/* ---------- Tokens de ilustración ---------- */
+:root {
+  --ill-deep: #0b3d36;
+  --ill-leaf: #16a34a;
+  --ill-pale: #f1fbf6;
+  --ill-mint: #c4eedc;
+  --ill-glass: rgba(255, 255, 255, 0.66);
+  --ill-edge: rgba(11, 61, 54, 0.46);
+  --ill-hi: #ffffff;
+  --ill-hi-op: 0.85;
+  --ill-shadow: rgba(11, 61, 54, 0.16);
+  --ill-liq-a: #0f766e;
+  --ill-liq-b: #22c55e;
+  --ill-liq-c: #86efac;
+  --ill-shield-fill: rgba(15, 118, 110, 0.14);
+  --ill-shield-stroke: #0f766e;
+
+  --wash: color-mix(in srgb, var(--accent) 7%, var(--surface));
+  --foot-bg: #0c2e29;
+  --foot-text: rgba(232, 244, 238, 0.74);
+}
+
+[data-theme="dark"] {
+  --ill-deep: #86e6cc;
+  --ill-leaf: #4ade80;
+  --ill-pale: #12302a;
+  --ill-mint: #0f2a25;
+  --ill-glass: rgba(255, 255, 255, 0.07);
+  --ill-edge: rgba(160, 240, 215, 0.52);
+  --ill-hi-op: 0.3;
+  --ill-shadow: rgba(0, 0, 0, 0.5);
+  --ill-liq-a: #14b8a6;
+  --ill-liq-b: #4ade80;
+  --ill-liq-c: #bbf7d0;
+  --ill-shield-fill: rgba(45, 212, 191, 0.16);
+  --ill-shield-stroke: #5eead4;
+  --foot-bg: #08201c;
+}
+
+/* Clases de dibujo reutilizables (escena y sprites) */
+.f-deep { fill: var(--ill-deep); }
+.f-leaf { fill: var(--ill-leaf); }
+.f-mint { fill: var(--ill-mint); }
+.f-shadow { fill: var(--ill-shadow); }
+.f-liqa { fill: var(--ill-liq-a); }
+.f-liqb { fill: var(--ill-liq-b); }
+.f-liqc { fill: var(--ill-liq-c); }
+.f-white { fill: #fff; }
+.s-pale { stop-color: var(--ill-pale); }
+.s-mint { stop-color: var(--ill-mint); }
+.s-liqa { stop-color: var(--ill-liq-a); }
+.s-liqb { stop-color: var(--ill-liq-b); }
+.glass {
+  fill: var(--ill-glass);
+  stroke: var(--ill-edge);
+  stroke-width: 3;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.edge {
+  fill: none;
+  stroke: var(--ill-edge);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.hi {
+  fill: none;
+  stroke: var(--ill-hi);
+  stroke-width: 5;
+  stroke-linecap: round;
+  opacity: var(--ill-hi-op);
+}
+.ring {
+  fill: none;
+  stroke: var(--ill-edge);
+  stroke-width: 1.6;
+  stroke-dasharray: 3 9;
+  stroke-linecap: round;
+}
+.plus {
+  fill: none;
+  stroke: var(--ill-leaf);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+.shield {
+  fill: var(--ill-shield-fill);
+  stroke: var(--ill-shield-stroke);
+  stroke-width: 4;
+  stroke-linejoin: round;
+}
+.shield-check {
+  fill: none;
+  stroke: var(--ill-shield-stroke);
+  stroke-width: 9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(1.5rem, 0.5rem + 3vw, 3rem);
+  padding-block: clamp(0.5rem, 2vw, 1.5rem) clamp(1.5rem, 1rem + 2vw, 2.5rem);
+}
+
+/* Papel milimetrado de laboratorio, que se desvanece hacia los bordes */
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: -3rem calc(var(--gutter) * -1) 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 38px 38px;
+  -webkit-mask: radial-gradient(ellipse 70% 80% at 70% 40%, #000 20%, transparent 75%);
+  mask: radial-gradient(ellipse 70% 80% at 70% 40%, #000 20%, transparent 75%);
+  opacity: 0.8;
+}
+
+.hero__copy {
+  gap: var(--sp-5);
+}
+
+.hero__title {
+  max-width: 11ch;
+  font-size: clamp(2.75rem, 1.6rem + 5vw, 5rem);
+  line-height: 0.98;
+}
+
+.hero__title mark::after {
+  height: 0.15em;
+  opacity: 0.3;
+  transform-origin: left;
+  animation: draw-line 1000ms 450ms var(--ease-out) both;
+}
+
+@keyframes draw-line {
+  from { transform: scaleX(0); }
+}
+
+/* Botón principal: relieve verde y destello al pasar el puntero */
+.btn--primary {
+  overflow: hidden;
+  background: linear-gradient(170deg, color-mix(in srgb, var(--accent) 86%, #fff), var(--accent));
+}
+
+.btn--primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.32) 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn--primary:hover::after {
+    transform: translateX(120%);
+    transition: transform 700ms var(--ease-out);
+  }
+}
+
+@media (max-width: 640px) {
+  .hero__cta .btn--primary {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- Escena 3D del hero ---------- */
+.hero__stage {
+  position: relative;
+  width: 100%;
+  max-width: 580px;
+  margin-inline: auto;
+  aspect-ratio: 6 / 5;
+  perspective: 1100px;
+  touch-action: pan-y;
+}
+
+.stage__tilt {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg));
+}
+
+.stage__scene {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  animation: stage-sway 11s ease-in-out infinite alternate;
+}
+
+.stage__layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  animation: layer-in 1000ms var(--ease-out) both;
+  animation-delay: calc(var(--d, 0) * 140ms + 150ms);
+}
+
+.stage__layer--back { transform: translateZ(-50px) scale(1.1); }
+.stage__layer--mid { transform: translateZ(10px); }
+.stage__layer--front { transform: translateZ(80px); }
+
+@keyframes stage-sway {
+  from { transform: rotateY(-5deg) rotateX(2deg); }
+  to { transform: rotateY(5deg) rotateX(-1deg); }
+}
+
+@keyframes layer-in {
+  from { opacity: 0; translate: 0 32px; filter: blur(8px); }
+}
+
+/* Elementos animados dentro de la escena */
+.ill-float {
+  animation: ill-bob 5.5s ease-in-out infinite alternate;
+  animation-delay: var(--dl, 0s);
+}
+
+@keyframes ill-bob {
+  to { translate: 0 -9px; }
+}
+
+.ill-fill {
+  animation: fill-up 1900ms 500ms var(--ease-out) both;
+}
+
+@keyframes fill-up {
+  from { translate: 0 95px; }
+}
+
+.ill-wave {
+  animation: wave 2.8s linear infinite;
+}
+
+@keyframes wave {
+  to { translate: -100px 0; }
+}
+
+.bub {
+  fill: rgba(255, 255, 255, 0.78);
+  stroke: var(--ill-liq-c);
+  stroke-width: 1.2;
+  animation: rise 3.6s ease-in infinite;
+  animation-delay: var(--dl, 0s);
+}
+
+.bub--out {
+  fill: none;
+  stroke: var(--ill-leaf);
+  stroke-width: 2;
+  animation-duration: 4.4s;
+}
+
+@keyframes rise {
+  0% { translate: 0 0; opacity: 0; }
+  15% { opacity: 1; }
+  100% { translate: 6px -92px; opacity: 0; }
+}
+
+/* ---------- Franja de resumen ---------- */
+.hero__panel {
+  margin-bottom: clamp(2rem, 1.5rem + 3vw, 3.5rem);
+}
+
+.hero__panel .summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-5) var(--sp-8);
+  align-items: start;
+  padding: var(--sp-6) var(--sp-8);
+}
+
+.hero__panel .summary__head {
+  grid-column: 1 / -1;
+}
+
+.hero__panel .bezel__core {
+  background: linear-gradient(160deg, var(--wash), var(--surface) 55%);
+}
+
+.stat dd {
+  font-size: 2.4rem;
+}
+
+@media (max-width: 960px) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero__stage {
+    max-width: 440px;
+    order: 2;
+  }
+
+  .hero__panel .summary {
+    grid-template-columns: minmax(0, 1fr);
+    padding: var(--sp-5);
+  }
+}
+
+/* ---------- Módulos (bento) ---------- */
+.tile--materiales,
+.tile--reactivos,
+.tile--practicas,
+.tile--seguridad {
+  grid-column: span 3;
+}
+
+.tile {
+  min-height: 250px;
+}
+
+.tile__desc {
+  max-width: 30ch;
+}
+
+.tile--reactivos::before { background: color-mix(in srgb, var(--ok) 16%, transparent); }
+
+.tile--reactivos .tile__icon {
+  background: var(--ok-soft);
+  color: var(--ok);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ok) 22%, transparent);
+}
+
+.tile--practicas .tile__icon,
+[data-theme="dark"] .tile--practicas .tile__icon {
+  background: color-mix(in srgb, var(--ill-leaf) 12%, transparent);
+  color: var(--ill-leaf);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ill-leaf) 24%, transparent);
+}
+
+.tile--practicas::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  right: -60px;
+  top: -60px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  opacity: 0.6;
+  filter: blur(40px);
+  background: color-mix(in srgb, var(--ill-leaf) 14%, transparent);
+}
+
+.tile--seguridad {
+  --ill-shield-fill: rgba(94, 234, 212, 0.16);
+  --ill-shield-stroke: #5eead4;
+}
+
+.tile__stripes { display: none; }
+
+.tile__art {
+  position: absolute;
+  right: 4px;
+  bottom: 6px;
+  z-index: -1;
+  width: min(48%, 210px);
+  aspect-ratio: 8 / 7;
+  pointer-events: none;
+  translate: calc(var(--mx, 0) * -12px) calc(var(--my, 0) * -9px);
+  transform-origin: 75% 90%;
+  transition: translate 420ms var(--ease-out), scale 500ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tile:hover .tile__art { scale: 1.07; }
+}
+
+/* Inclinación 3D controlada por js/fx.js mediante variables */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .tile.tile--3d,
+  .tile.tile--3d:hover {
+    transform: perspective(1000px) rotateX(var(--ry, 0deg)) rotateY(var(--rx, 0deg)) translateY(var(--lift, 0px)) scale(var(--s, 1));
+    transition: box-shadow var(--dur-3) var(--ease-out);
+    will-change: transform;
+  }
+
+  .tile.tile--3d:hover { --lift: -4px; }
+  .tile.tile--3d:active { --s: 0.985; }
+
+  .tile.tile--3d::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: var(--glare, 0);
+    background: radial-gradient(360px 260px at var(--gx, 50%) var(--gy, 50%), rgba(255, 255, 255, 0.5), transparent 62%);
+    transition: opacity 300ms var(--ease-out);
+  }
+
+  [data-theme="dark"] .tile.tile--3d::after {
+    background: radial-gradient(360px 260px at var(--gx, 50%) var(--gy, 50%), rgba(94, 234, 212, 0.12), transparent 62%);
+  }
+}
+
+/* ---------- Encabezado de cada vista ---------- */
+.view-head {
+  position: relative;
+  align-items: center;
+  margin-bottom: var(--sp-5);
+  padding: clamp(1.1rem, 0.6rem + 1.6vw, 1.6rem) clamp(1.1rem, 0.6rem + 2vw, 2rem);
+  border-radius: var(--r-xl);
+  background: linear-gradient(115deg, var(--wash), var(--surface) 72%);
+  box-shadow: inset 0 0 0 1px var(--line), var(--shadow-sm);
+  overflow: hidden;
+}
+
+.view-head__art {
+  display: none;
+  flex-shrink: 0;
+  width: 168px;
+  height: 147px;
+  margin-block: -14px;
+  pointer-events: none;
+  animation: ill-bob 6s ease-in-out infinite alternate;
+}
+
+@media (min-width: 1000px) {
+  .view-head__art { display: block; }
+}
+
+.view-title__icon {
+  background: var(--accent);
+  color: var(--on-accent);
+  box-shadow: var(--inner-hi), 0 6px 14px -6px var(--accent-ring);
+}
+
+/* ---------- Tablas ---------- */
+.table-card {
+  box-shadow: inset 0 0 0 1px var(--line), var(--shadow-lg);
+}
+
+.data-table th {
+  background: color-mix(in srgb, var(--accent) 8%, var(--surface-2));
+  color: var(--accent-text);
+}
+
+.data-table tbody tr:nth-child(even) {
+  background: color-mix(in srgb, var(--accent) 3.5%, var(--surface));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .data-table tbody tr:not(.empty-row):hover {
+    background: var(--accent-soft);
+  }
+}
+
+.data-table td.mono,
+.data-table .mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------- Seguridad: tonos en familia verde ---------- */
+.tone-blue   { --tone: #0f766e; }
+.tone-violet { --tone: #15803d; }
+.tone-indigo { --tone: #166534; }
+.tone-slate  { --tone: #365f55; }
+.tone-teal   { --tone: #0d9488; }
+
+[data-theme="dark"] .tone-blue,
+[data-theme="dark"] .tone-violet,
+[data-theme="dark"] .tone-indigo,
+[data-theme="dark"] .tone-slate,
+[data-theme="dark"] .tone-teal { --tone-fg: #86efac; }
+
+.s-card {
+  transition:
+    transform var(--dur-3) var(--ease-out),
+    box-shadow var(--dur-3) var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .s-card:hover {
+    transform: translateY(-3px);
+    box-shadow: inset 0 0 0 1px var(--line-2), var(--shadow-lg);
+  }
+}
+
+/* ---------- Pie con ola ---------- */
+.footer {
+  position: relative;
+  margin-top: clamp(3rem, 2rem + 4vw, 5rem);
+  border-top: 0;
+  background: var(--foot-bg);
+  color: var(--foot-text);
+}
+
+.footer__wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% - 1px);
+  width: 100%;
+  height: clamp(36px, 5vw, 72px);
+  fill: var(--foot-bg);
+  pointer-events: none;
+}
+
+.footer__wave path:first-child {
+  fill: color-mix(in srgb, var(--foot-bg) 45%, var(--bg));
+  animation: ill-bob 7s ease-in-out infinite alternate;
+}
+
+.footer__inner,
+.footer__inner p { color: var(--foot-text); }
+.footer__title { color: #f1f8f4 !important; }
+.footer__credit { color: rgba(232, 244, 238, 0.5) !important; }
+
+/* ---------- Acabados del navegador ---------- */
+::selection {
+  background: color-mix(in srgb, var(--ill-leaf) 30%, transparent);
+}
+
+input,
+textarea {
+  caret-color: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage__scene,
+  .ill-float,
+  .ill-fill,
+  .ill-wave,
+  .bub,
+  .view-head__art,
+  .footer__wave path:first-child {
+    animation: none;
+  }
+
+  .stage__layer { animation: none; }
+}

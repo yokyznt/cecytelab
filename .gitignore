@@ -2,3 +2,5 @@ _respaldo/
 .DS_Store
 Thumbs.db
 node_modules/
+.claude/
+.playwright-mcp/
