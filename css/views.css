@@ -363,23 +363,23 @@ a.alert:active {
 [data-theme="dark"] .tile--practicas .tile__icon { color: #a78bfa; }
 
 .tile--seguridad {
-  background: #13201b;
+  background: #1b2d0b;
   color: #e8ece9;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06), var(--shadow-md);
 }
 
 [data-theme="light"] .tile--seguridad {
-  background: linear-gradient(150deg, #123b35, #0d2420 60%);
+  background: linear-gradient(150deg, #2a4710, #16260a 60%);
 }
 
 [data-theme="dark"] .tile--seguridad {
-  background: linear-gradient(150deg, #123c35, #0b1714 70%);
+  background: linear-gradient(150deg, #2b4a0f, #0f1a08 70%);
 }
 
 .tile--seguridad .tile__title { color: #f4f7f5; }
 .tile--seguridad .tile__desc,
 .tile--seguridad .tile__meta { color: rgba(232, 236, 233, 0.66); }
-.tile--seguridad .tile__icon { background: rgba(45, 212, 191, 0.14); color: #5eead4; box-shadow: inset 0 0 0 1px rgba(94, 234, 212, 0.2); }
+.tile--seguridad .tile__icon { background: rgba(190, 242, 100, 0.16); color: #d9f99d; box-shadow: inset 0 0 0 1px rgba(190, 242, 100, 0.26); }
 .tile--seguridad .tile__arrow { color: rgba(232, 236, 233, 0.7); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14); }
 
 .tile__stripes {
@@ -409,8 +409,8 @@ a.alert:active {
   }
 
   .tile--seguridad:hover .tile__arrow {
-    background: #5eead4;
-    color: #04201c;
+    background: #bef264;
+    color: #15230a;
   }
 }
 

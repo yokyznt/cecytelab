@@ -298,7 +298,7 @@ main:focus {
 /* =========================================================
    Responsivo
    ========================================================= */
-@media (max-width: 1020px) {
+@media (max-width: 960px) {
   .nav__link span {
     display: none;
   }

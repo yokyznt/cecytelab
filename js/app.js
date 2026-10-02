@@ -22,6 +22,7 @@
     var hash = (location.hash || '').replace('#', '');
     var view = VIEWS.indexOf(hash) > -1 ? hash : 'inicio';
     if (view === currentView) return;
+    var prevView = currentView;
     currentView = view;
 
     document.querySelectorAll('.view[data-view]').forEach(function (sec) {
@@ -29,6 +30,7 @@
       sec.hidden = !on;
       if (on) {
         sec.classList.remove('is-entering');
+        sec.setAttribute('data-dir', prevView && VIEWS.indexOf(view) < VIEWS.indexOf(prevView) ? 'back' : 'next');
         void sec.offsetWidth;
         sec.classList.add('is-entering');
       }

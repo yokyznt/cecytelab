@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="description" content="Sistema de control del Laboratorio de Ciencias Experimentales del CECyTE Plantel 18 Tehuantepec: inventario de materiales y reactivos, prácticas y normas de seguridad.">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f4f1">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c100e">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f8ec">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d1209">
   <title>CECyTE Lab · Sistema integral de laboratorio</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f766e'/%3E%3Cpath d='M26 14h12M28 14v14L17 47a4 4 0 0 0 3.5 6h23a4 4 0 0 0 3.5-6L36 28V14' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2384cc16'/%3E%3Cpath d='M26 14h12M28 14v14L17 47a4 4 0 0 0 3.5 6h23a4 4 0 0 0 3.5-6L36 28V14' fill='none' stroke='%23233a08' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 
   <!-- Tema antes del primer pintado (evita parpadeo claro/oscuro) -->
   <script src="js/theme.js"></script>
@@ -124,6 +124,9 @@
       </nav>
 
       <div class="topbar__actions">
+        <button class="icon-btn" id="textSize" type="button" aria-label="Tamaño de texto" data-level="0">
+          <i class="ph ph-text-aa" aria-hidden="true"></i>
+        </button>
         <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar a tema oscuro">
           <i class="ph ph-moon" aria-hidden="true"></i>
         </button>
@@ -153,13 +156,13 @@
       <div class="hero">
         <div class="hero__copy">
           <h1 class="hero__title reveal" id="t-inicio" style="--i:1">El laboratorio, <mark>en orden</mark> y a la vista.</h1>
-          <div class="hero__cta reveal" style="--i:3">
-            <a class="btn btn--primary btn--lg" href="#materiales">
-              Ver inventario
-              <span class="btn__orb" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
-            </a>
-            <a class="btn btn--ghost btn--lg" href="#seguridad"><i class="ph ph-shield-check" aria-hidden="true"></i> Normas de seguridad</a>
-          </div>
+          <form class="hero__search reveal" style="--i:3" id="globalSearchForm" role="search" novalidate>
+            <label class="sr-only" for="globalSearch">Buscar en materiales, reactivos y prácticas</label>
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+            <input id="globalSearch" type="search" placeholder="¿Qué buscas?" autocomplete="off" enterkeyhint="search">
+            <button class="btn btn--primary btn--lg" type="submit">Buscar</button>
+          </form>
+          <p class="hero__search-msg" id="globalSearchMsg" role="status" aria-live="polite"></p>
         </div>
 
         <div class="hero__stage reveal" style="--i:2" aria-hidden="true" data-stage>
@@ -179,8 +182,8 @@
                   <circle r="8" class="f-leaf"><animateMotion dur="16s" repeatCount="indefinite" path="M32 188a208 58 0 1 0 416 0a208 58 0 1 0 -416 0"/></circle>
                   <circle r="5" class="f-deep"><animateMotion dur="16s" begin="-8s" repeatCount="indefinite" path="M32 188a208 58 0 1 0 416 0a208 58 0 1 0 -416 0"/></circle>
                 </g>
-                <circle cx="62" cy="96" r="6" class="f-leaf ill-float"/>
-                <circle cx="428" cy="262" r="4" class="f-deep ill-float" style="--dl:-2s"/>
+                <circle cx="62" cy="96" r="7" class="f-lemon ill-float"/>
+                <circle cx="428" cy="262" r="5" class="f-lemon ill-float" style="--dl:-2s"/>
                 <path class="plus ill-float" style="--dl:-1s" d="M410 52v16M402 60h16"/>
                 <path class="plus ill-float" style="--dl:-3s" d="M44 236v12M38 242h12"/>
               </svg>
@@ -248,20 +251,9 @@
         </div>
 
       </div>
-
-      <aside class="hero__panel reveal" style="--i:2" aria-label="Resumen del inventario">
-          <div class="bezel">
-            <div class="bezel__core summary">
-
-              <div class="summary__block">
-                <div class="dist" id="distBar" role="img" aria-label="Distribución de reactivos por color"></div>
-                <ul class="dist-legend" id="distLegend"></ul>
-              </div>
-
-              <div class="summary__alerts" id="homeAlerts"></div>
-            </div>
-          </div>
-      </aside>
+      <section class="attention reveal" style="--i:1" aria-label="Requiere atención">
+        <div class="summary__alerts" id="homeAlerts"></div>
+      </section>
 
       <div class="bento" aria-label="Módulos del sistema">
         <a class="tile tile--materiales tile--3d reveal" style="--i:0" href="#materiales">
@@ -310,13 +302,20 @@
         </a>
       </div>
 
-      <section class="agenda reveal" aria-labelledby="t-agenda">
+      <div class="home-lower">
+        <section class="agenda reveal" aria-labelledby="t-agenda">
         <header class="agenda__head">
           <h2 id="t-agenda">Próximas prácticas</h2>
           <a class="link-arrow" href="#practicas">Ver todas <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
         </header>
         <ol class="agenda__list" id="agendaList"></ol>
       </section>
+        <section class="card-dist reveal" aria-labelledby="t-dist">
+          <h2 class="card-title" id="t-dist">Reactivos por color</h2>
+          <div class="dist" id="distBar" role="img" aria-label="Distribución de reactivos por color"></div>
+          <ul class="dist-legend" id="distLegend"></ul>
+        </section>
+      </div>
     </section>
 
     <!-- ===================== MATERIALES ===================== -->
@@ -638,6 +637,8 @@
       <div class="sheet__body" id="safetyBody"></div>
     </div>
   </dialog>
+
+  <button class="to-top" id="toTop" type="button" aria-label="Volver arriba"><i class="ph ph-arrow-up" aria-hidden="true"></i></button>
 
   <!-- Notificaciones -->
   <section class="toaster" id="toaster" popover="manual" aria-live="polite" aria-label="Notificaciones"></section>

@@ -163,6 +163,103 @@
     });
   }
 
+  /* ---------- Búsqueda global del inicio ----------
+     Lleva a la tabla con más coincidencias y deja la búsqueda escrita. */
+  function initGlobalSearch() {
+    var form = document.getElementById('globalSearchForm');
+    var input = document.getElementById('globalSearch');
+    var msg = document.getElementById('globalSearchMsg');
+    if (!form || !input || !window.Store || !window.Tables) return;
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      var raw = input.value.trim();
+      var q = Tables.norm(raw);
+      if (!q) { input.focus(); return; }
+
+      var best = null;
+      var bestN = 0;
+      ['reactivos', 'materiales', 'practicas'].forEach(function (cat) {
+        var n = Store.getDB(cat).filter(function (row) {
+          var hay = Tables.norm(Object.keys(row).map(function (k) { return row[k]; }).join(' '));
+          return q.split(/\s+/).every(function (w) { return hay.indexOf(w) > -1; });
+        }).length;
+        if (n > bestN) { bestN = n; best = cat; }
+      });
+
+      if (!best) {
+        msg.textContent = 'No hay resultados para “' + raw + '”. Prueba con otra palabra.';
+        input.focus();
+        return;
+      }
+
+      msg.textContent = '';
+      location.hash = '#' + best;
+      setTimeout(function () {
+        var target = document.querySelector('[data-search="' + best + '"]');
+        if (!target) return;
+        target.value = raw;
+        target.dispatchEvent(new Event('input'));
+      }, 0);
+    });
+
+    input.addEventListener('input', function () { msg.textContent = ''; });
+  }
+
+  /* ---------- Tamaño de texto (normal / grande / muy grande) ---------- */
+  function initTextSize() {
+    var btn = document.getElementById('textSize');
+    if (!btn) return;
+    var root = document.documentElement;
+    var SIZES = ['', 'lg', 'xl'];
+    var NAMES = ['normal', 'grande', 'muy grande'];
+
+    function current() {
+      var i = SIZES.indexOf(root.getAttribute('data-size') || '');
+      return i < 0 ? 0 : i;
+    }
+
+    function sync() {
+      var i = current();
+      btn.setAttribute('data-level', String(i));
+      btn.setAttribute('aria-label', 'Tamaño de texto: ' + NAMES[i] + '. Pulsa para cambiar');
+      btn.title = 'Tamaño de texto: ' + NAMES[i];
+    }
+
+    btn.addEventListener('click', function () {
+      var next = (current() + 1) % SIZES.length;
+      if (SIZES[next]) root.setAttribute('data-size', SIZES[next]);
+      else root.removeAttribute('data-size');
+      try { localStorage.setItem('cecyte_size', SIZES[next]); } catch (e) { /* noop */ }
+      sync();
+      if (window.UI && UI.updateSliders) UI.updateSliders();
+    });
+    sync();
+  }
+
+  /* ---------- Volver arriba ---------- */
+  function initToTop() {
+    var btn = document.getElementById('toTop');
+    if (!btn) return;
+    var ticking = false;
+
+    function update() {
+      ticking = false;
+      btn.classList.toggle('is-visible', window.scrollY > 700);
+    }
+
+    window.addEventListener('scroll', function () {
+      if (!ticking) { ticking = true; requestAnimationFrame(update); }
+    }, { passive: true });
+
+    btn.addEventListener('click', function () {
+      window.scrollTo({ top: 0, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      var main = document.getElementById('main');
+      if (main) main.focus({ preventScroll: true });
+    });
+    update();
+  }
+
   /* ---------- Inicialización ---------- */
   function init() {
     // Los átomos orbitales usan animación SMIL: respetar "menos movimiento".
@@ -172,6 +269,9 @@
       });
     }
 
+    initGlobalSearch();
+    initTextSize();
+    initToTop();
     initTilt();
     initSafetyCardGlare();
     initAmbientParallax();

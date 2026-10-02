@@ -319,10 +319,11 @@
         content = '<span class="badge badge--color"><span class="swatch-dot swatch-dot--' + colorSlug(val) + '" aria-hidden="true"></span>' + esc(val) + '</span>';
         break;
       case 'caducidad':
-        var cadText = val === 'N/A' ? 'Sin caducidad' : val;
         content = isExpired(val)
           ? '<span class="expired"><i class="ph-fill ph-warning" aria-hidden="true"></i>' + esc(val) + '</span>'
-          : '<span class="mono cell-muted">' + esc(cadText) + '</span>';
+          : (val === 'N/A'
+            ? '<span class="cell-none" aria-hidden="true">—</span><span class="sr-only">Sin caducidad</span>'
+            : '<span class="mono cell-muted">' + esc(val) + '</span>');
         break;
       case 'materia':
         content = '<span class="badge badge--subject">' + esc(val) + '</span>';
@@ -364,7 +365,13 @@
         if (!expTerms.length) return true;
         var hay = norm(Object.keys(item.row).map(function (k) { return item.row[k]; }).join(' '));
         return expTerms.every(function (group) {
-          return group.some(function (t) { return hay.indexOf(t) > -1; });
+          return group.some(function (t) {
+            // Símbolos de 1–2 letras (Na, K, Cl…) solo cuentan como palabra completa
+            if (t.length <= 2 && /^[a-z]+$/.test(t)) {
+              return new RegExp('(^|[^a-z0-9])' + t + '([^a-z0-9]|$)').test(hay);
+            }
+            return hay.indexOf(t) > -1;
+          });
         });
       });
   }
@@ -479,6 +486,9 @@
           '<button type="button" class="icon-btn icon-btn--sm" data-page="' + cat + '" data-delta="1" aria-label="Página siguiente"' + (st.page >= totalPages ? ' disabled' : '') + '><i class="ph ph-caret-right" aria-hidden="true"></i></button>' +
         '</nav>' +
       '</footer>';
+
+    // Las filas nuevas nacen con .reveal: hay que observarlas para que aparezcan
+    if (window.UI && UI.observeReveals) UI.observeReveals(card);
   }
 
   function buildAll() {
