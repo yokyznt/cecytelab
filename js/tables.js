@@ -17,8 +17,7 @@
         { key: 'material', label: 'Tipo', type: 'icon' },
         { key: 'cantidad', label: 'Cantidad', type: 'qty' },
         { key: 'estado', label: 'Estado', type: 'estado' },
-        { key: 'ubicacion', label: 'Ubicación' },
-        { key: 'desc', label: 'Descripción', type: 'muted' }
+        { key: 'ubicacion', label: 'Ubicación' }
       ],
       filterKey: 'estado',
       filterLabel: 'Estado',
@@ -62,8 +61,7 @@
         { key: 'prac', label: 'Práctica', type: 'strong' },
         { key: 'mat', label: 'Materia', type: 'materia' },
         { key: 'fecha', label: 'Fecha', type: 'fecha' },
-        { key: 'rec', label: 'Reactivos / material' },
-        { key: 'obs', label: 'Observaciones', type: 'muted' }
+        { key: 'rec', label: 'Reactivos / material' }
       ],
       filterKey: 'mat',
       filterLabel: 'Materia',
@@ -173,22 +171,23 @@
     'solucion 0.1': ['0.1', 'normal', 'n/10'],
   };
 
+  // Devuelve un grupo por palabra buscada: basta que el texto contenga
+  // cualquiera de sus sinónimos, pero deben cumplirse todas las palabras.
   function expandSearchTerms(terms) {
-    var expanded = [];
-    terms.forEach(function (t) {
-      expanded.push(t);
+    return terms.map(function (t) {
+      var group = [t];
       var nt = norm(t);
       if (SEARCH_SYNONYMS[nt]) {
-        SEARCH_SYNONYMS[nt].forEach(function (s) { expanded.push(norm(s)); });
+        SEARCH_SYNONYMS[nt].forEach(function (s) { group.push(norm(s)); });
       }
       Object.keys(SEARCH_SYNONYMS).forEach(function (k) {
         if (SEARCH_SYNONYMS[k].indexOf(nt) > -1) {
-          expanded.push(k);
-          SEARCH_SYNONYMS[k].forEach(function (s) { expanded.push(norm(s)); });
+          group.push(k);
+          SEARCH_SYNONYMS[k].forEach(function (s) { group.push(norm(s)); });
         }
       });
+      return group;
     });
-    return expanded;
   }
 
   /* ---------- Celdas ---------- */
@@ -341,9 +340,11 @@
   }
 
   /* ---------- Datos filtrados ---------- */
-  function getFiltered(cat) {
+  // `filterValue` permite contar cada chip respetando la búsqueda activa.
+  function getFiltered(cat, filterValue) {
     var conf = CONFIG[cat];
     var st = state[cat];
+    var active = filterValue === undefined ? st.filter : filterValue;
     var q = norm(st.query.trim());
     var terms = q ? q.split(/\s+/) : [];
     var expTerms = expandSearchTerms(terms);
@@ -351,18 +352,20 @@
     return Store.getDB(cat)
       .map(function (row, index) { return { row: row, index: index }; })
       .filter(function (item) {
-        if (st.filter) {
-          if (st.filter === '__caducado') {
+        if (active) {
+          if (active === '__caducado') {
             if (!isExpired(item.row.caducidad)) return false;
           } else if (cat === 'reactivos') {
-            if (colorSlug(item.row.almacen) !== colorSlug(st.filter)) return false;
-          } else if (norm(item.row[conf.filterKey]) !== norm(st.filter)) {
+            if (colorSlug(item.row.almacen) !== colorSlug(active)) return false;
+          } else if (norm(item.row[conf.filterKey]) !== norm(active)) {
             return false;
           }
         }
         if (!expTerms.length) return true;
         var hay = norm(Object.keys(item.row).map(function (k) { return item.row[k]; }).join(' '));
-        return expTerms.every(function (t) { return hay.indexOf(t) > -1; });
+        return expTerms.every(function (group) {
+          return group.some(function (t) { return hay.indexOf(t) > -1; });
+        });
       });
   }
 
@@ -381,13 +384,11 @@
     }
 
     function count(value) {
-      if (value === '__caducado') return all.filter(function (r) { return isExpired(r.caducidad); }).length;
-      if (cat === 'reactivos') return all.filter(function (r) { return colorSlug(r.almacen) === colorSlug(value); }).length;
-      return all.filter(function (r) { return norm(r[conf.filterKey]) === norm(value); }).length;
+      return getFiltered(cat, value).length;
     }
 
-    var html = '<span class="filters__label">' + esc(conf.filterLabel) + '</span>';
-    html += chip('', 'Todos', all.length, !st.filter);
+    var html = '';
+    html += chip('', 'Todos', count(''), !st.filter);
     opts.forEach(function (o) {
       var n = count(o.value);
       if (!n && o.value !== st.filter) return;
@@ -398,10 +399,15 @@
 
   function chip(value, label, n, active, opt) {
     var lead = '';
+    var dotOnly = !!(opt && opt.swatch);
     if (opt && opt.swatch) lead = '<span class="swatch-dot swatch-dot--' + opt.swatch + '" aria-hidden="true"></span>';
     else if (opt && opt.dot) lead = '<span class="badge__dot badge__dot--' + opt.dot + '" aria-hidden="true"></span>';
-    return '<button type="button" class="chip" data-filter="' + esc(value) + '" aria-pressed="' + active + '">' +
-      lead + '<span>' + esc(label) + '</span><span class="chip__count mono">' + n + '</span></button>';
+    var text = dotOnly
+      ? '<span class="sr-only">' + esc(label) + '</span>'
+      : '<span>' + esc(label) + '</span>';
+    return '<button type="button" class="chip' + (dotOnly ? ' chip--dot' : '') + '" data-filter="' + esc(value) + '"' +
+      ' aria-pressed="' + active + '" title="' + esc(label) + ': ' + n + '">' +
+      lead + text + '<span class="chip__count mono">' + n + '</span></button>';
   }
 
   /* ---------- Tabla ---------- */
@@ -413,7 +419,6 @@
     var isAdmin = document.body.classList.contains('is-admin');
 
     renderFilters(cat);
-    if (cat === 'reactivos') renderReactivosLegend();
 
     var data = getFiltered(cat);
     var totalPages = Math.max(1, Math.ceil(data.length / ROWS_PER_PAGE));
@@ -474,71 +479,6 @@
           '<button type="button" class="icon-btn icon-btn--sm" data-page="' + cat + '" data-delta="1" aria-label="Página siguiente"' + (st.page >= totalPages ? ' disabled' : '') + '><i class="ph ph-caret-right" aria-hidden="true"></i></button>' +
         '</nav>' +
       '</footer>';
-  }
-
-  function renderReactivosLegend() {
-    var host = document.getElementById('reactivosLegend');
-    if (!host) return;
-    var all = Store.getDB('reactivos');
-    if (!all.length) { host.hidden = true; return; }
-    host.hidden = false;
-
-    var riskCounts = {};
-    var almacenCounts = {};
-    var RISK_ORDER = [
-      { key: 'flame', label: 'Inflamable', icon: 'ph-flame' },
-      { key: 'drop-half', label: 'Corrosivo', icon: 'ph-drop-half' },
-      { key: 'skull', label: 'Tóxico', icon: 'ph-skull' },
-      { key: 'warning', label: 'Irritante', icon: 'ph-warning' },
-      { key: 'fire-simple', label: 'Oxidante', icon: 'ph-fire-simple' },
-      { key: 'sparkle', label: 'Reactivo', icon: 'ph-sparkle' },
-      { key: 'waveform', label: 'Reactivo c/ agua', icon: 'ph-waveform' },
-      { key: 'wind', label: 'Volátil', icon: 'ph-wind' },
-      { key: 'leaf', label: 'Bajo / Inocuo', icon: 'ph-leaf' }
-    ];
-    var ALMACEN_ORDER = [
-      { slug: 'verde', label: 'Verde', swatch: 'verde' },
-      { slug: 'azul', label: 'Azul', swatch: 'azul' },
-      { slug: 'amarillo', label: 'Amarillo', swatch: 'amarillo' },
-      { slug: 'rojo', label: 'Rojo', swatch: 'rojo' },
-      { slug: 'blanco', label: 'Blanco', swatch: 'blanco' },
-      { slug: 'rayas', label: 'Rayas', swatch: 'rayas' }
-    ];
-
-    function norm(v) { return String(v || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
-
-    all.forEach(function (r) {
-      var risk = norm(r.riesgo);
-      RISK_ORDER.forEach(function (ro) {
-        if (risk.indexOf(ro.key) > -1 || risk.indexOf(ro.label.toLowerCase()) > -1) {
-          riskCounts[ro.key] = (riskCounts[ro.key] || 0) + 1;
-        }
-      });
-      var a = norm(r.almacen);
-      ALMACEN_ORDER.forEach(function (ao) {
-        if (a.indexOf(ao.slug) > -1) {
-          almacenCounts[ao.slug] = (almacenCounts[ao.slug] || 0) + 1;
-        }
-      });
-    });
-
-    var riskHtml = RISK_ORDER.filter(function (ro) { return riskCounts[ro.key]; }).map(function (ro) {
-      return '<span class="legend-bar__item"><i class="ph ' + ro.icon + '" aria-hidden="true"></i><span>' + ro.label + '</span><span class="mono">(' + riskCounts[ro.key] + ')</span></span>';
-    }).join('');
-
-    var almacenHtml = ALMACEN_ORDER.filter(function (ao) { return almacenCounts[ao.slug]; }).map(function (ao) {
-      return '<span class="legend-bar__item legend-bar__item--color"><span class="swatch-dot swatch-dot--' + ao.swatch + '" aria-hidden="true"></span><span>' + ao.label + '</span><span class="mono">(' + almacenCounts[ao.slug] + ')</span></span>';
-    }).join('');
-
-    host.innerHTML =
-      '<div class="legend-bar__section">' +
-        '<span class="legend-bar__label">Riesgos SGA</span>' +
-        '<div class="legend-bar__items">' + riskHtml + '</div>' +
-      '</div>' +
-      '<div class="legend-bar__section">' +
-        '<span class="legend-bar__label">Almacenaje</span>' +
-        '<div class="legend-bar__items">' + almacenHtml + '</div>' +
-      '</div>';
   }
 
   function buildAll() {

@@ -153,7 +153,6 @@
       <div class="hero">
         <div class="hero__copy">
           <h1 class="hero__title reveal" id="t-inicio" style="--i:1">El laboratorio, <mark>en orden</mark> y a la vista.</h1>
-          <p class="hero__lead reveal" style="--i:2">Inventario de materiales y reactivos, registro de prácticas y normas de seguridad del plantel, en un solo lugar.</p>
           <div class="hero__cta reveal" style="--i:3">
             <a class="btn btn--primary btn--lg" href="#materiales">
               Ver inventario
@@ -253,28 +252,8 @@
       <aside class="hero__panel reveal" style="--i:2" aria-label="Resumen del inventario">
           <div class="bezel">
             <div class="bezel__core summary">
-              <div class="summary__head">
-                <span>Resumen del inventario</span>
-                <time class="mono" id="todayLabel"></time>
-              </div>
-
-              <dl class="stats">
-                <div class="stat">
-                  <dt><i class="ph ph-package" aria-hidden="true"></i> Materiales</dt>
-                  <dd class="mono" id="stat-mat">0</dd>
-                </div>
-                <div class="stat">
-                  <dt><i class="ph ph-test-tube" aria-hidden="true"></i> Reactivos</dt>
-                  <dd class="mono" id="stat-reac">0</dd>
-                </div>
-                <div class="stat">
-                  <dt><i class="ph ph-microscope" aria-hidden="true"></i> Prácticas</dt>
-                  <dd class="mono" id="stat-prac">0</dd>
-                </div>
-              </dl>
 
               <div class="summary__block">
-                <p class="summary__label">Reactivos por código de almacenaje</p>
                 <div class="dist" id="distBar" role="img" aria-label="Distribución de reactivos por color"></div>
                 <ul class="dist-legend" id="distLegend"></ul>
               </div>
@@ -293,7 +272,6 @@
           <div>
             <p class="tile__meta mono" id="tile-mat">— registros</p>
             <h2 class="tile__title">Materiales y equipos</h2>
-            <p class="tile__desc">Control de material de vidrio, equipos de medición e inventario de herramientas.</p>
           </div>
           <svg class="tile__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-materiales"/></svg>
         </a>
@@ -305,7 +283,6 @@
           <div>
             <p class="tile__meta mono" id="tile-reac">— registros</p>
             <h2 class="tile__title">Sustancias y reactivos</h2>
-            <p class="tile__desc">Inventario químico clasificado según hojas de seguridad y rombo NFPA.</p>
           </div>
           <svg class="tile__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-reactivos"/></svg>
         </a>
@@ -317,7 +294,6 @@
           <div>
             <p class="tile__meta mono" id="tile-prac">— registros</p>
             <h2 class="tile__title">Prácticas experimentales</h2>
-            <p class="tile__desc">Registro y seguimiento de actividades y procedimientos académicos.</p>
           </div>
           <svg class="tile__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-practicas"/></svg>
         </a>
@@ -327,9 +303,8 @@
             <span class="tile__arrow" aria-hidden="true"><i class="ph ph-arrow-up-right"></i></span>
           </div>
           <div>
-            <p class="tile__meta mono">16 protocolos · STPS · SEMARNAT</p>
+            <p class="tile__meta mono">16</p>
             <h2 class="tile__title">Normas de seguridad</h2>
-            <p class="tile__desc">Protocolos de contingencia, equipo de protección, código de colores y manejo de residuos.</p>
           </div>
           <svg class="tile__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-seguridad"/></svg>
         </a>
@@ -349,12 +324,11 @@
       <header class="view-head">
         <div>
           <h2 class="view-title" id="t-materiales"><span class="view-title__icon"><i class="ph ph-package" aria-hidden="true"></i></span> Inventario de materiales</h2>
-          <p class="view-sub">Material de vidrio, equipos de medición y herramientas del laboratorio.</p>
         </div>
         <div class="view-actions">
           <label class="search">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" data-search="materiales" placeholder="Buscar material, ubicación…" aria-label="Buscar en materiales" autocomplete="off" enterkeyhint="search">
+            <input type="search" data-search="materiales" placeholder="Buscar" aria-label="Buscar en materiales" autocomplete="off" enterkeyhint="search">
             <kbd aria-hidden="true">/</kbd>
           </label>
           <button class="btn btn--primary admin-only" type="button" data-add="materiales"><i class="ph ph-plus" aria-hidden="true"></i> Agregar</button>
@@ -370,12 +344,11 @@
       <header class="view-head">
         <div>
           <h2 class="view-title" id="t-reactivos"><span class="view-title__icon"><i class="ph ph-test-tube" aria-hidden="true"></i></span> Control de reactivos</h2>
-          <p class="view-sub">Sustancias clasificadas por riesgo SGA y código de color de almacenaje.</p>
         </div>
         <div class="view-actions">
           <label class="search">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" data-search="reactivos" placeholder="Buscar sustancia, riesgo…" aria-label="Buscar en reactivos" autocomplete="off" enterkeyhint="search">
+            <input type="search" data-search="reactivos" placeholder="Buscar" aria-label="Buscar en reactivos" autocomplete="off" enterkeyhint="search">
             <kbd aria-hidden="true">/</kbd>
           </label>
           <button class="btn btn--primary admin-only" type="button" data-add="reactivos"><i class="ph ph-plus" aria-hidden="true"></i> Agregar</button>
@@ -383,7 +356,6 @@
         <svg class="view-head__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-reactivos"/></svg>
       </header>
       <div class="filters" data-filters="reactivos" role="group" aria-label="Filtrar reactivos"></div>
-      <div class="legend-bar" id="reactivosLegend" aria-label="Leyenda de riesgos y almacenaje" hidden></div>
       <div class="table-card" data-table-card="reactivos"></div>
     </section>
 
@@ -392,12 +364,11 @@
       <header class="view-head">
         <div>
           <h2 class="view-title" id="t-practicas"><span class="view-title__icon"><i class="ph ph-microscope" aria-hidden="true"></i></span> Prácticas experimentales</h2>
-          <p class="view-sub">Actividades realizadas y programadas, con sus reactivos y materiales.</p>
         </div>
         <div class="view-actions">
           <label class="search">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" data-search="practicas" placeholder="Buscar práctica, materia…" aria-label="Buscar en prácticas" autocomplete="off" enterkeyhint="search">
+            <input type="search" data-search="practicas" placeholder="Buscar" aria-label="Buscar en prácticas" autocomplete="off" enterkeyhint="search">
             <kbd aria-hidden="true">/</kbd>
           </label>
           <button class="btn btn--primary admin-only" type="button" data-add="practicas"><i class="ph ph-plus" aria-hidden="true"></i> Agregar</button>
@@ -413,7 +384,6 @@
       <header class="view-head">
         <div>
           <h2 class="view-title" id="t-seguridad"><span class="view-title__icon"><i class="ph ph-shield-check" aria-hidden="true"></i></span> Normatividad y seguridad</h2>
-          <p class="view-sub">Reglamentos, guías de almacenaje y protocolos del laboratorio CECyTE.</p>
         </div>
         <svg class="view-head__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-seguridad"/></svg>
       </header>
@@ -431,17 +401,17 @@
         <div class="s-grid">
           <button class="s-card tone-blue" type="button" data-safety="equipo">
             <span class="s-card__icon"><i class="ph ph-eyeglasses" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Equipo de protección</strong><small>Bata, lentes, guantes y calzado</small></span>
+            <span class="s-card__text"><strong>Equipo de protección</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-red" type="button" data-safety="autorizacion">
             <span class="s-card__icon"><i class="ph ph-prohibit" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Sin autorización</strong><small>Nada se manipula sin el profesor</small></span>
+            <span class="s-card__text"><strong>Sin autorización</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-violet" type="button" data-safety="disciplina">
             <span class="s-card__icon"><i class="ph ph-chalkboard-teacher" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Instrucciones y disciplina</strong><small>Competencias 1.5 y 14</small></span>
+            <span class="s-card__text"><strong>Instrucciones y disciplina</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
         </div>
@@ -450,17 +420,17 @@
         <div class="s-grid">
           <button class="s-card tone-amber" type="button" data-safety="alimentos">
             <span class="s-card__icon"><i class="ph ph-fork-knife" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Prohibido alimentos</strong><small>Sin comida, bebida ni tabaco</small></span>
+            <span class="s-card__text"><strong>Prohibido alimentos</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-green" type="button" data-safety="limpieza">
             <span class="s-card__icon"><i class="ph ph-broom" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Orden y limpieza</strong><small>Antes, durante y al terminar</small></span>
+            <span class="s-card__text"><strong>Orden y limpieza</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-rose" type="button" data-safety="accidentes">
             <span class="s-card__icon"><i class="ph ph-first-aid-kit" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>En caso de accidente</strong><small>Regadera, lavaojos y aviso inmediato</small></span>
+            <span class="s-card__text"><strong>En caso de accidente</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
         </div>
@@ -471,17 +441,17 @@
         <div class="s-grid">
           <button class="s-card tone-slate s-card--codes" type="button" data-safety="colores">
             <span class="s-card__icon"><i class="ph ph-paint-bucket" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Código de colores</strong><small>Estante interactivo por color</small></span>
+            <span class="s-card__text"><strong>Código de colores</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-indigo" type="button" data-safety="estanteria">
             <span class="s-card__icon"><i class="ph ph-rows" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Reglas de estantería</strong><small>Altura, volumen y separación</small></span>
+            <span class="s-card__text"><strong>Reglas de estantería</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-teal" type="button" data-safety="senaletica">
             <span class="s-card__icon"><i class="ph ph-signpost" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Señalética y áreas</strong><small>Áreas, gas e instalaciones vitales</small></span>
+            <span class="s-card__text"><strong>Señalética y áreas</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
         </div>
@@ -492,22 +462,22 @@
         <div class="s-grid">
           <button class="s-card tone-amber" type="button" data-safety="carpeta1">
             <span class="s-card__icon"><i class="ph ph-folder-open" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Carpeta 1 · Operatividad</strong><small>Manual y manejo de residuos</small></span>
+            <span class="s-card__text"><strong>Carpeta 1 · Operatividad</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-red" type="button" data-safety="carpeta2">
             <span class="s-card__icon"><i class="ph ph-folder-open" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Carpeta 2 · Seguridad (HDS)</strong><small>Inventario y hojas de seguridad</small></span>
+            <span class="s-card__text"><strong>Carpeta 2 · Seguridad (HDS)</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-blue" type="button" data-safety="carpeta3">
             <span class="s-card__icon"><i class="ph ph-folder-open" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Carpeta 3 · Mantenimiento</strong><small>Bitácoras, equipo y manuales</small></span>
+            <span class="s-card__text"><strong>Carpeta 3 · Mantenimiento</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-green" type="button" data-safety="etiquetas">
             <span class="s-card__icon"><i class="ph ph-tag" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Re-etiquetado obligatorio</strong><small>Formato de etiqueta requerido</small></span>
+            <span class="s-card__text"><strong>Re-etiquetado obligatorio</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
         </div>
@@ -518,17 +488,17 @@
         <div class="s-grid">
           <button class="s-card tone-green" type="button" data-safety="normativa">
             <span class="s-card__icon"><i class="ph ph-leaf" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Normatividad ambiental</strong><small>SEMARNAT y desechos in situ</small></span>
+            <span class="s-card__text"><strong>Normatividad ambiental</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-blue" type="button" data-safety="neutralizacion">
             <span class="s-card__icon"><i class="ph ph-scales" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Neutralización in situ</strong><small>Llevar a pH neutro antes de desechar</small></span>
+            <span class="s-card__text"><strong>Neutralización in situ</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
           <button class="s-card tone-amber" type="button" data-safety="pozo">
             <span class="s-card__icon"><i class="ph ph-waves" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Pozo de absorción</strong><small>Destino final de residuos tratados</small></span>
+            <span class="s-card__text"><strong>Pozo de absorción</strong></span>
             <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
           </button>
         </div>
@@ -545,8 +515,6 @@
     <div class="footer__inner">
       <div>
         <p class="footer__title">CECyTE Plantel 18 “Tehuantepec”</p>
-        <p>Sistema de control del Laboratorio de Ciencias Experimentales.</p>
-        <p>Conforme a las normativas de seguridad, operatividad y lineamientos de la SEMARNAT y STPS.</p>
       </div>
       <p class="footer__credit mono">@yokyznt</p>
     </div>

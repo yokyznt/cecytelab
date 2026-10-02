@@ -94,9 +94,9 @@
     animateNumber(document.getElementById('stat-reac'), reac.length);
     animateNumber(document.getElementById('stat-prac'), prac.length);
 
-    document.getElementById('tile-mat').textContent = plural(mat.length, 'registro', 'registros');
-    document.getElementById('tile-reac').textContent = plural(reac.length, 'registro', 'registros');
-    document.getElementById('tile-prac').textContent = plural(prac.length, 'registro', 'registros');
+    animateNumber(document.getElementById('tile-mat'), mat.length);
+    animateNumber(document.getElementById('tile-reac'), reac.length);
+    animateNumber(document.getElementById('tile-prac'), prac.length);
 
     // Distribución por color de almacenaje
     var counts = {};
@@ -131,7 +131,7 @@
         '<a class="alert alert--bad" href="#reactivos" data-goto-filter="reactivos:__caducado">' +
           '<i class="ph-fill ph-warning" aria-hidden="true"></i>' +
           '<span><strong>' + plural(expired.length, 'reactivo con lote caducado', 'reactivos con lotes caducados') + '</strong>' +
-          '<small>' + esc(expired.slice(0, 2).map(function (r) { return r.reactivo; }).join(', ')) + (expired.length > 2 ? '…' : '') + '</small></span>' +
+          '</span>' +
           '<i class="ph ph-arrow-right alert__go" aria-hidden="true"></i>' +
         '</a>');
     }
@@ -140,12 +140,12 @@
         '<a class="alert alert--warn" href="#materiales" data-goto-filter="materiales:Malo">' +
           '<i class="ph-fill ph-wrench" aria-hidden="true"></i>' +
           '<span><strong>' + plural(bad.length, 'material en mal estado', 'materiales en mal estado') + '</strong>' +
-          '<small>' + esc(bad.slice(0, 2).map(function (m) { return m.material; }).join(', ')) + (bad.length > 2 ? '…' : '') + '</small></span>' +
+          '</span>' +
           '<i class="ph ph-arrow-right alert__go" aria-hidden="true"></i>' +
         '</a>');
     }
     if (!alerts.length) {
-      alerts.push('<p class="alert alert--ok"><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span><strong>Todo en orden</strong><small>Sin caducados ni material dañado.</small></span></p>');
+      alerts.push('<p class="alert alert--ok"><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span><strong>Todo en orden</strong></span></p>');
     }
     document.getElementById('homeAlerts').innerHTML = alerts.join('');
 
@@ -192,11 +192,11 @@
         '</time>' +
         '<div class="agenda__body">' +
           '<p class="agenda__title">' + esc(x.p.prac) + '</p>' +
-          '<p class="agenda__meta"><span class="badge badge--subject">' + esc(x.p.mat) + '</span> <span>' + esc(x.p.rec) + '</span></p>' +
+          '<p class="agenda__meta"><span class="badge badge--subject">' + esc(x.p.mat) + '</span></p>' +
         '</div>' +
-        '<span class="agenda__rel"><span class="mono">' + rel + '</span><small>' + wkFmt.format(x.d) + '</small></span>' +
+        '<span class="agenda__rel"><span class="mono">' + rel + '</span></span>' +
       '</li>';
-    }).join('') + (showingPast ? '<li class="agenda__note">No hay prácticas próximas; se muestran las más recientes.</li>' : '');
+    }).join('') + '';
   }
 
   // Alertas del inicio: navegar y aplicar filtro

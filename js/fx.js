@@ -80,6 +80,10 @@
     document.querySelectorAll('.tile--3d').forEach(function (tile) {
       makeTilt(tile, { max: 6, glare: true });
     });
+
+    document.querySelectorAll('.s-card').forEach(function (card) {
+      makeTilt(card, { max: 5 });
+    });
   }
 
   /* ---------- Brillo en tarjetas de seguridad ---------- */
