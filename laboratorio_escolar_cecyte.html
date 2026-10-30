@@ -26,6 +26,7 @@
   <link rel="stylesheet" href="css/views.css">
   <link rel="stylesheet" href="css/safety.css">
   <link rel="stylesheet" href="css/redesign.css">
+  <link rel="stylesheet" href="css/practicas.css">
 
   <script src="js/data.js" defer></script>
   <script src="js/inventario.js" defer></script>
@@ -33,7 +34,9 @@
   <script src="js/legacy.js" defer></script>
   <script src="js/store.js" defer></script>
   <script src="js/ui.js" defer></script>
+  <script src="js/practicas-media.js" defer></script>
   <script src="js/tables.js" defer></script>
+  <script src="js/practicas.js" defer></script>
   <script src="js/admin.js" defer></script>
   <script src="js/safety.js" defer></script>
   <script src="js/app.js" defer></script>
@@ -338,6 +341,11 @@
             <input type="search" data-search="practicas" placeholder="Buscar" aria-label="Buscar en prácticas" autocomplete="off" enterkeyhint="search">
             <kbd aria-hidden="true">/</kbd>
           </label>
+          <div class="vswitch" role="radiogroup" aria-label="Tipo de vista">
+            <button type="button" class="vswitch__btn" role="radio" data-prac-mode="tabla" aria-label="Tabla" title="Tabla"><i class="ph ph-list-bullets" aria-hidden="true"></i></button>
+            <button type="button" class="vswitch__btn" role="radio" data-prac-mode="chico" aria-label="Cuadros pequeños" title="Cuadros pequeños"><i class="ph ph-dots-nine" aria-hidden="true"></i></button>
+            <button type="button" class="vswitch__btn" role="radio" data-prac-mode="grande" aria-label="Cuadros grandes" title="Cuadros grandes"><i class="ph ph-squares-four" aria-hidden="true"></i></button>
+          </div>
           <button class="btn btn--primary admin-only" type="button" data-add="practicas"><i class="ph ph-plus" aria-hidden="true"></i> Agregar</button>
         </div>
         <svg class="view-head__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-practicas"/></svg>
@@ -433,6 +441,27 @@
   </dialog>
 
   <!-- Alta / edición de registros -->
+  <dialog class="dialog dialog--video" id="pracDialog" aria-labelledby="pracTitle">
+    <div class="dialog__panel pdlg">
+      <header class="dialog__head">
+        <div class="pdlg__titles">
+          <p class="pdlg__eyebrow mono" data-prac-num>Práctica</p>
+          <h2 class="dialog__title" id="pracTitle">Práctica</h2>
+        </div>
+        <button type="button" class="icon-btn" data-close aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+      </header>
+      <div class="pdlg__grid">
+        <div class="pdlg__stage" data-prac-stage></div>
+        <div class="pdlg__info" data-prac-info></div>
+      </div>
+      <footer class="dialog__foot pdlg__foot">
+        <button type="button" class="btn btn--quiet btn--sm" data-prac-step="-1"><i class="ph ph-caret-left" aria-hidden="true"></i> Anterior</button>
+        <span class="pdlg__count mono" data-prac-count aria-live="polite"></span>
+        <button type="button" class="btn btn--quiet btn--sm" data-prac-step="1">Siguiente <i class="ph ph-caret-right" aria-hidden="true"></i></button>
+      </footer>
+    </div>
+  </dialog>
+
   <dialog class="dialog dialog--wide" id="formDialog" aria-labelledby="formTitle">
     <form class="dialog__panel" id="recordForm" novalidate>
       <header class="dialog__head">

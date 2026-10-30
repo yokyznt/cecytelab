@@ -1,0 +1,123 @@
+window.PRACTICAS_MEDIA = {
+  'ensaye a la flama': {
+    num: 1,
+    video: 'media/practicas/ensayo_ala_flama.mp4',
+    poster: 'media/practicas/ensayo_ala_flama.jpg',
+    duracion: '3:27',
+    fenomeno: 'Emisión de luz y energía de los electrones',
+    objetivo: 'Identificar la presencia de determinados elementos metálicos mediante la coloración que producen sus sales al ser expuestas a una fuente de calor.',
+    fundamento: 'Técnica de análisis químico cualitativo: al recibir energía térmica, los electrones pasan a niveles superiores y, al regresar, liberan esa energía en forma de luz. Sodio: amarillo intenso. Potasio: lila. Calcio: rojo anaranjado. Cobre: verde azulado. Estroncio: rojo intenso.',
+    materiales: ['Mechero de laboratorio', 'Asa metálica', 'Cloruro de estroncio y otras sales metálicas', 'Vasos de precipitado', 'Agua destilada', 'Pinzas', 'Bata y lentes de seguridad'],
+    pasos: [
+      'Colocarse la bata y los lentes de seguridad.',
+      'El docente prepara y distribuye pequeñas muestras de las sales metálicas.',
+      'Identificar y etiquetar las muestras para evitar confusiones.',
+      'El docente prepara el mechero y expone cada muestra a la flama con el asa.',
+      'Observar la coloración que aparece durante el calentamiento.',
+      'Registrar el color de cada sal en una tabla de resultados.',
+      'Comparar los colores con los característicos de cada metal.',
+      'El docente apaga el mechero y supervisa la limpieza.',
+      'Analizar los resultados para identificar los elementos presentes.'
+    ],
+    resultados: 'Cada metal produce un color distinto; con el cloruro de estroncio se obtiene una coloración roja intensa.',
+    conclusion: 'El ensayo a la flama permite reconocer elementos metálicos por los colores que producen al recibir energía térmica, porque sus electrones absorben y liberan energía en forma de luz.',
+    seguridad: 'El mechero y el calentamiento de las sales quedan a cargo del docente. No mirar directamente la flama ni manipular las muestras sin indicación.'
+  },
+  'combustion del magnesio': {
+    num: 2,
+    video: 'media/practicas/combustion_magnesio.mp4',
+    poster: 'media/practicas/combustion_magnesio.jpg',
+    duracion: '1:11',
+    fenomeno: 'Reacción química de oxidación',
+    objetivo: 'Observar una reacción de combustión y reconocer los cambios químicos que experimenta el magnesio al reaccionar con el oxígeno del aire.',
+    fundamento: 'El magnesio se combina con el oxígeno y forma óxido de magnesio, liberando luz blanca intensa y calor. Ecuación: 2 Mg + O₂ → 2 MgO.',
+    materiales: ['Cinta de magnesio', 'Mechero', 'Cápsula de porcelana', 'Pinzas metálicas', 'Espátula', 'Bata y lentes de seguridad'],
+    pasos: [
+      'Colocarse la bata y los lentes de seguridad.',
+      'El docente prepara el área y retira materiales inflamables.',
+      'Describir la cinta de magnesio: color plateado y apariencia metálica.',
+      'El docente sujeta la muestra con pinzas y realiza la combustión.',
+      'Observar desde una distancia segura, sin mirar directamente la luz.',
+      'Esperar a que termine la reacción y se enfríe el material.',
+      'El docente deposita el producto en la cápsula de porcelana.',
+      'Observar el color y la apariencia del producto final.',
+      'Registrar los cambios físicos y químicos observados.',
+      'Comparar el material inicial con el producto final.'
+    ],
+    resultados: 'El magnesio emite una luz blanca muy intensa y deja un sólido blanco, principalmente óxido de magnesio.',
+    conclusion: 'La combustión del magnesio es una oxidación: se forma una sustancia diferente (MgO) y se libera energía en forma de luz y calor.',
+    seguridad: 'La combustión la realiza solo el docente, con protección ocular y distancia segura de observación.'
+  },
+  'separacion de mezclas': {
+    num: 3,
+    video: 'media/practicas/separacion_mezclas.mp4',
+    poster: 'media/practicas/separacion_mezclas.jpg',
+    duracion: '2:47',
+    fenomeno: 'Métodos físicos de separación',
+    objetivo: 'Conocer y aplicar la filtración para separar los componentes de una mezcla heterogénea, aprovechando el tamaño de sus partículas.',
+    fundamento: 'Los métodos físicos separan componentes sin cambiar su composición: filtración, decantación, evaporación, tamizado e imantación. En la filtración, el papel filtro retiene el sólido y deja pasar el líquido.',
+    materiales: ['Papel filtro', 'Embudo', 'Matraz Erlenmeyer', 'Vasos de precipitado', 'Agua', 'Arena o tierra', 'Varilla de vidrio', 'Soporte universal y pinza (opcional)'],
+    pasos: [
+      'Reunir y limpiar los materiales.',
+      'Colocar agua en un vaso de precipitado.',
+      'Agregar arena o tierra y mezclar con la varilla.',
+      'Observar la mezcla e identificar sus componentes.',
+      'Doblar el papel filtro y colocarlo en el embudo.',
+      'Colocar el embudo sobre el matraz Erlenmeyer.',
+      'Verter la mezcla lentamente sin rebasar el papel.',
+      'Esperar a que el líquido pase al matraz.',
+      'Observar las partículas retenidas en el papel.',
+      'Comparar el líquido obtenido con la mezcla inicial.',
+      'Registrar resultados y diferencias.'
+    ],
+    resultados: 'La arena queda retenida en el papel filtro y el agua pasa al matraz; puede quedar algo turbia si lleva partículas muy finas.',
+    conclusion: 'La filtración separa sólidos insolubles de líquidos sin modificar químicamente sus componentes.',
+    seguridad: ''
+  },
+  'tension superficial': {
+    num: 4,
+    video: 'media/practicas/tension_superficial.mp4',
+    poster: 'media/practicas/tension_superficial.jpg',
+    duracion: '4:28',
+    fenomeno: 'Cohesión molecular de los líquidos',
+    objetivo: 'Comprender y demostrar la tensión superficial del agua, identificando cómo la atracción entre sus moléculas forma una película elástica en la superficie.',
+    fundamento: 'Las moléculas de la superficie sufren una atracción neta hacia el interior, por eso la superficie tiende a reducir su área. El agua tiene una tensión superficial alta por sus puentes de hidrógeno.',
+    materiales: ['Vasos de precipitado', 'Agua', 'Gotero o pipeta', 'Moneda', 'Clips metálicos', 'Papel absorbente', 'Jabón líquido', 'Palillo'],
+    pasos: [
+      'A · Poner gotas de agua una por una sobre una moneda limpia.',
+      'A · Observar la superficie curva y contar cuántas gotas caben antes de derramarse.',
+      'B · Colocar papel absorbente sobre el agua de un vaso y un clip encima.',
+      'B · Esperar a que el papel se hunda y ver si el clip sigue flotando.',
+      'C · Agregar un poco de jabón líquido al agua y mezclar suavemente.',
+      'C · Repetir la prueba del clip si el docente lo indica y comparar.',
+      'Registrar las diferencias.'
+    ],
+    resultados: 'Las gotas forman una superficie curva sobre la moneda, el clip puede flotar y el jabón reduce la tensión superficial.',
+    conclusion: 'La tensión superficial nace de la cohesión entre moléculas; el agua se comporta como una película elástica que el jabón debilita.',
+    seguridad: ''
+  },
+  'circuito en serie': {
+    num: 5,
+    video: 'media/practicas/circuito_electrico.mp4',
+    poster: 'media/practicas/circuito_electrico.jpg',
+    duracion: '2:34',
+    fenomeno: 'Corriente, voltaje y resistencia eléctrica',
+    objetivo: 'Construir y analizar un circuito en serie para comprender cómo circula la corriente por componentes conectados en una sola trayectoria.',
+    fundamento: 'En serie la corriente es la misma en todos los componentes, el voltaje se reparte y, si uno se desconecta, se abre todo el circuito. Rtotal = R₁ + R₂ + R₃ + …',
+    materiales: ['Focos de 2.2 V', 'Portafocos', 'Caimanes o cables con pinzas', 'Pila de bajo voltaje', 'Interruptor (opcional)', 'Multímetro (opcional)'],
+    pasos: [
+      'Revisar que los materiales estén en buen estado.',
+      'Identificar los polos positivo y negativo de la pila.',
+      'Colocar los focos en sus portafocos con la pila desconectada.',
+      'Conectar el positivo al primer foco, el primer foco al segundo y el segundo al negativo.',
+      'Revisar conexiones firmes y sin cables pelados.',
+      'Pedir al docente que revise el montaje.',
+      'Cerrar el circuito y comparar el brillo de los focos.',
+      'Desconectar, retirar un foco y observar qué pasa con el otro.',
+      'Registrar los resultados.'
+    ],
+    resultados: 'Con el circuito cerrado ambos focos encienden; al retirar uno, el otro se apaga porque se interrumpe el único camino de la corriente.',
+    conclusion: 'Un circuito en serie tiene una sola trayectoria: todos sus componentes dependen de la continuidad del circuito.',
+    seguridad: 'Usar solo fuentes de bajo voltaje compatibles con los focos y desconectar la pila antes de modificar conexiones.'
+  }
+};

@@ -443,6 +443,7 @@
         .concat(presList(row).map(function (p) { return [p.medida, p.cantidad, p.unidad, p.caducidad, p.nota].join(' '); }))
         .join(' ');
     }
+    if (cat === 'practicas' && window.Practicas) return Object.keys(row).map(function (k) { return row[k]; }).join(' ') + ' ' + Practicas.text(row);
     return Object.keys(row).map(function (k) { return row[k]; }).join(' ');
   }
 
@@ -555,6 +556,10 @@
     renderFilters(cat);
 
     var data = getFiltered(cat);
+    if (cat === 'practicas' && window.Practicas && Practicas.mode() !== 'tabla') {
+      Practicas.render(card, data, isAdmin, !!(st.query.trim() || anyFilter(cat)));
+      return;
+    }
     var totalPages = Math.max(1, Math.ceil(data.length / perPage));
     if (st.page > totalPages) st.page = totalPages;
     if (st.page < 1) st.page = 1;
@@ -590,7 +595,8 @@
             '<button type="button" class="icon-btn icon-btn--sm icon-btn--danger" data-delete="' + cat + '" data-index="' + item.index + '" aria-label="Eliminar ' + name + '"><i class="ph ph-trash" aria-hidden="true"></i></button>' +
           '</div></td>';
         }
-        return '<tr class="reveal' + (expired ? ' is-expired' : '') + '" style="--i:' + i + '">' + cells + '</tr>';
+        var open = cat === 'practicas' ? ' data-prac-open="' + item.index + '" tabindex="0"' : '';
+        return '<tr class="reveal' + (expired ? ' is-expired' : '') + (open ? ' is-clickable' : '') + '" style="--i:' + i + '"' + open + '>' + cells + '</tr>';
       }).join('');
     }
 
@@ -722,6 +728,8 @@
 
   window.Tables = {
     CONFIG: CONFIG,
+    formatDate: formatDate,
+    getFiltered: getFiltered,
     build: build,
     buildAll: buildAll,
     isExpired: isExpired,
