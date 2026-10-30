@@ -18,7 +18,13 @@
       document.documentElement.dataset.theme = next;
       try { localStorage.setItem(KEY, next); } catch (e) { /* noop */ }
       var meta = document.querySelectorAll('meta[name="theme-color"]');
-      meta.forEach(function (m) { m.setAttribute('content', next === 'dark' ? '#0c100e' : '#f2f4f1'); });
+      meta.forEach(function (m) { m.setAttribute('content', next === 'dark' ? '#0d1209' : '#f6f8ec'); });
     }
   };
 })();
+
+/* Tamaño de texto guardado: se aplica antes del primer pintado */
+try {
+  var cecyteSize = localStorage.getItem('cecyte_size');
+  if (cecyteSize) document.documentElement.setAttribute('data-size', cecyteSize);
+} catch (e) { /* almacenamiento bloqueado */ }

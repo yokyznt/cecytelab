@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
   <meta name="description" content="Sistema de control del Laboratorio de Ciencias Experimentales del CECyTE Plantel 18 Tehuantepec: inventario de materiales y reactivos, prácticas y normas de seguridad.">
   <meta name="color-scheme" content="light dark">
-  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f2f4f1">
-  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0c100e">
+  <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f8ec">
+  <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0d1209">
   <title>CECyTE Lab · Sistema integral de laboratorio</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230f766e'/%3E%3Cpath d='M26 14h12M28 14v14L17 47a4 4 0 0 0 3.5 6h23a4 4 0 0 0 3.5-6L36 28V14' fill='none' stroke='%23fff' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2384cc16'/%3E%3Cpath d='M26 14h12M28 14v14L17 47a4 4 0 0 0 3.5 6h23a4 4 0 0 0 3.5-6L36 28V14' fill='none' stroke='%23233a08' stroke-width='4' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 
   <!-- Tema antes del primer pintado (evita parpadeo claro/oscuro) -->
   <script src="js/theme.js"></script>
@@ -25,21 +25,87 @@
   <link rel="stylesheet" href="css/components.css">
   <link rel="stylesheet" href="css/views.css">
   <link rel="stylesheet" href="css/safety.css">
+  <link rel="stylesheet" href="css/redesign.css">
+  <link rel="stylesheet" href="css/practicas.css">
 
   <script src="js/data.js" defer></script>
+  <script src="js/inventario.js" defer></script>
   <script src="js/safety-content.js" defer></script>
+  <script src="js/legacy.js" defer></script>
   <script src="js/store.js" defer></script>
   <script src="js/ui.js" defer></script>
+  <script src="js/practicas-media.js" defer></script>
   <script src="js/tables.js" defer></script>
+  <script src="js/practicas.js" defer></script>
   <script src="js/admin.js" defer></script>
   <script src="js/safety.js" defer></script>
   <script src="js/app.js" defer></script>
   <script src="js/fx.js" defer></script>
+  <script src="js/search.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Saltar al contenido</a>
   <div class="ambient" aria-hidden="true"></div>
   <div class="grain" aria-hidden="true"></div>
+
+  <!-- Sprite de ilustraciones (se usan con <use>) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <symbol id="art-materiales" viewBox="0 0 160 140">
+        <ellipse cx="80" cy="128" rx="64" ry="6" class="f-shadow"/>
+        <path class="glass" d="M46 20h22v30l28 54q5 12-8 12H26q-13 0-8-12l28-54z"/>
+        <path class="f-liqb" d="M30 85h54l12 19q5 12-8 12H26q-13 0-8-12z"/>
+        <path class="hi" d="M34 100l14-27"/>
+        <path class="glass" d="M102 52v56q0 8 8 8h32q8 0 8-8V52"/>
+        <path class="f-liqa" d="M104 82h44v26q0 6-6 6h-32q-6 0-6-6z"/>
+        <path class="edge" d="M98 52h56M140 74h8M140 92h8"/>
+        <circle cx="52" cy="95" r="3.2" class="bub"/>
+        <circle cx="66" cy="102" r="2.4" class="bub" style="--dl:1.2s"/>
+      </symbol>
+
+      <symbol id="art-reactivos" viewBox="0 0 160 140">
+        <ellipse cx="78" cy="128" rx="66" ry="6" class="f-shadow"/>
+        <rect x="14" y="24" width="30" height="12" rx="3" class="f-deep"/>
+        <rect x="12" y="34" width="34" height="86" rx="11" class="glass"/>
+        <path class="f-liqb" d="M13.5 70h31v38a10 10 0 0 1-10 10h-11a10 10 0 0 1-10-10z"/>
+        <rect x="18" y="74" width="24" height="26" rx="3" class="f-white"/>
+        <path class="edge" d="M22 82h16M22 90h10"/>
+        <rect x="56" y="10" width="38" height="14" rx="4" class="f-deep"/>
+        <rect x="54" y="22" width="42" height="98" rx="12" class="glass"/>
+        <path class="f-liqa" d="M55.5 62h39v46a10 10 0 0 1-10 10h-19a10 10 0 0 1-10-10z"/>
+        <rect x="62" y="70" width="26" height="30" rx="3" class="f-white"/>
+        <path class="edge" d="M67 79h16M67 87h10"/>
+        <g transform="translate(128 60) rotate(45)">
+          <rect x="-21" y="-21" width="20" height="20" rx="2" class="f-liqa"/>
+          <rect x="1" y="-21" width="20" height="20" rx="2" class="f-leaf"/>
+          <rect x="-21" y="1" width="20" height="20" rx="2" class="f-liqc"/>
+          <rect x="1" y="1" width="20" height="20" rx="2" class="f-mint" style="stroke:var(--ill-edge);stroke-width:1.5"/>
+        </g>
+      </symbol>
+
+      <symbol id="art-practicas" viewBox="0 0 160 140">
+        <ellipse cx="80" cy="130" rx="62" ry="6" class="f-shadow"/>
+        <rect x="34" y="116" width="84" height="10" rx="5" class="f-deep"/>
+        <path d="M100 116v-10q32-6 32-44 0-34-30-38" fill="none" stroke="var(--ill-deep)" stroke-width="9" stroke-linecap="round"/>
+        <g transform="rotate(-18 72 52)">
+          <rect x="60" y="8" width="24" height="64" rx="7" class="f-deep"/>
+          <rect x="56" y="4" width="32" height="11" rx="4" class="f-liqa"/>
+          <rect x="64" y="72" width="16" height="16" rx="3" class="f-liqa"/>
+        </g>
+        <rect x="46" y="100" width="62" height="7" rx="3.5" class="f-liqa"/>
+        <rect x="55" y="95" width="40" height="5" rx="2" class="f-white"/>
+        <circle cx="76" cy="112" r="4.5" class="f-liqc"/>
+        <path class="plus" d="M22 40v14M15 47h14M136 108v10M131 113h10"/>
+      </symbol>
+
+      <symbol id="art-seguridad" viewBox="0 0 160 140">
+        <ellipse cx="80" cy="130" rx="54" ry="6" class="f-shadow"/>
+        <path class="shield" d="M80 12l46 16v34q0 36-46 60-46-24-46-60V28z"/>
+        <path class="shield-check" d="M58 66l16 16 30-34"/>
+        <path class="plus" d="M24 34v12M18 40h12M138 92v12M132 98h12"/>
+      </symbol>
+    </defs>
+  </svg>
 
   <!-- ===================== BARRA SUPERIOR ===================== -->
   <header class="topbar">
@@ -54,16 +120,18 @@
 
       <nav class="nav" aria-label="Secciones">
         <ul class="nav__list" data-slider>
-          <li><a class="nav__link" href="#inicio" data-nav="inicio"><i class="ph ph-house" aria-hidden="true"></i><span>Inicio</span></a></li>
-          <li><a class="nav__link" href="#materiales" data-nav="materiales"><i class="ph ph-package" aria-hidden="true"></i><span>Materiales</span></a></li>
-          <li><a class="nav__link" href="#reactivos" data-nav="reactivos"><i class="ph ph-test-tube" aria-hidden="true"></i><span>Reactivos</span></a></li>
-          <li><a class="nav__link" href="#practicas" data-nav="practicas"><i class="ph ph-microscope" aria-hidden="true"></i><span>Prácticas</span></a></li>
-          <li><a class="nav__link" href="#seguridad" data-nav="seguridad"><i class="ph ph-shield-check" aria-hidden="true"></i><span>Seguridad</span></a></li>
+          <li><a class="nav__link" href="#inicio" data-nav="inicio"><i class="ph ph-house" aria-hidden="true"></i><span class="nav__label">Inicio</span></a></li>
+          <li><a class="nav__link" href="#inventario" data-nav="inventario"><i class="ph ph-list-checks" aria-hidden="true"></i><span class="nav__label">Inventario</span><span class="nav__badge nav__badge--warn" id="navBadgeObs" hidden></span><span class="nav__badge" id="navBadgeCad" hidden></span></a></li>
+          <li><a class="nav__link" href="#practicas" data-nav="practicas"><i class="ph ph-microscope" aria-hidden="true"></i><span class="nav__label">Prácticas</span></a></li>
+          <li><a class="nav__link" href="#seguridad" data-nav="seguridad"><i class="ph ph-shield-check" aria-hidden="true"></i><span class="nav__label">Seguridad</span></a></li>
           <li class="slider-indicator" aria-hidden="true"></li>
         </ul>
       </nav>
 
       <div class="topbar__actions">
+        <button class="icon-btn" id="textSize" type="button" aria-label="Tamaño de texto" data-level="0">
+          <i class="ph ph-text-aa" aria-hidden="true"></i>
+        </button>
         <button class="icon-btn" id="themeToggle" type="button" aria-label="Cambiar a tema oscuro">
           <i class="ph ph-moon" aria-hidden="true"></i>
         </button>
@@ -92,63 +160,109 @@
     <section class="view" id="sec-inicio" data-view="inicio" aria-labelledby="t-inicio">
       <div class="hero">
         <div class="hero__copy">
-          <div class="hero__molecule" aria-hidden="true">
-            <div class="hero__molecule__scene">
-              <div class="hero__molecule__nucleus"></div>
-              <div class="hero__molecule__orbit"><span class="hero__molecule__electron"></span></div>
-              <div class="hero__molecule__orbit"><span class="hero__molecule__electron"></span></div>
-              <div class="hero__molecule__orbit"><span class="hero__molecule__electron"></span></div>
-            </div>
-          </div>
-          <p class="eyebrow reveal" style="--i:0"><span class="eyebrow__dot" aria-hidden="true"></span> Laboratorio de Ciencias Experimentales</p>
           <h1 class="hero__title reveal" id="t-inicio" style="--i:1">El laboratorio, <mark>en orden</mark> y a la vista.</h1>
-          <p class="hero__lead reveal" style="--i:2">Inventario de materiales y reactivos, registro de prácticas y normas de seguridad del plantel, en un solo lugar.</p>
-          <div class="hero__cta reveal" style="--i:3">
-            <a class="btn btn--primary btn--lg" href="#materiales">
-              Ver inventario
-              <span class="btn__orb" aria-hidden="true"><i class="ph ph-arrow-right"></i></span>
-            </a>
-            <a class="btn btn--ghost btn--lg" href="#seguridad"><i class="ph ph-shield-check" aria-hidden="true"></i> Normas de seguridad</a>
+          <form class="hero__search reveal" style="--i:3" id="globalSearchForm" role="search" novalidate>
+            <label class="sr-only" for="globalSearch">Buscar en el inventario y en las prácticas</label>
+            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
+            <input id="globalSearch" type="search" placeholder="¿Qué buscas?" autocomplete="off" enterkeyhint="search" role="combobox" aria-expanded="false" aria-controls="sgPanel" aria-autocomplete="list" aria-haspopup="listbox">
+            <button class="btn btn--primary btn--lg" type="submit">Buscar</button>
+            <div class="sg" id="sgPanel" role="listbox" aria-label="Sugerencias" hidden></div>
+          </form>
+          <p class="sr-only" id="sgLive" role="status" aria-live="polite"></p>
+        </div>
+
+        <div class="hero__stage reveal" style="--i:2" aria-hidden="true" data-stage>
+          <div class="stage__tilt">
+            <div class="stage__scene">
+
+              <svg class="stage__layer stage__layer--back" style="--d:0" viewBox="0 0 480 400">
+                <defs>
+                  <radialGradient id="ill-disc" cx="50%" cy="42%" r="62%">
+                    <stop offset="0" class="s-pale"/><stop offset="1" class="s-mint"/>
+                  </radialGradient>
+                </defs>
+                <ellipse cx="240" cy="354" rx="208" ry="15" class="f-shadow"/>
+                <circle cx="240" cy="188" r="160" fill="url(#ill-disc)"/>
+                <g transform="rotate(-16 240 188)">
+                  <ellipse cx="240" cy="188" rx="208" ry="58" class="ring"/>
+                  <circle r="8" class="f-leaf"><animateMotion dur="16s" repeatCount="indefinite" path="M32 188a208 58 0 1 0 416 0a208 58 0 1 0 -416 0"/></circle>
+                  <circle r="5" class="f-deep"><animateMotion dur="16s" begin="-8s" repeatCount="indefinite" path="M32 188a208 58 0 1 0 416 0a208 58 0 1 0 -416 0"/></circle>
+                </g>
+                <circle cx="62" cy="96" r="7" class="f-lemon ill-float"/>
+                <circle cx="428" cy="262" r="5" class="f-lemon ill-float" style="--dl:-2s"/>
+                <path class="plus ill-float" style="--dl:-1s" d="M410 52v16M402 60h16"/>
+                <path class="plus ill-float" style="--dl:-3s" d="M44 236v12M38 242h12"/>
+              </svg>
+
+              <svg class="stage__layer stage__layer--mid" style="--d:1" viewBox="0 0 480 400">
+                <ellipse cx="108" cy="338" rx="78" ry="9" class="f-shadow"/>
+                <g class="ill-float" style="--dl:-1.5s">
+                  <path class="glass" d="M60 196h22v82a11 11 0 0 1-22 0z"/>
+                  <path class="f-liqa" d="M61.5 236h19v42a9.5 9.5 0 0 1-19 0z"/>
+                  <path class="glass" d="M96 182h22v96a11 11 0 0 1-22 0z"/>
+                  <path class="f-liqb" d="M97.5 224h19v54a9.5 9.5 0 0 1-19 0z"/>
+                  <path class="glass" d="M132 204h22v74a11 11 0 0 1-22 0z"/>
+                  <path class="f-liqc" d="M133.5 240h19v38a9.5 9.5 0 0 1-19 0z"/>
+                  <path class="hi" d="M68 206v26M104 192v30M140 214v22"/>
+                  <rect x="44" y="268" width="126" height="40" rx="9" class="f-deep"/>
+                  <path d="M52 276h110" stroke="var(--ill-hi)" stroke-opacity=".35" stroke-width="3" stroke-linecap="round"/>
+                </g>
+                <ellipse cx="398" cy="338" rx="58" ry="8" class="f-shadow"/>
+                <g class="ill-float" style="--dl:-3.2s">
+                  <path class="glass" d="M352 196v102q0 15 15 15h62q15 0 15-15V196"/>
+                  <path class="f-liqb" d="M354 246h88v52q0 13-13 13h-62q-13 0-13-13z"/>
+                  <path class="edge" d="M345 196h104M426 222h14M426 246h14M426 270h14M426 294h14"/>
+                  <path class="hi" d="M364 214v70"/>
+                  <circle cx="380" cy="290" r="4" class="bub" style="--dl:.4s"/>
+                  <circle cx="404" cy="300" r="3" class="bub" style="--dl:1.8s"/>
+                </g>
+              </svg>
+
+              <svg class="stage__layer stage__layer--front" style="--d:2" viewBox="0 0 480 400">
+                <defs>
+                  <clipPath id="ill-flask-clip"><path d="M205 70h40v70l75 150q10 25-15 25H145q-25 0-15-25l75-150z"/></clipPath>
+                  <linearGradient id="ill-liq" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" class="s-liqb"/><stop offset="1" class="s-liqa"/>
+                  </linearGradient>
+                </defs>
+                <ellipse cx="240" cy="344" rx="104" ry="12" class="f-shadow"/>
+                <g transform="translate(15 0)">
+                  <g class="ill-float">
+                    <path class="glass" d="M205 70h40v70l75 150q10 25-15 25H145q-25 0-15-25l75-150z"/>
+                    <g clip-path="url(#ill-flask-clip)">
+                      <g class="ill-fill"><g class="ill-wave"><path d="M-100 218q25-12 50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0t50 0V340H-100z" fill="url(#ill-liq)"/></g></g>
+                      <circle cx="205" cy="292" r="5" class="bub" style="--dl:0s"/>
+                      <circle cx="232" cy="300" r="7" class="bub" style="--dl:1.1s"/>
+                      <circle cx="256" cy="288" r="4" class="bub" style="--dl:2.1s"/>
+                      <circle cx="222" cy="282" r="3" class="bub" style="--dl:2.8s"/>
+                    </g>
+                    <path class="glass" d="M205 70h40v70l75 150q10 25-15 25H145q-25 0-15-25l75-150z" fill="none"/>
+                    <rect x="197" y="62" width="56" height="12" rx="6" class="f-deep"/>
+                    <path class="hi" d="M150 284l42-84"/>
+                    <circle cx="225" cy="54" r="5" class="bub bub--out" style="--dl:.6s"/>
+                    <circle cx="233" cy="46" r="3" class="bub bub--out" style="--dl:2.4s"/>
+                  </g>
+                </g>
+                <g class="ill-float" style="--dl:-2s">
+                  <path class="edge" d="M392 96l34-22M392 96l-14 36M392 96l30 30"/>
+                  <circle cx="392" cy="96" r="13" class="f-leaf"/>
+                  <circle cx="426" cy="74" r="8" class="f-deep"/>
+                  <circle cx="378" cy="132" r="9" class="f-liqc" style="stroke:var(--ill-edge);stroke-width:2"/>
+                  <circle cx="422" cy="126" r="7" class="f-mint" style="stroke:var(--ill-edge);stroke-width:2"/>
+                </g>
+              </svg>
+
+            </div>
           </div>
         </div>
 
-        <aside class="hero__panel reveal" style="--i:2" aria-label="Resumen del inventario">
-          <div class="bezel">
-            <div class="bezel__core summary">
-              <div class="summary__head">
-                <span>Resumen del inventario</span>
-                <time class="mono" id="todayLabel"></time>
-              </div>
-
-              <dl class="stats">
-                <div class="stat">
-                  <dt><i class="ph ph-package" aria-hidden="true"></i> Materiales</dt>
-                  <dd class="mono" id="stat-mat">0</dd>
-                </div>
-                <div class="stat">
-                  <dt><i class="ph ph-test-tube" aria-hidden="true"></i> Reactivos</dt>
-                  <dd class="mono" id="stat-reac">0</dd>
-                </div>
-                <div class="stat">
-                  <dt><i class="ph ph-microscope" aria-hidden="true"></i> Prácticas</dt>
-                  <dd class="mono" id="stat-prac">0</dd>
-                </div>
-              </dl>
-
-              <div class="summary__block">
-                <p class="summary__label">Reactivos por código de almacenaje</p>
-                <div class="dist" id="distBar" role="img" aria-label="Distribución de reactivos por color"></div>
-                <ul class="dist-legend" id="distLegend"></ul>
-              </div>
-
-              <div class="summary__alerts" id="homeAlerts"></div>
-            </div>
-          </div>
-        </aside>
       </div>
+      <section class="attention reveal" style="--i:1" aria-label="Requiere atención">
+        <div class="summary__alerts" id="homeAlerts"></div>
+      </section>
 
       <div class="bento" aria-label="Módulos del sistema">
-        <a class="tile tile--materiales tile--3d reveal" style="--i:0" href="#materiales">
+        <a class="tile tile--materiales tile--3d reveal" style="--i:0" href="#inventario" data-goto-filter="inventario:tipo=material">
           <div class="tile__top">
             <span class="tile__icon"><i class="ph ph-package" aria-hidden="true"></i></span>
             <span class="tile__arrow" aria-hidden="true"><i class="ph ph-arrow-up-right"></i></span>
@@ -156,10 +270,10 @@
           <div>
             <p class="tile__meta mono" id="tile-mat">— registros</p>
             <h2 class="tile__title">Materiales y equipos</h2>
-            <p class="tile__desc">Control de material de vidrio, equipos de medición e inventario de herramientas.</p>
           </div>
+          <svg class="tile__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-materiales"/></svg>
         </a>
-        <a class="tile tile--reactivos tile--3d reveal" style="--i:1" href="#reactivos">
+        <a class="tile tile--reactivos tile--3d reveal" style="--i:1" href="#inventario" data-goto-filter="inventario:tipo=reactivo">
           <div class="tile__top">
             <span class="tile__icon"><i class="ph ph-test-tube" aria-hidden="true"></i></span>
             <span class="tile__arrow" aria-hidden="true"><i class="ph ph-arrow-up-right"></i></span>
@@ -167,8 +281,8 @@
           <div>
             <p class="tile__meta mono" id="tile-reac">— registros</p>
             <h2 class="tile__title">Sustancias y reactivos</h2>
-            <p class="tile__desc">Inventario químico clasificado según hojas de seguridad y rombo NFPA.</p>
           </div>
+          <svg class="tile__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-reactivos"/></svg>
         </a>
         <a class="tile tile--practicas tile--3d reveal" style="--i:2" href="#practicas">
           <div class="tile__top">
@@ -178,8 +292,8 @@
           <div>
             <p class="tile__meta mono" id="tile-prac">— registros</p>
             <h2 class="tile__title">Prácticas experimentales</h2>
-            <p class="tile__desc">Registro y seguimiento de actividades y procedimientos académicos.</p>
           </div>
+          <svg class="tile__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-practicas"/></svg>
         </a>
         <a class="tile tile--seguridad tile--3d reveal" style="--i:3" href="#seguridad">
           <div class="tile__top">
@@ -187,62 +301,32 @@
             <span class="tile__arrow" aria-hidden="true"><i class="ph ph-arrow-up-right"></i></span>
           </div>
           <div>
-            <p class="tile__meta mono">16 protocolos · STPS · SEMARNAT</p>
+            <p class="tile__meta mono">16</p>
             <h2 class="tile__title">Normas de seguridad</h2>
-            <p class="tile__desc">Protocolos de contingencia, equipo de protección, código de colores y manejo de residuos.</p>
           </div>
-          <div class="tile__stripes" aria-hidden="true"></div>
+          <svg class="tile__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-seguridad"/></svg>
         </a>
       </div>
-
-      <section class="agenda reveal" aria-labelledby="t-agenda">
-        <header class="agenda__head">
-          <h2 id="t-agenda">Próximas prácticas</h2>
-          <a class="link-arrow" href="#practicas">Ver todas <i class="ph ph-arrow-right" aria-hidden="true"></i></a>
-        </header>
-        <ol class="agenda__list" id="agendaList"></ol>
-      </section>
     </section>
 
-    <!-- ===================== MATERIALES ===================== -->
-    <section class="view" id="sec-materiales" data-view="materiales" aria-labelledby="t-materiales" hidden>
+    <!-- ===================== INVENTARIO ===================== -->
+    <section class="view" id="sec-inventario" data-view="inventario" aria-labelledby="t-inventario" hidden>
       <header class="view-head">
         <div>
-          <h2 class="view-title" id="t-materiales"><span class="view-title__icon"><i class="ph ph-package" aria-hidden="true"></i></span> Inventario de materiales</h2>
-          <p class="view-sub">Material de vidrio, equipos de medición y herramientas del laboratorio.</p>
+          <h2 class="view-title" id="t-inventario"><span class="view-title__icon"><i class="ph ph-list-checks" aria-hidden="true"></i></span> Inventario</h2>
         </div>
         <div class="view-actions">
           <label class="search">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" data-search="materiales" placeholder="Buscar material, ubicación…" aria-label="Buscar en materiales" autocomplete="off" enterkeyhint="search">
+            <input type="search" data-search="inventario" placeholder="Buscar" aria-label="Buscar en el inventario" autocomplete="off" enterkeyhint="search">
             <kbd aria-hidden="true">/</kbd>
           </label>
-          <button class="btn btn--primary admin-only" type="button" data-add="materiales"><i class="ph ph-plus" aria-hidden="true"></i> Agregar</button>
+          <button class="btn btn--primary admin-only" type="button" data-add="inventario"><i class="ph ph-plus" aria-hidden="true"></i> Agregar</button>
         </div>
+        <svg class="view-head__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-materiales"/></svg>
       </header>
-      <div class="filters" data-filters="materiales" role="group" aria-label="Filtrar materiales por estado"></div>
-      <div class="table-card" data-table-card="materiales"></div>
-    </section>
-
-    <!-- ===================== REACTIVOS ===================== -->
-    <section class="view" id="sec-reactivos" data-view="reactivos" aria-labelledby="t-reactivos" hidden>
-      <header class="view-head">
-        <div>
-          <h2 class="view-title" id="t-reactivos"><span class="view-title__icon"><i class="ph ph-test-tube" aria-hidden="true"></i></span> Control de reactivos</h2>
-          <p class="view-sub">Sustancias clasificadas por riesgo SGA y código de color de almacenaje.</p>
-        </div>
-        <div class="view-actions">
-          <label class="search">
-            <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" data-search="reactivos" placeholder="Buscar sustancia, riesgo…" aria-label="Buscar en reactivos" autocomplete="off" enterkeyhint="search">
-            <kbd aria-hidden="true">/</kbd>
-          </label>
-          <button class="btn btn--primary admin-only" type="button" data-add="reactivos"><i class="ph ph-plus" aria-hidden="true"></i> Agregar</button>
-        </div>
-      </header>
-      <div class="filters" data-filters="reactivos" role="group" aria-label="Filtrar reactivos"></div>
-      <div class="legend-bar" id="reactivosLegend" aria-label="Leyenda de riesgos y almacenaje" hidden></div>
-      <div class="table-card" data-table-card="reactivos"></div>
+      <div class="filters" data-filters="inventario" role="group" aria-label="Filtrar el inventario por tipo y alertas"></div>
+      <div class="table-card" data-table-card="inventario"></div>
     </section>
 
     <!-- ===================== PRÁCTICAS ===================== -->
@@ -250,16 +334,21 @@
       <header class="view-head">
         <div>
           <h2 class="view-title" id="t-practicas"><span class="view-title__icon"><i class="ph ph-microscope" aria-hidden="true"></i></span> Prácticas experimentales</h2>
-          <p class="view-sub">Actividades realizadas y programadas, con sus reactivos y materiales.</p>
         </div>
         <div class="view-actions">
           <label class="search">
             <i class="ph ph-magnifying-glass" aria-hidden="true"></i>
-            <input type="search" data-search="practicas" placeholder="Buscar práctica, materia…" aria-label="Buscar en prácticas" autocomplete="off" enterkeyhint="search">
+            <input type="search" data-search="practicas" placeholder="Buscar" aria-label="Buscar en prácticas" autocomplete="off" enterkeyhint="search">
             <kbd aria-hidden="true">/</kbd>
           </label>
+          <div class="vswitch" role="radiogroup" aria-label="Tipo de vista">
+            <button type="button" class="vswitch__btn" role="radio" data-prac-mode="tabla" aria-label="Tabla" title="Tabla"><i class="ph ph-list-bullets" aria-hidden="true"></i></button>
+            <button type="button" class="vswitch__btn" role="radio" data-prac-mode="chico" aria-label="Cuadros pequeños" title="Cuadros pequeños"><i class="ph ph-dots-nine" aria-hidden="true"></i></button>
+            <button type="button" class="vswitch__btn" role="radio" data-prac-mode="grande" aria-label="Cuadros grandes" title="Cuadros grandes"><i class="ph ph-squares-four" aria-hidden="true"></i></button>
+          </div>
           <button class="btn btn--primary admin-only" type="button" data-add="practicas"><i class="ph ph-plus" aria-hidden="true"></i> Agregar</button>
         </div>
+        <svg class="view-head__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-practicas"/></svg>
       </header>
       <div class="filters" data-filters="practicas" role="group" aria-label="Filtrar prácticas"></div>
       <div class="table-card" data-table-card="practicas"></div>
@@ -270,135 +359,23 @@
       <header class="view-head">
         <div>
           <h2 class="view-title" id="t-seguridad"><span class="view-title__icon"><i class="ph ph-shield-check" aria-hidden="true"></i></span> Normatividad y seguridad</h2>
-          <p class="view-sub">Reglamentos, guías de almacenaje y protocolos del laboratorio CECyTE.</p>
         </div>
+        <svg class="view-head__art" aria-hidden="true" viewBox="0 0 160 140"><use href="#art-seguridad"/></svg>
       </header>
 
-      <div class="segmented" role="tablist" aria-label="Categorías de seguridad" data-slider>
-        <button class="segmented__btn" role="tab" id="tab-normas" aria-controls="st-normas" aria-selected="true" type="button">Normas básicas</button>
-        <button class="segmented__btn" role="tab" id="tab-almacen" aria-controls="st-almacen" aria-selected="false" tabindex="-1" type="button">Almacenamiento</button>
-        <button class="segmented__btn" role="tab" id="tab-carpetas" aria-controls="st-carpetas" aria-selected="false" tabindex="-1" type="button">Etiquetado y carpetas</button>
-        <button class="segmented__btn" role="tab" id="tab-residuos" aria-controls="st-residuos" aria-selected="false" tabindex="-1" type="button">Residuos</button>
-        <span class="slider-indicator" aria-hidden="true"></span>
-      </div>
-
-      <div class="safety-panel" id="st-normas" role="tabpanel" aria-labelledby="tab-normas">
-        <h3 class="group-title"><i class="ph ph-user-gear" aria-hidden="true"></i> Protección y disciplina</h3>
-        <div class="s-grid">
-          <button class="s-card tone-blue" type="button" data-safety="equipo">
-            <span class="s-card__icon"><i class="ph ph-eyeglasses" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Equipo de protección</strong><small>Bata, lentes, guantes y calzado</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-red" type="button" data-safety="autorizacion">
-            <span class="s-card__icon"><i class="ph ph-prohibit" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Sin autorización</strong><small>Nada se manipula sin el profesor</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-violet" type="button" data-safety="disciplina">
-            <span class="s-card__icon"><i class="ph ph-chalkboard-teacher" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Instrucciones y disciplina</strong><small>Competencias 1.5 y 14</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-
-        <h3 class="group-title"><i class="ph ph-warning" aria-hidden="true"></i> Prevención y contingencias</h3>
-        <div class="s-grid">
-          <button class="s-card tone-amber" type="button" data-safety="alimentos">
-            <span class="s-card__icon"><i class="ph ph-fork-knife" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Prohibido alimentos</strong><small>Sin comida, bebida ni tabaco</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-green" type="button" data-safety="limpieza">
-            <span class="s-card__icon"><i class="ph ph-broom" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Orden y limpieza</strong><small>Antes, durante y al terminar</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-rose" type="button" data-safety="accidentes">
-            <span class="s-card__icon"><i class="ph ph-first-aid-kit" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>En caso de accidente</strong><small>Regadera, lavaojos y aviso inmediato</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="safety-panel" id="st-almacen" role="tabpanel" aria-labelledby="tab-almacen" hidden>
-        <h3 class="group-title"><i class="ph ph-stack" aria-hidden="true"></i> Almacenamiento de reactivos</h3>
-        <div class="s-grid">
-          <button class="s-card tone-slate s-card--codes" type="button" data-safety="colores">
-            <span class="s-card__icon"><i class="ph ph-paint-bucket" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Código de colores</strong><small>Estante interactivo por color</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-indigo" type="button" data-safety="estanteria">
-            <span class="s-card__icon"><i class="ph ph-rows" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Reglas de estantería</strong><small>Altura, volumen y separación</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-teal" type="button" data-safety="senaletica">
-            <span class="s-card__icon"><i class="ph ph-signpost" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Señalética y áreas</strong><small>Áreas, gas e instalaciones vitales</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="safety-panel" id="st-carpetas" role="tabpanel" aria-labelledby="tab-carpetas" hidden>
-        <h3 class="group-title"><i class="ph ph-folders" aria-hidden="true"></i> Documentación obligatoria</h3>
-        <div class="s-grid">
-          <button class="s-card tone-amber" type="button" data-safety="carpeta1">
-            <span class="s-card__icon"><i class="ph ph-folder-open" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Carpeta 1 · Operatividad</strong><small>Manual y manejo de residuos</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-red" type="button" data-safety="carpeta2">
-            <span class="s-card__icon"><i class="ph ph-folder-open" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Carpeta 2 · Seguridad (HDS)</strong><small>Inventario y hojas de seguridad</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-blue" type="button" data-safety="carpeta3">
-            <span class="s-card__icon"><i class="ph ph-folder-open" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Carpeta 3 · Mantenimiento</strong><small>Bitácoras, equipo y manuales</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-green" type="button" data-safety="etiquetas">
-            <span class="s-card__icon"><i class="ph ph-tag" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Re-etiquetado obligatorio</strong><small>Formato de etiqueta requerido</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
-
-      <div class="safety-panel" id="st-residuos" role="tabpanel" aria-labelledby="tab-residuos" hidden>
-        <h3 class="group-title"><i class="ph ph-recycle" aria-hidden="true"></i> Manejo de residuos</h3>
-        <div class="s-grid">
-          <button class="s-card tone-green" type="button" data-safety="normativa">
-            <span class="s-card__icon"><i class="ph ph-leaf" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Normatividad ambiental</strong><small>SEMARNAT y desechos in situ</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-blue" type="button" data-safety="neutralizacion">
-            <span class="s-card__icon"><i class="ph ph-scales" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Neutralización in situ</strong><small>Llevar a pH neutro antes de desechar</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-          <button class="s-card tone-amber" type="button" data-safety="pozo">
-            <span class="s-card__icon"><i class="ph ph-waves" aria-hidden="true"></i></span>
-            <span class="s-card__text"><strong>Pozo de absorción</strong><small>Destino final de residuos tratados</small></span>
-            <i class="ph ph-arrow-up-right s-card__arrow" aria-hidden="true"></i>
-          </button>
-        </div>
-      </div>
+      <div class="manual" id="manual"></div>
     </section>
   </main>
 
   <!-- ===================== PIE ===================== -->
   <footer class="footer">
+    <svg class="footer__wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0 34C220 80 440 4 720 34S1200 74 1440 22V80H0z"/>
+      <path d="M0 52C260 8 480 78 760 46S1180 14 1440 50V80H0z"/>
+    </svg>
     <div class="footer__inner">
       <div>
         <p class="footer__title">CECyTE Plantel 18 “Tehuantepec”</p>
-        <p>Sistema de control del Laboratorio de Ciencias Experimentales.</p>
-        <p>Conforme a las normativas de seguridad, operatividad y lineamientos de la SEMARNAT y STPS.</p>
       </div>
       <p class="footer__credit mono">@yokyznt</p>
     </div>
@@ -464,6 +441,27 @@
   </dialog>
 
   <!-- Alta / edición de registros -->
+  <dialog class="dialog dialog--video" id="pracDialog" aria-labelledby="pracTitle">
+    <div class="dialog__panel pdlg">
+      <header class="dialog__head">
+        <div class="pdlg__titles">
+          <p class="pdlg__eyebrow mono" data-prac-num>Práctica</p>
+          <h2 class="dialog__title" id="pracTitle">Práctica</h2>
+        </div>
+        <button type="button" class="icon-btn" data-close aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
+      </header>
+      <div class="pdlg__grid">
+        <div class="pdlg__stage" data-prac-stage></div>
+        <div class="pdlg__info" data-prac-info></div>
+      </div>
+      <footer class="dialog__foot pdlg__foot">
+        <button type="button" class="btn btn--quiet btn--sm" data-prac-step="-1"><i class="ph ph-caret-left" aria-hidden="true"></i> Anterior</button>
+        <span class="pdlg__count mono" data-prac-count aria-live="polite"></span>
+        <button type="button" class="btn btn--quiet btn--sm" data-prac-step="1">Siguiente <i class="ph ph-caret-right" aria-hidden="true"></i></button>
+      </footer>
+    </div>
+  </dialog>
+
   <dialog class="dialog dialog--wide" id="formDialog" aria-labelledby="formTitle">
     <form class="dialog__panel" id="recordForm" novalidate>
       <header class="dialog__head">
@@ -490,8 +488,7 @@
       <div class="dialog__body">
         <p class="dialog__lead">Agrega, edita o elimina registros. Conserva la estructura de corchetes <code>[ ]</code> y llaves <code>{ }</code>.</p>
         <div class="segmented segmented--sm" role="tablist" aria-label="Tabla a editar" data-slider>
-          <button class="segmented__btn" role="tab" type="button" data-bulk="materiales" aria-selected="true">Materiales</button>
-          <button class="segmented__btn" role="tab" type="button" data-bulk="reactivos" aria-selected="false" tabindex="-1">Reactivos</button>
+          <button class="segmented__btn" role="tab" type="button" data-bulk="inventario" aria-selected="true">Inventario</button>
           <button class="segmented__btn" role="tab" type="button" data-bulk="practicas" aria-selected="false" tabindex="-1">Prácticas</button>
           <span class="slider-indicator" aria-hidden="true"></span>
         </div>
@@ -509,19 +506,8 @@
     </div>
   </dialog>
 
-  <!-- Hoja lateral de protocolos de seguridad -->
-  <dialog class="sheet" id="safetySheet" aria-labelledby="safetyTitle">
-    <div class="sheet__panel">
-      <header class="sheet__hero">
-        <span class="sheet__grab" aria-hidden="true"></span>
-        <span class="sheet__icon"><i class="ph ph-shield-check" id="safetyIcon" aria-hidden="true"></i></span>
-        <p class="sheet__kicker">Protocolo de seguridad</p>
-        <h2 class="sheet__title" id="safetyTitle"></h2>
-        <button type="button" class="sheet__close" data-close aria-label="Cerrar"><i class="ph ph-x" aria-hidden="true"></i></button>
-      </header>
-      <div class="sheet__body" id="safetyBody"></div>
-    </div>
-  </dialog>
+
+  <button class="to-top" id="toTop" type="button" aria-label="Volver arriba"><i class="ph ph-arrow-up" aria-hidden="true"></i></button>
 
   <!-- Notificaciones -->
   <section class="toaster" id="toaster" popover="manual" aria-live="polite" aria-label="Notificaciones"></section>

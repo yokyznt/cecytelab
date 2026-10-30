@@ -6,22 +6,30 @@
   'use strict';
 
   var esc = UI.escapeHTML;
-  var VIEWS = ['inicio', 'materiales', 'reactivos', 'practicas', 'seguridad'];
+  var VIEWS = ['inicio', 'inventario', 'practicas', 'seguridad'];
   var TITLES = {
     inicio: 'CECyTE Lab · Sistema integral de laboratorio',
-    materiales: 'Materiales · CECyTE Lab',
-    reactivos: 'Reactivos · CECyTE Lab',
     practicas: 'Prácticas · CECyTE Lab',
+    inventario: 'Inventario · CECyTE Lab',
     seguridad: 'Seguridad · CECyTE Lab'
   };
+
+  // Enlaces de las versiones anteriores: abren el inventario con su tipo ya elegido
+  var LEGACY_VIEWS = { materiales: 'material', reactivos: 'reactivo' };
 
   /* ---------- Enrutador ---------- */
   var currentView = null;
 
   function route(initial) {
     var hash = (location.hash || '').replace('#', '');
+    if (LEGACY_VIEWS[hash]) {
+      Tables.show('inventario', { tipo: LEGACY_VIEWS[hash] });
+      history.replaceState(null, '', '#inventario');
+      hash = 'inventario';
+    }
     var view = VIEWS.indexOf(hash) > -1 ? hash : 'inicio';
     if (view === currentView) return;
+    var prevView = currentView;
     currentView = view;
 
     document.querySelectorAll('.view[data-view]').forEach(function (sec) {
@@ -29,6 +37,7 @@
       sec.hidden = !on;
       if (on) {
         sec.classList.remove('is-entering');
+        sec.setAttribute('data-dir', prevView && VIEWS.indexOf(view) < VIEWS.indexOf(prevView) ? 'back' : 'next');
         void sec.offsetWidth;
         sec.classList.add('is-entering');
       }
@@ -56,16 +65,6 @@
 
   window.addEventListener('hashchange', function () { route(false); });
 
-  /* ---------- Panel de inicio ---------- */
-  var DIST_ORDER = [
-    { slug: 'verde', label: 'Verde' },
-    { slug: 'azul', label: 'Azul' },
-    { slug: 'amarillo', label: 'Amarillo' },
-    { slug: 'rojo', label: 'Rojo' },
-    { slug: 'blanco', label: 'Blanco' },
-    { slug: 'rayas', label: 'Rayas' }
-  ];
-
   function animateNumber(el, to) {
     if (!el) return;
     var from = parseInt(el.textContent, 10) || 0;
@@ -85,132 +84,59 @@
     return n + ' ' + (n === 1 ? one : many);
   }
 
+  function setNavBadge(id, n, text) {
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.hidden = !n;
+    el.innerHTML = n + '<span class="sr-only"> ' + text + '</span>';
+  }
+
   function renderHome() {
-    var mat = Store.getDB('materiales');
-    var reac = Store.getDB('reactivos');
+    var inv = Tables.stats();
     var prac = Store.getDB('practicas');
 
-    animateNumber(document.getElementById('stat-mat'), mat.length);
-    animateNumber(document.getElementById('stat-reac'), reac.length);
-    animateNumber(document.getElementById('stat-prac'), prac.length);
-
-    document.getElementById('tile-mat').textContent = plural(mat.length, 'registro', 'registros');
-    document.getElementById('tile-reac').textContent = plural(reac.length, 'registro', 'registros');
-    document.getElementById('tile-prac').textContent = plural(prac.length, 'registro', 'registros');
-
-    // Distribución por color de almacenaje
-    var counts = {};
-    reac.forEach(function (r) {
-      var s = Tables.colorSlug(r.almacen);
-      counts[s] = (counts[s] || 0) + 1;
-    });
-    var total = reac.length || 1;
-    var bar = document.getElementById('distBar');
-    var legend = document.getElementById('distLegend');
-    var parts = DIST_ORDER.filter(function (d) { return counts[d.slug]; });
-
-    bar.innerHTML = parts.map(function (d) {
-      return '<span class="dist__seg swatch-bg--' + d.slug + '" style="flex-grow:' + counts[d.slug] + '" title="' + d.label + ': ' + counts[d.slug] + '"></span>';
-    }).join('');
-    bar.setAttribute('aria-label', 'Distribución de reactivos: ' + parts.map(function (d) {
-      return d.label + ' ' + counts[d.slug];
-    }).join(', '));
-
-    legend.innerHTML = parts.map(function (d) {
-      var pct = Math.round((counts[d.slug] / total) * 100);
-      return '<li><span class="swatch-dot swatch-dot--' + d.slug + '" aria-hidden="true"></span>' + d.label +
-        ' <span class="mono dist-legend__n">' + counts[d.slug] + '</span><span class="sr-only"> (' + pct + '%)</span></li>';
-    }).join('');
+    animateNumber(document.getElementById('tile-mat'), inv.materiales);
+    animateNumber(document.getElementById('tile-reac'), inv.reactivos);
+    animateNumber(document.getElementById('tile-prac'), prac.length);
 
     // Alertas
-    var expired = reac.filter(function (r) { return Tables.isExpired(r.caducidad); });
-    var bad = mat.filter(function (m) { return Tables.estadoTone(m.estado) === 'bad'; });
     var alerts = [];
-    if (expired.length) {
+    if (inv.expired) {
       alerts.push(
-        '<a class="alert alert--bad" href="#reactivos" data-goto-filter="reactivos:__caducado">' +
+        '<a class="alert alert--bad" href="#inventario" data-goto-filter="inventario:alerta=caducado">' +
           '<i class="ph-fill ph-warning" aria-hidden="true"></i>' +
-          '<span><strong>' + plural(expired.length, 'reactivo con lote caducado', 'reactivos con lotes caducados') + '</strong>' +
-          '<small>' + esc(expired.slice(0, 2).map(function (r) { return r.reactivo; }).join(', ')) + (expired.length > 2 ? '…' : '') + '</small></span>' +
+          '<span><strong>' + plural(inv.expired, 'artículo con lote caducado', 'artículos con lotes caducados') + '</strong>' +
+          '</span>' +
           '<i class="ph ph-arrow-right alert__go" aria-hidden="true"></i>' +
         '</a>');
     }
-    if (bad.length) {
+    if (inv.observed) {
       alerts.push(
-        '<a class="alert alert--warn" href="#materiales" data-goto-filter="materiales:Malo">' +
+        '<a class="alert alert--warn" href="#inventario" data-goto-filter="inventario:alerta=obs">' +
           '<i class="ph-fill ph-wrench" aria-hidden="true"></i>' +
-          '<span><strong>' + plural(bad.length, 'material en mal estado', 'materiales en mal estado') + '</strong>' +
-          '<small>' + esc(bad.slice(0, 2).map(function (m) { return m.material; }).join(', ')) + (bad.length > 2 ? '…' : '') + '</small></span>' +
+          '<span><strong>' + plural(inv.observed, 'artículo con observaciones', 'artículos con observaciones') + '</strong>' +
+          '</span>' +
           '<i class="ph ph-arrow-right alert__go" aria-hidden="true"></i>' +
         '</a>');
     }
     if (!alerts.length) {
-      alerts.push('<p class="alert alert--ok"><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span><strong>Todo en orden</strong><small>Sin caducados ni material dañado.</small></span></p>');
+      alerts.push('<p class="alert alert--ok"><i class="ph-fill ph-check-circle" aria-hidden="true"></i><span><strong>Todo en orden</strong></span></p>');
     }
     document.getElementById('homeAlerts').innerHTML = alerts.join('');
-
-    renderAgenda(prac);
+    setNavBadge('navBadgeCad', inv.expired, 'caducados');
+    setNavBadge('navBadgeObs', inv.observed, 'con observaciones');
   }
 
-  function renderAgenda(prac) {
-    var list = document.getElementById('agendaList');
-    var today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    var dated = prac
-      .map(function (p) {
-        var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(p.fecha || ''));
-        return m ? { p: p, d: new Date(+m[1], +m[2] - 1, +m[3]) } : null;
-      })
-      .filter(Boolean)
-      .sort(function (a, b) { return a.d - b.d; });
-
-    var upcoming = dated.filter(function (x) { return x.d >= today; });
-    var showingPast = false;
-    if (!upcoming.length) {
-      upcoming = dated.slice(-4).reverse();
-      showingPast = true;
-    }
-    upcoming = upcoming.slice(0, 4);
-
-    if (!upcoming.length) {
-      list.innerHTML = '<li class="agenda__empty"><i class="ph ph-calendar-blank" aria-hidden="true"></i> No hay prácticas con fecha registrada.</li>';
-      return;
-    }
-
-    var dayFmt = new Intl.DateTimeFormat('es-MX', { day: '2-digit' });
-    var monFmt = new Intl.DateTimeFormat('es-MX', { month: 'short' });
-    var wkFmt = new Intl.DateTimeFormat('es-MX', { weekday: 'long' });
-
-    list.innerHTML = upcoming.map(function (x) {
-      var diff = Math.round((x.d - today) / 86400000);
-      var rel = diff === 0 ? 'Hoy' : diff === 1 ? 'Mañana' : diff > 1 ? 'En ' + diff + ' días' : 'Hace ' + Math.abs(diff) + ' días';
-      return '<li class="agenda__item' + (diff === 0 ? ' is-today' : '') + (diff < 0 ? ' is-past' : '') + '">' +
-        '<time class="agenda__date" datetime="' + esc(x.p.fecha) + '">' +
-          '<span class="agenda__day mono">' + dayFmt.format(x.d) + '</span>' +
-          '<span class="agenda__mon">' + monFmt.format(x.d).replace('.', '') + '</span>' +
-        '</time>' +
-        '<div class="agenda__body">' +
-          '<p class="agenda__title">' + esc(x.p.prac) + '</p>' +
-          '<p class="agenda__meta"><span class="badge badge--subject">' + esc(x.p.mat) + '</span> <span>' + esc(x.p.rec) + '</span></p>' +
-        '</div>' +
-        '<span class="agenda__rel"><span class="mono">' + rel + '</span><small>' + wkFmt.format(x.d) + '</small></span>' +
-      '</li>';
-    }).join('') + (showingPast ? '<li class="agenda__note">No hay prácticas próximas; se muestran las más recientes.</li>' : '');
-  }
-
-  // Alertas del inicio: navegar y aplicar filtro
+  // Tarjetas y alertas del inicio: al navegar, el inventario abre con ese filtro solo
+  // ("inventario:tipo=material" limpia búsqueda y demás filtros y deja únicamente ese).
   document.addEventListener('click', function (e) {
     var a = e.target.closest('[data-goto-filter]');
     if (!a) return;
-    var parts = a.getAttribute('data-goto-filter').split(':');
-    var btn = function () {
-      return document.querySelector('[data-filters="' + parts[0] + '"] [data-filter="' + parts[1] + '"]');
-    };
-    setTimeout(function () {
-      var b = btn();
-      if (b && b.getAttribute('aria-pressed') !== 'true') b.click();
-    }, 0);
+    var m = /^([^:]+):([^=]+)=(.*)$/.exec(a.getAttribute('data-goto-filter'));
+    if (!m) return;
+    var f = {};
+    f[m[2]] = m[3];
+    Tables.show(m[1], f);
   });
 
   /* ---------- Fecha de hoy ---------- */

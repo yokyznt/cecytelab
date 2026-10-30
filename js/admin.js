@@ -8,22 +8,19 @@
   var esc = UI.escapeHTML;
   var $ = function (id) { return document.getElementById(id); };
 
+  // `only` = campo que solo aplica a ese tipo de artículo (se oculta con el otro tipo y no se guarda)
   var SCHEMAS = {
-    materiales: [
-      { id: 'id', label: 'ID', type: 'text', placeholder: 'M079', mono: true },
-      { id: 'material', label: 'Material', type: 'text', required: true, wide: true },
-      { id: 'cantidad', label: 'Cantidad', type: 'text', placeholder: '10 piezas' },
-      { id: 'estado', label: 'Estado', type: 'select', opts: ['Bueno', 'Regular', 'Malo'] },
-      { id: 'ubicacion', label: 'Ubicación', type: 'text', placeholder: 'Cristalería', list: 'ubicaciones' },
-      { id: 'desc', label: 'Descripción', type: 'textarea' }
-    ],
-    reactivos: [
-      { id: 'id', label: 'ID', type: 'text', placeholder: 'R052', mono: true },
-      { id: 'reactivo', label: 'Reactivo', type: 'text', required: true, wide: true },
-      { id: 'cantidad', label: 'Cantidad', type: 'text', placeholder: '500 ml (1 frasco)' },
-      { id: 'caducidad', label: 'Caducidad', type: 'text', placeholder: 'N/A o CADUCADO (Mes Año)' },
-      { id: 'riesgo', label: 'Riesgo / tipo', type: 'text', placeholder: 'Irritante' },
-      { id: 'almacen', label: 'Color de almacenaje', type: 'select', opts: ['Verde', 'Azul', 'Amarillo', 'Rojo', 'Blanco (Piso)', 'Rayas (Separado)'] }
+    inventario: [
+      { id: 'id', label: 'ID', type: 'text', placeholder: 'I254', mono: true },
+      { id: 'articulo', label: 'Artículo', type: 'text', required: true, wide: true },
+      { id: 'tipo', label: 'Tipo', type: 'select', opts: [['reactivo', 'Reactivo'], ['material', 'Material']] },
+      { id: 'presentaciones', label: 'Presentaciones', type: 'presentaciones', required: true, wide: true,
+        placeholder: '250 gr | 5 | N/A | nota opcional' },
+      { id: 'riesgo', label: 'Riesgo / tipo', type: 'text', placeholder: 'Irritante', only: 'reactivo' },
+      { id: 'almacen', label: 'Color de almacenaje', type: 'select', only: 'reactivo',
+        opts: ['Verde', 'Azul', 'Amarillo', 'Rojo', 'Blanco (Piso)', 'Rayas (Separado)', 'Por identificar'] },
+      { id: 'ubicacion', label: 'Ubicación', type: 'text', placeholder: 'Cristalería', list: 'ubicaciones', only: 'material' },
+      { id: 'obs', label: 'Observaciones', type: 'textarea' }
     ],
     practicas: [
       { id: 'prac', label: 'Nombre de la práctica', type: 'text', required: true, wide: true },
@@ -34,10 +31,38 @@
     ]
   };
 
-  var NOUN = { materiales: 'material', reactivos: 'reactivo', practicas: 'práctica' };
+  var NOUN = { inventario: 'artículo', practicas: 'práctica' };
 
   var current = { cat: null, index: null };
-  var bulkCat = 'materiales';
+  var bulkCat = 'inventario';
+
+  /* ---------- Presentaciones: una por línea ----------
+     "medida | cantidad | caducidad | nota | unidad" (solo la cantidad es obligatoria). */
+  function formatPresentaciones(list) {
+    return (Array.isArray(list) ? list : []).map(function (p) {
+      var cols = [p.medida || '', p.cantidad, p.caducidad && p.caducidad !== 'N/A' ? p.caducidad : '', p.nota || '', p.unidad || ''];
+      while (cols.length > 2 && cols[cols.length - 1] === '') cols.pop();
+      return cols.join(' | ');
+    }).join('\n');
+  }
+
+  function parsePresentaciones(text) {
+    var list = [];
+    var lines = text.split('\n');
+    for (var i = 0; i < lines.length; i++) {
+      if (!lines[i].trim()) continue;
+      var c = lines[i].split('|').map(function (s) { return s.trim(); });
+      var qty = (c[1] || '').replace(',', '.');
+      if (!/^\d+(\.\d+)?$/.test(qty)) {
+        return { error: 'Línea ' + (i + 1) + ': escribe la cantidad como número (medida | cantidad | caducidad | nota).' };
+      }
+      var p = { medida: c[0] || '', cantidad: parseFloat(qty), caducidad: c[2] || 'N/A', nota: c[3] || '' };
+      if (c[4]) p.unidad = c[4];
+      list.push(p);
+    }
+    if (!list.length) return { error: 'Agrega al menos una presentación.' };
+    return { list: list };
+  }
 
   /* ---------- Estado de sesión ---------- */
   function isAdmin() {
@@ -128,7 +153,7 @@
   }
 
   function nextId(cat) {
-    var prefix = cat === 'materiales' ? 'M' : 'R';
+    var prefix = 'I';
     var max = 0;
     Store.getDB(cat).forEach(function (r) {
       var m = /^[A-Z](\d+)$/.exec(String(r.id || ''));
@@ -148,19 +173,28 @@
       (isEdit ? 'Editar ' : 'Nuevo ') + esc(NOUN[cat]);
 
     var html = '';
+    var tipoActual = isEdit ? (data.tipo === 'material' ? 'material' : 'reactivo') : 'reactivo';
     SCHEMAS[cat].forEach(function (f) {
       var val = data[f.id] != null ? String(data[f.id]) : '';
+      if (f.type === 'presentaciones') val = formatPresentaciones(data[f.id]);
       if (!isEdit && f.id === 'id') val = nextId(cat);
       var fid = 'inp_' + f.id;
-      var cls = 'field' + (f.type === 'textarea' || f.wide ? ' field--full' : '');
-      var auto = f.required ? ' autofocus' : '';
-      html += '<div class="' + cls + '"><label for="' + fid + '">' + esc(f.label) + (f.required ? ' <span class="req" aria-hidden="true">*</span>' : '') + '</label>';
+      var cls = 'field' + (f.type === 'textarea' || f.type === 'presentaciones' || f.wide ? ' field--full' : '');
+      var auto = f.required && f.type === 'text' ? ' autofocus' : '';
+      var only = f.only ? ' data-only="' + f.only + '"' + (f.only === tipoActual ? '' : ' hidden') : '';
+      html += '<div class="' + cls + '"' + only + '><label for="' + fid + '">' + esc(f.label) + (f.required ? ' <span class="req" aria-hidden="true">*</span>' : '') + '</label>';
       if (f.type === 'select') {
-        var opts = f.opts.slice();
-        if (val && opts.indexOf(val) === -1) opts.unshift(val);
+        // Cada opción es un texto o un par [valor, etiqueta]
+        var opts = f.opts.map(function (o) { return Array.isArray(o) ? o : [o, o]; });
+        if (val && !opts.some(function (o) { return o[0] === val; })) opts.unshift([val, val]);
+        if (f.id === 'tipo') val = tipoActual;
         html += '<div class="select-wrap"><select class="input" id="' + fid + '" name="' + f.id + '">' +
-          opts.map(function (o) { return '<option' + (o === val ? ' selected' : '') + '>' + esc(o) + '</option>'; }).join('') +
+          opts.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (o[0] === val ? ' selected' : '') + '>' + esc(o[1]) + '</option>'; }).join('') +
           '</select><i class="ph ph-caret-up-down" aria-hidden="true"></i></div>';
+      } else if (f.type === 'presentaciones') {
+        html += '<textarea class="input mono" id="' + fid + '" name="' + f.id + '" rows="5" spellcheck="false" autocomplete="off"' +
+          ' placeholder="' + esc(f.placeholder || '') + '" aria-describedby="hint_' + f.id + '" required aria-required="true">' + esc(val) + '</textarea>' +
+          '<p class="field__hint" id="hint_' + f.id + '">Una por línea: <code>medida | cantidad | caducidad | nota</code>. Solo la cantidad es obligatoria (para piezas sueltas deja la medida vacía: <code> | 16</code>).</p>';
       } else if (f.type === 'textarea') {
         html += '<textarea class="input" id="' + fid + '" name="' + f.id + '" rows="3">' + esc(val) + '</textarea>';
       } else {
@@ -172,9 +206,18 @@
       }
       html += '<p class="field__error" id="err_' + f.id + '" hidden></p></div>';
     });
-    html += datalist('ubicaciones', 'materiales', 'ubicacion') + datalist('materias', 'practicas', 'mat');
+    html += datalist('ubicaciones', 'inventario', 'ubicacion') + datalist('materias', 'practicas', 'mat');
 
     $('formFields').innerHTML = html;
+    // Con cada tipo se muestran solo sus campos (riesgo y almacenaje, o ubicación)
+    var tipoSel = $('inp_tipo');
+    if (tipoSel) {
+      tipoSel.addEventListener('change', function () {
+        $('formFields').querySelectorAll('[data-only]').forEach(function (el) {
+          el.hidden = el.getAttribute('data-only') !== tipoSel.value;
+        });
+      });
+    }
     UI.openDialog('formDialog', document.activeElement);
   }
 
@@ -184,12 +227,29 @@
     if (!cat) return;
     var obj = {};
     var invalid = null;
+    var tipo = $('inp_tipo') ? $('inp_tipo').value : null;
     SCHEMAS[cat].forEach(function (f) {
       var el = $('inp_' + f.id);
       var errEl = $('err_' + f.id);
-      obj[f.id] = el.value.trim();
       el.removeAttribute('aria-invalid');
       errEl.hidden = true;
+      if (f.only && f.only !== tipo) return; // campo del otro tipo: no se guarda
+      if (f.type === 'presentaciones') {
+        var res = parsePresentaciones(el.value);
+        if (res.error) {
+          if (!invalid) {
+            invalid = el;
+            el.setAttribute('aria-invalid', 'true');
+            el.setAttribute('aria-describedby', 'err_' + f.id);
+            errEl.textContent = res.error;
+            errEl.hidden = false;
+          }
+        } else {
+          obj[f.id] = res.list;
+        }
+        return;
+      }
+      obj[f.id] = el.value.trim();
       if (f.required && !obj[f.id] && !invalid) {
         invalid = el;
         el.setAttribute('aria-invalid', 'true');
@@ -212,7 +272,7 @@
     var db = Store.getDB(cat);
     var row = db[index];
     if (!row) return;
-    var label = row.material || row.reactivo || row.prac || 'este registro';
+    var label = row.articulo || row.prac || 'este registro';
     UI.confirm({
       title: '¿Eliminar ' + NOUN[cat] + '?',
       message: '“' + label + '” se eliminará de forma definitiva.',
