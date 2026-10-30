@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Integral de Laboratorio - CECyTE</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    /* ==========================================================================
+       VARIABLES GLOBALES Y TEMA
+       ========================================================================== */
+    :root {
+      --bg-dark: #0f172a;        
+      --bg-darker: #020617;      
+      --bg-light: #f8fafc;       
+      --bg-card: #ffffff;
+      
+      --accent-primary: #0ea5e9; 
+      --accent-hover: #0284c7;   
+      --accent-glow: rgba(14, 165, 233, 0.35);
+      
+      --text-main: #1e293b;      
+      --text-muted: #64748b;     
+      --text-light: #f1f5f9;     
+      
+      --border-light: #e2e8f0;   
+      --border-dark: #334155;    
+      
+      --danger: #ef4444;
+      --danger-bg: #fee2e2;
+      --warning: #f59e0b;
+      --warning-bg: #fef3c7;
+      --success: #10b981;
+      --success-bg: #d1fae5;
+      --info: #3b82f6;
+      --info-bg: #dbeafe;
+
+      --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+      --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.08);
+      --shadow-lg: 0 12px 24px rgba(15, 23, 42, 0.12);
+      --shadow-glow: 0 0 20px var(--accent-glow);
+      
+      --radius-sm: 8px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --radius-full: 9999px;
+      
+      --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-main);
+      line-height: 1.6;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* ANIMACIONES AVANZADAS */
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    
+    @keyframes springIn {
+      0% { opacity: 0; transform: scale(0.9) translateY(20px); }
+      70% { transform: scale(1.02) translateY(-5px); }
+      100% { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    @keyframes pulseAlert {
+      0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(239, 68, 68, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    @keyframes waterDrop {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(25px); opacity: 0; }
+    }
+
+    .stagger-1 { animation: fadeUp 0.5s var(--transition) 0.1s both; }
+    .stagger-2 { animation: fadeUp 0.5s var(--transition) 0.2s both; }
+    .stagger-3 { animation: fadeUp 0.5s var(--transition) 0.3s both; }
+
+    /* NAVEGACIÓN (HEADER) */
+    header {
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-dark);
+      position: sticky; top: 0; z-index: 1000; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    }
+    .nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding: 0.8rem 2rem; }
+    .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; cursor: pointer; }
+    .brand-icon { width: 42px; height: 42px; background: linear-gradient(135deg, var(--accent-primary), #3b82f6); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; font-size: 1.4rem; box-shadow: var(--shadow-glow); }
+    .brand-text h1 { color: var(--text-light); font-size: 1.25rem; font-weight: 800; letter-spacing: -0.5px; line-height: 1.1; }
+    .brand-text span { color: var(--accent-primary); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+    .nav-menu { display: flex; gap: 4px; list-style: none; }
+    .nav-menu a { color: #94a3b8; text-decoration: none; padding: 0.6rem 1.2rem; border-radius: var(--radius-full); font-size: 0.88rem; font-weight: 500; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+    .nav-menu a:hover { color: var(--text-light); background: rgba(255, 255, 255, 0.05); }
+    .nav-menu a.active { color: white; background: var(--accent-primary); box-shadow: 0 4px 12px var(--accent-glow); }
+    
+    .btn-admin-login { background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); padding: 0.6rem 1.2rem; border-radius: var(--radius-full); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: var(--transition); }
+    .btn-admin-login:hover { background: white; color: var(--bg-dark); border-color: white; }
+
+    /* BANNER ADMIN */
+    .admin-banner { background: linear-gradient(90deg, #f59e0b, #d97706); color: white; padding: 0.6rem 2rem; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 0.85rem; box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3); display: none; }
+    .admin-actions { display: flex; gap: 8px; }
+    .btn-admin-action { background: rgba(0,0,0,0.2); border: none; color: white; padding: 0.4rem 1rem; border-radius: var(--radius-sm); font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: var(--transition); }
+    .btn-admin-action:hover { background: rgba(0,0,0,0.4); }
+
+    /* CONTENIDO PRINCIPAL */
+    main { flex: 1; width: 100%; max-width: 1400px; margin: 0 auto; padding: 2.5rem 2rem; }
+    .page-section { display: none; }
+    .page-section.active { display: block; animation: fadeUp 0.4s ease forwards; }
+
+    /* INICIO */
+    .hero { background: linear-gradient(135deg, var(--bg-dark) 0%, #1e3a8a 100%); border-radius: var(--radius-lg); padding: 4rem; color: white; position: relative; overflow: hidden; margin-bottom: 3rem; box-shadow: var(--shadow-lg); display: flex; justify-content: space-between; align-items: center; }
+    .hero::after { content: ''; position: absolute; top: -50%; left: 50%; width: 800px; height: 800px; background: radial-gradient(circle, rgba(14,165,233,0.15) 0%, transparent 70%); border-radius: 50%; pointer-events: none; }
+    .hero-content { position: relative; z-index: 2; max-width: 600px; }
+    .hero-title { font-size: 3rem; font-weight: 800; line-height: 1.1; margin-bottom: 1rem; letter-spacing: -1px; }
+    .hero-subtitle { font-size: 1.1rem; color: #cbd5e1; margin-bottom: 2rem; }
+    .hero-stats { display: flex; gap: 2rem; background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); padding: 1.5rem 2rem; border-radius: var(--radius-md); border: 1px solid rgba(255, 255, 255, 0.1); z-index: 2; }
+    .stat-item { display: flex; flex-direction: column; gap: 4px; }
+    .stat-value { font-size: 2rem; font-weight: 800; color: white; line-height: 1; }
+    .stat-label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+
+    /* CARDS GENÉRICAS */
+    .module-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+    .module-card { background: var(--bg-card); border-radius: var(--radius-md); padding: 2rem; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); transition: var(--transition); cursor: pointer; display: flex; flex-direction: column; }
+    .module-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-md); border-color: var(--accent-primary); }
+    .module-icon { width: 54px; height: 54px; background: var(--info-bg); color: var(--info); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.5rem; transition: var(--transition); }
+    .module-card:hover .module-icon { background: var(--accent-primary); color: white; transform: scale(1.1) rotate(-5deg); box-shadow: var(--shadow-glow); }
+    .module-card h3 { font-size: 1.1rem; color: var(--text-main); margin-bottom: 0.5rem; }
+    .module-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* CONTROLES Y TABLAS */
+    .section-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border-light); }
+    .section-title h2 { font-size: 2rem; font-weight: 800; color: var(--bg-dark); letter-spacing: -0.5px; display: flex; align-items: center; gap: 12px; }
+    .section-title h2 i { color: var(--accent-primary); }
+    .section-title p { color: var(--text-muted); font-size: 0.95rem; margin-top: 0.3rem; margin-left: 2.8rem; }
+    .controls { display: flex; gap: 1rem; align-items: center; }
+    .search-bar { position: relative; width: 300px; }
+    .search-bar i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+    .search-bar input { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border-radius: var(--radius-full); border: 1px solid var(--border-light); background: white; font-size: 0.9rem; outline: none; transition: var(--transition); }
+    .search-bar input:focus { border-color: var(--accent-primary); box-shadow: 0 0 0 4px var(--accent-glow); }
+    .btn-primary { background: var(--accent-primary); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: var(--transition); }
+    .btn-primary:hover { background: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 6px 16px var(--accent-glow); }
+
+    .table-container { background: white; border-radius: var(--radius-md); border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); overflow: hidden; }
+    .table-scroll { width: 100%; overflow-x: auto; min-height: 300px;}
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    thead { background: #e2e8f0; border-bottom: 2px solid #cbd5e1; }
+    th { padding: 1.2rem 1.5rem; font-size: 0.85rem; font-weight: 700; color: #334155; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid var(--border-light); transition: var(--transition); }
+    tbody tr:hover { background: #f8fafc; }
+    td { padding: 1.2rem 1.5rem; font-size: 0.9rem; color: var(--text-main); vertical-align: middle; }
+    .td-bold { font-weight: 600; color: var(--bg-dark); }
+    
+    .badge { padding: 0.35rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; letter-spacing: 0.3px; }
+    .b-success { background: var(--success-bg); color: #065f46; } .b-warning { background: var(--warning-bg); color: #92400e; } .b-danger { background: var(--danger-bg); color: #991b1b; } .b-info { background: var(--info-bg); color: #1e40af; } .b-dark { background: #e2e8f0; color: #334155; }
+    
+    .action-group { display: flex; gap: 6px; }
+    .btn-icon { width: 32px; height: 32px; border-radius: 8px; border: none; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: var(--transition); background: transparent; }
+    .btn-icon.edit { color: var(--info); background: var(--info-bg); } .btn-icon.edit:hover { background: var(--info); color: white; }
+    .btn-icon.delete { color: var(--danger); background: var(--danger-bg); } .btn-icon.delete:hover { background: var(--danger); color: white; }
+    
+    /* PAGINACIÓN ESTILOS */
+    .table-footer { padding: 1rem 1.5rem; background: #e2e8f0; border-top: 1px solid #cbd5e1; font-size: 0.85rem; color: #334155; font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+    .pagination { display: flex; gap: 8px; align-items: center; }
+    .btn-page { background: white; border: 1px solid #cbd5e1; padding: 0.4rem 0.75rem; border-radius: 8px; cursor: pointer; transition: 0.2s; color: #334155; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; }
+    .btn-page:hover:not(:disabled) { background: var(--accent-primary); border-color: var(--accent-primary); color: white; transform: translateY(-2px); box-shadow: 0 4px 8px var(--accent-glow); }
+    .btn-page:disabled { opacity: 0.4; cursor: not-allowed; }
+    .page-info { font-size: 0.85rem; color: #475569; font-weight: 700; margin: 0 5px; min-width: 80px; text-align: center; }
+
+    /* SEGURIDAD INTERACTIVA */
+    .safety-tabs { display: flex; gap: 1rem; margin-bottom: 2rem; background: white; padding: 0.5rem; border-radius: var(--radius-full); box-shadow: var(--shadow-sm); border: 1px solid var(--border-light); width: fit-content; flex-wrap: wrap; }
+    .s-tab { padding: 0.6rem 1.5rem; border: none; background: transparent; border-radius: var(--radius-full); font-weight: 600; color: var(--text-muted); cursor: pointer; transition: var(--transition); }
+    .s-tab.active { background: var(--bg-dark); color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
+    .s-tab:hover:not(.active) { background: var(--bg-light); color: var(--text-main); }
+    .s-content { display: none; animation: scaleIn 0.3s ease forwards; }
+    .s-content.active { display: block; }
+    .sub-header-safety { font-size: 1.25rem; font-weight: 700; color: var(--bg-dark); margin-bottom: 1.2rem; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid var(--border-light); padding-bottom: 0.5rem; margin-top: 1.5rem; }
+    .sub-header-safety i { color: var(--accent-primary); }
+
+    /* Tarjetas Minimalistas */
+    .safety-card { align-items: center; justify-content: center; text-align: center; padding: 2.5rem 1.5rem; border: 2px solid transparent; }
+    .safety-card .module-icon { width: 70px; height: 70px; font-size: 2rem; margin-bottom: 1rem; border-radius: 20px; }
+    .safety-card h3 { margin-bottom: 0; font-size: 1.15rem; font-weight: 700; }
+    .safety-card:hover { border-color: var(--accent-primary); transform: translateY(-5px) scale(1.02); }
+
+    /* MODALES GENÉRICOS Y BACKDROP */
+    .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(6px); display: none; align-items: center; justify-content: center; z-index: 2000; padding: 1rem; animation: fadeIn 0.3s ease; }
+    .modal-backdrop.active { display: flex; }
+    
+    .modal-card { background: white; width: 100%; max-width: 600px; border-radius: var(--radius-lg); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); overflow: hidden; display: flex; flex-direction: column; animation: springIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    .modal-card.wide { max-width: 900px; }
+    .modal-header { background: var(--bg-light); padding: 1.5rem 2rem; border-bottom: 1px solid var(--border-light); display: flex; justify-content: space-between; align-items: center; }
+    .modal-header h3 { font-size: 1.25rem; font-weight: 700; color: var(--bg-dark); }
+    .btn-close { background: none; border: none; font-size: 1.25rem; color: var(--text-muted); cursor: pointer; transition: 0.2s; }
+    .btn-close:hover { color: var(--danger); transform: rotate(90deg); }
+    .modal-body { padding: 2rem; max-height: 70vh; overflow-y: auto; }
+    
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    .form-group label { font-size: 0.85rem; font-weight: 600; color: var(--text-main); }
+    .form-group input, .form-group select, .form-group textarea { padding: 0.8rem 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-light); background: var(--bg-light); font-size: 0.95rem; outline: none; transition: var(--transition); font-family: inherit; }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { background: white; border-color: var(--accent-primary); box-shadow: 0 0 0 4px var(--accent-glow); }
+    .modal-footer { background: var(--bg-light); padding: 1.25rem 2rem; border-top: 1px solid var(--border-light); display: flex; justify-content: flex-end; gap: 1rem; }
+    .btn-secondary { background: white; border: 1px solid var(--border-light); color: var(--text-main); padding: 0.75rem 1.5rem; border-radius: var(--radius-full); font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-secondary:hover { background: var(--bg-light); border-color: var(--text-muted); }
+
+    /* EDITOR MASIVO (JSON) */
+    .editor-tabs { display: flex; gap: 8px; margin-bottom: 1rem; border-bottom: 2px solid var(--border-light); padding-bottom: 0.5rem; }
+    .e-tab { padding: 0.5rem 1rem; border: none; background: transparent; font-weight: 600; color: var(--text-muted); cursor: pointer; border-radius: var(--radius-sm); transition: 0.2s; }
+    .e-tab.active { background: var(--info-bg); color: var(--info); }
+    .e-tab:hover:not(.active) { background: var(--bg-light); }
+    .code-area { width: 100%; height: 350px; background: #1e293b; color: #38bdf8; font-family: 'Fira Code', monospace; font-size: 0.9rem; padding: 1.5rem; border-radius: var(--radius-md); border: none; outline: none; resize: vertical; line-height: 1.5; box-shadow: inset 0 4px 6px rgba(0,0,0,0.1); }
+    .code-error { color: var(--danger); font-size: 0.85rem; margin-top: 8px; font-weight: 600; display: none; }
+
+    /* ==========================================================================
+       MEGA MODAL DE SEGURIDAD Y ARTE CSS
+       ========================================================================== */
+    .mega-modal { position: relative; width: 100%; max-width: 850px; }
+    .mega-modal-header { padding: 2.5rem 2rem; color: white; position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; text-align: center; border-radius: var(--radius-lg) var(--radius-lg) 0 0; }
+    .mega-modal-header::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, rgba(255,255,255,0.2), transparent); pointer-events: none; }
+    .mega-modal-icon { font-size: 3.5rem; margin-bottom: 1rem; position: relative; z-index: 2; text-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+    .mega-modal-title { font-size: 2rem; font-weight: 800; position: relative; z-index: 2; letter-spacing: -0.5px; }
+    
+    .mega-modal-close { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.35); border: 2px solid rgba(255,255,255,0.1); color: white; width: 36px; height: 36px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; z-index: 100; transition: var(--transition); display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+    .mega-modal-close:hover { background: rgba(0,0,0,0.7); transform: rotate(90deg) scale(1.1); border-color: rgba(255,255,255,0.4); }
+    
+    .mega-modal-body { padding: 3rem; overflow-y: auto; max-height: 70vh; font-size: 1.05rem; line-height: 1.8; color: var(--text-main); }
+    
+    .art-quote { background: white; border-left: 5px solid var(--accent-primary); padding: 1.5rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; box-shadow: var(--shadow-sm); margin-bottom: 1.5rem; font-style: italic; color: var(--text-main); }
+    .art-warning { background: var(--danger-bg); color: #991b1b; padding: 1.5rem; border-radius: var(--radius-md); border: 2px dashed var(--danger); font-weight: 700; display: flex; align-items: center; gap: 15px; margin-bottom: 1.5rem; }
+    .art-warning.pulse { animation: pulseAlert 2s infinite; border-style: solid; border-color: var(--danger); box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+    .art-warning i { font-size: 2rem; }
+    .art-list { list-style: none; display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem; }
+    .art-list li { background: white; padding: 1rem 1.5rem; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); display: flex; align-items: center; gap: 12px; font-weight: 500; border: 1px solid var(--border-light); transition: 0.2s; }
+    .art-list li:hover { transform: translateX(5px); border-color: var(--accent-primary); }
+    .art-list li i { color: var(--accent-primary); font-size: 1.2rem; }
+    
+    /* 1. Arte: Grid de Equipo de Protección */
+    .art-ppe-grid { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: center; margin: 2rem 0; }
+    .art-ppe-item { background: #f8fafc; border: 2px solid #e2e8f0; border-radius: 16px; width: 110px; height: 110px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; transition: var(--transition); cursor: default; }
+    .art-ppe-item i { font-size: 2.2rem; color: #64748b; transition: 0.3s; }
+    .art-ppe-item span { font-size: 0.85rem; font-weight: 700; color: #334155; }
+    .art-ppe-item:hover { transform: translateY(-10px); border-color: #3b82f6; background: #eff6ff; box-shadow: 0 10px 15px rgba(59, 130, 246, 0.2); }
+    .art-ppe-item:hover i { color: #2563eb; transform: scale(1.1); }
+
+    /* 2. Arte: Alimentos / Limpieza */
+    .art-flex-center { display: flex; justify-content: center; align-items: center; gap: 2rem; margin: 2rem 0; }
+    
+    /* 3. Arte: Regadera y Lavaojos */
+    .art-emergency { display: flex; justify-content: center; gap: 3rem; margin: 2rem 0; }
+    .art-shower, .art-eyewash { background: #fff1f2; border: 2px solid #fda4af; border-radius: 50%; width: 120px; height: 120px; display: flex; align-items: center; justify-content: center; font-size: 3rem; color: #e11d48; position: relative; box-shadow: 0 10px 20px rgba(225, 29, 72, 0.15); transition: 0.3s; }
+    .art-shower:hover, .art-eyewash:hover { transform: scale(1.05); }
+    .art-drop { position: absolute; font-size: 1rem; color: #38bdf8; top: 70%; animation: waterDrop 1s infinite; opacity: 0; }
+    .art-drop:nth-child(2) { left: 30%; animation-delay: 0.2s; }
+    .art-drop:nth-child(3) { left: 50%; animation-delay: 0.5s; }
+    .art-drop:nth-child(4) { right: 30%; animation-delay: 0.1s; }
+
+    /* 4. Arte: Diagrama de Estantería */
+    .art-rack-diagram { display: flex; flex-direction: column; background: #cbd5e1; padding: 15px; border-radius: 12px; margin: 2rem auto; max-width: 400px; gap: 10px; border: 4px solid #94a3b8; }
+    .art-rack-level { background: #f8fafc; padding: 15px; border-radius: 6px; text-align: center; border-bottom: 6px solid #64748b; font-weight: 700; color: #334155; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.3s; }
+    .art-rack-level:hover { background: white; transform: scale(1.02); }
+    .art-rack-level.bot { background: #fee2e2; border-bottom-color: #ef4444; color: #991b1b; }
+
+    /* 5. Arte: Carpetas Animadas */
+    .art-folders { display: flex; justify-content: center; gap: 2rem; margin: 2rem 0; flex-wrap: wrap; }
+    .art-folder { position: relative; width: 100px; height: 75px; background: #eab308; border-radius: 0 8px 8px 8px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 10px; font-weight: 800; color: rgba(0,0,0,0.5); font-size: 1.5rem; transition: 0.3s; cursor: default; box-shadow: inset 0 -10px 20px rgba(0,0,0,0.1), 0 5px 15px rgba(0,0,0,0.1); }
+    .art-folder::before { content: ''; position: absolute; top: -15px; left: 0; width: 40px; height: 15px; background: inherit; border-radius: 8px 8px 0 0; }
+    .art-folder::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, rgba(255,255,255,0.4), transparent); border-radius: inherit; pointer-events: none; transition: 0.3s; transform-origin: bottom; }
+    .art-folder:hover { transform: translateY(-5px); }
+    .art-folder:hover::after { transform: rotateX(-20deg); }
+    .f-hds { background: #ef4444; color: rgba(255,255,255,0.5); }
+    .f-mant { background: #3b82f6; color: rgba(255,255,255,0.5); }
+
+    /* 6. Arte: Etiqueta Obligatoria (Mockup) */
+    .label-mockup { background: white; border: 2px solid var(--text-main); padding: 2rem; border-radius: var(--radius-md); box-shadow: 10px 10px 0 rgba(15, 23, 42, 0.1); margin: 2rem 0; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; position: relative; transition: 0.3s; }
+    .label-mockup:hover { transform: translateY(-5px); box-shadow: 15px 15px 0 rgba(15, 23, 42, 0.1); }
+    .label-title { grid-column: 1 / -1; font-size: 1.5rem; font-weight: 800; border-bottom: 2px solid var(--border-light); padding-bottom: 0.5rem; margin-bottom: 1rem; text-transform: uppercase; display: flex; justify-content: space-between;}
+    .label-field { display: flex; flex-direction: column; }
+    .label-field span { font-size: 0.75rem; text-transform: uppercase; font-weight: 700; color: var(--text-muted); }
+    .label-field strong { font-size: 1.1rem; color: var(--bg-dark); }
+
+    /* Estante Interactivo de Colores */
+    .shelf-container { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; margin-top: 1.5rem; }
+    .shelf-graphic { background: white; border-radius: var(--radius-md); padding: 2.5rem; border: 1px solid var(--border-light); box-shadow: var(--shadow-sm); }
+    .rack { display: flex; flex-direction: column; background: #e5e7eb; padding: 20px 20px 0; border: 6px solid #9ca3af; border-bottom: none; border-radius: 8px 8px 0 0; }
+    .rack-shelf { height: 90px; border-bottom: 10px solid #6b7280; display: flex; align-items: flex-end; justify-content: space-evenly; padding-bottom: 2px; }
+    .flask { width: 40px; height: 55px; border-radius: 4px 4px 10px 10px; position: relative; cursor: pointer; transition: var(--transition); border: 2px solid rgba(0,0,0,0.15); box-shadow: inset -5px 0 10px rgba(0,0,0,0.1), 0 5px 5px rgba(0,0,0,0.2); }
+    .flask::before { content: ''; position: absolute; top: -14px; left: 50%; transform: translateX(-50%); width: 16px; height: 14px; border: 2px solid rgba(0,0,0,0.15); border-bottom: none; border-radius: 3px 3px 0 0; }
+    .flask:hover { transform: translateY(-10px) scale(1.15); z-index: 10; }
+    .f-green { background: #22c55e; } .f-green::before { background: #22c55e; }
+    .f-blue { background: #3b82f6; } .f-blue::before { background: #3b82f6; }
+    .f-yellow { background: #eab308; } .f-yellow::before { background: #eab308; }
+    .f-white { background: #f8fafc; } .f-white::before { background: #f8fafc; }
+    .f-red { background: #ef4444; } .f-red::before { background: #ef4444; }
+    .f-stripes { background: repeating-linear-gradient(45deg, #f8fafc, #f8fafc 6px, #ef4444 6px, #ef4444 12px); } .f-stripes::before { background: #f8fafc; }
+    .shelf-info { background: var(--bg-dark); color: white; border-radius: var(--radius-md); padding: 2.5rem; box-shadow: var(--shadow-lg); transition: var(--transition); height: 100%; display: flex; flex-direction: column; justify-content: center; }
+    .shelf-info h3 { font-size: 1.5rem; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+    .shelf-info p { color: #cbd5e1; margin-bottom: 1.5rem; line-height: 1.6;}
+
+    footer { background: var(--bg-darker); color: var(--text-muted); text-align: center; padding: 2rem; font-size: 0.85rem; margin-top: auto; border-top: 1px solid rgba(255,255,255,0.05); }
+
+    /* ==========================================================================
+       DISEÑO RESPONSIVO (MÓVILES Y TABLETS) - OPTIMIZADO FINAL
+       ========================================================================== */
+    @media (max-width: 768px) {
+      /* Ajustes generales */
+      main { padding: 1rem; }
+
+      /* HEADER ULTRA COMPACTO */
+      .nav-container { 
+        flex-direction: column; 
+        padding: 0.8rem 1rem 0.2rem 1rem; 
+        gap: 0.6rem; 
+      }
+      .brand { width: 100%; justify-content: center; margin: 0; }
+      .brand-icon { width: 32px; height: 32px; font-size: 1rem; border-radius: 8px; }
+      .brand-text h1 { font-size: 1.1rem; }
+      .brand-text span { font-size: 0.65rem; }
+      
+/* Menú deslizable con botón admin al final */
+      .nav-menu { 
+        width: 100%; 
+        overflow-x: auto; 
+        padding-bottom: 6px; 
+        justify-content: flex-start;
+        align-items: center; 
+        gap: 6px; 
+      }
+      .nav-menu::-webkit-scrollbar { height: 3px; }
+      .nav-menu::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 4px; }
+      
+      /* CLONACIÓN EXACTA: Enlaces y Botón Admin miden exactamente lo mismo */
+      .nav-menu a, .btn-admin-login { 
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 0.4rem 0.8rem;
+        font-size: 0.8rem; 
+        font-family: inherit; /* Obliga al botón a usar tu fuente Inter */
+        line-height: 1.2;
+        border: 1px solid transparent; /* Le damos el mismo borde invisible a los enlaces */
+        border-radius: var(--radius-full);
+        margin: 0;
+        height: auto;
+      }
+      
+      .btn-admin-login { 
+        border-color: rgba(255, 255, 255, 0.2); /* Solo el botón pinta su borde */
+        white-space: nowrap; 
+      }
+      
+      .admin-menu-item { margin-left: 0; padding-right: 1rem; display: flex; }
+
+      /* Banner Admin */
+      .admin-banner { flex-direction: column; gap: 8px; padding: 0.8rem; font-size: 0.75rem; }
+      .admin-actions { width: 100%; flex-wrap: wrap; justify-content: center; gap: 5px; }
+      .btn-admin-action { padding: 0.3rem 0.6rem; font-size: 0.75rem; }
+
+      /* Hero Section */
+      .hero { padding: 1.5rem 1rem; flex-direction: column; text-align: center; gap: 1rem; margin-bottom: 1.5rem; }
+      .hero-title { font-size: 1.5rem; }
+      .hero-subtitle { font-size: 0.9rem; margin-bottom: 0.5rem; }
+      .hero-stats { flex-direction: column; gap: 0.8rem; padding: 1rem; }
+      .stat-value { font-size: 1.5rem; }
+
+      /* Controles */
+      .section-header { flex-direction: column; align-items: flex-start; gap: 0.8rem; padding-bottom: 1rem; margin-bottom: 1rem; }
+      .section-title h2 { font-size: 1.3rem; }
+      .section-title p { margin-left: 0; margin-top: 0.3rem; font-size: 0.8rem; }
+      .controls { width: 100%; flex-direction: column; gap: 0.8rem; }
+      .search-bar, .search-bar input { width: 100%; }
+      .search-bar input { padding: 0.6rem 1rem 0.6rem 2.2rem; font-size: 0.85rem; }
+      .search-bar i { left: 0.8rem; }
+      .btn-primary { padding: 0.6rem 1.2rem; font-size: 0.85rem; justify-content: center; }
+
+      /* Tarjetas de Información y Seguridad */
+      .module-grid { grid-template-columns: 1fr; gap: 0.8rem; }
+      .module-card { display: grid; grid-template-columns: auto 1fr; gap: 0 12px; padding: 1rem; align-items: center; text-align: left; }
+      .module-card .module-icon { grid-row: 1 / span 2; width: 42px; height: 42px; font-size: 1.1rem; border-radius: 10px; margin: 0; }
+      .module-card h3 { font-size: 0.95rem; margin-bottom: 2px; align-self: flex-end; }
+      .module-card p { font-size: 0.75rem; align-self: flex-start; margin-bottom: 0; line-height: 1.3; }
+      .safety-card h3 { grid-row: 1 / span 2; align-self: center; margin-bottom: 0; }
+
+      /* Pestañas de Seguridad */
+      .safety-tabs { width: 100%; justify-content: flex-start; flex-wrap: nowrap; overflow-x: auto; padding: 0.4rem; margin-bottom: 1.2rem; }
+      .safety-tabs::-webkit-scrollbar { height: 3px; }
+      .safety-tabs::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+      .s-tab { flex: 0 0 auto; font-size: 0.8rem; padding: 0.4rem 1rem; }
+      .sub-header-safety { font-size: 1.1rem; margin-top: 1rem; margin-bottom: 0.8rem; }
+
+      /* Arte CSS y Estantes */
+      .shelf-container { grid-template-columns: 1fr; gap: 1rem; margin-top: 1rem; }
+      .shelf-graphic, .shelf-info { padding: 1.2rem; }
+      .shelf-info h3 { font-size: 1.1rem; padding-bottom: 0.5rem; }
+      .shelf-info p { font-size: 0.85rem; }
+      
+      /* Modales */
+      .form-grid { grid-template-columns: 1fr; gap: 1rem; }
+      .modal-card { width: 95%; margin: 10px; }
+      .modal-header, .modal-body, .modal-footer { padding: 1rem; }
+      .modal-header h3 { font-size: 1.1rem; }
+      .modal-footer { flex-direction: column; gap: 0.5rem; }
+      .modal-footer button { width: 100%; margin: 0; }
+      
+      /* Mega Modal */
+      .mega-modal-header { padding: 1.5rem 1rem; }
+      .mega-modal-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+      .mega-modal-title { font-size: 1.3rem; }
+      .mega-modal-body { padding: 1.2rem 1rem; font-size: 0.9rem; line-height: 1.6; }
+      .art-ppe-grid { gap: 0.5rem; }
+      .art-ppe-item { width: 75px; height: 75px; border-radius: 12px; }
+      .art-ppe-item i { font-size: 1.6rem; }
+      .art-ppe-item span { font-size: 0.75rem; }
+
+      /* FIJOS: NO SE SOBREPONEN Y SE ALINEAN HORIZONTALMENTE */
+      .art-emergency { flex-direction: row; justify-content: center; gap: 1rem; margin: 1.5rem 0; }
+      .art-shower, .art-eyewash { width: 70px; height: 70px; font-size: 1.6rem; }
+      .art-flex-center { flex-direction: row; justify-content: center; gap: 1.5rem; margin: 1.5rem 0; }
+      
+      .label-mockup { grid-template-columns: 1fr; padding: 1rem; gap: 0.6rem; margin: 1.5rem 0; }
+      .label-title { flex-direction: column; font-size: 1.1rem; gap: 4px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="nav-container">
+      <div class="brand" onclick="navigate('inicio')">
+        <div class="brand-icon"><i class="fa-solid fa-flask-vial"></i></div>
+        <div class="brand-text">
+          <h1>CECyTE Lab</h1>
+          <span>Sistema Integral</span>
+        </div>
+      </div>
+      <ul class="nav-menu">
+        <li><a href="#" id="nav-inicio" class="active" onclick="navigate('inicio')"><i class="fa-solid fa-house"></i> Inicio</a></li>
+        <li><a href="#" id="nav-materiales" onclick="navigate('materiales')"><i class="fa-solid fa-boxes-stacked"></i> Materiales</a></li>
+        <li><a href="#" id="nav-reactivos" onclick="navigate('reactivos')"><i class="fa-solid fa-vial-virus"></i> Reactivos</a></li>
+        <li><a href="#" id="nav-practicas" onclick="navigate('practicas')"><i class="fa-solid fa-microscope"></i> Prácticas</a></li>
+        <li><a href="#" id="nav-seguridad" onclick="navigate('seguridad')"><i class="fa-solid fa-shield-halved"></i> Seguridad</a></li>
+        <li class="admin-menu-item"><button class="btn-admin-login" id="btnAuth" onclick="openModal('loginModal')"><i class="fa-solid fa-lock"></i> Modo Admin</button></li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- BANNER ADMIN -->
+  <div class="admin-banner" id="adminBanner">
+    <div><i class="fa-solid fa-unlock-keyhole"></i> Privilegios de Administrador Activados.</div>
+    <div class="admin-actions">
+      <button class="btn-admin-action" onclick="openModal('changePassModal')"><i class="fa-solid fa-key"></i> Cambiar Clave</button>
+      <button class="btn-admin-action" onclick="openBulkEditor()"><i class="fa-solid fa-table-list"></i> Edición Masiva</button>
+      <button class="btn-admin-action" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Salir</button>
+    </div>
+  </div>
+
+  <main>
+    <!-- SECCIÓN: INICIO -->
+    <section id="sec-inicio" class="page-section active">
+      <div class="hero stagger-1">
+        <div class="hero-content">
+          <h1 class="hero-title">Gestión Inteligente para el Laboratorio</h1>
+          <p class="hero-subtitle">Control total de inventarios, registro de prácticas y normatividad de seguridad en una sola plataforma unificada.</p>
+        </div>
+        <div class="hero-stats">
+          <div class="stat-item"><span class="stat-value" id="stat-mat">0</span><span class="stat-label">Materiales</span></div>
+          <div class="stat-item"><span class="stat-value" id="stat-reac">0</span><span class="stat-label">Reactivos</span></div>
+          <div class="stat-item"><span class="stat-value" id="stat-prac">0</span><span class="stat-label">Prácticas</span></div>
+        </div>
+      </div>
+      <div class="module-grid stagger-2">
+        <div class="module-card" onclick="navigate('materiales')"><div class="module-icon"><i class="fa-solid fa-boxes-stacked"></i></div><h3>Materiales y Equipos</h3><p>Control de material de vidrio, equipos de medición e inventario de herramientas.</p></div>
+        <div class="module-card" onclick="navigate('reactivos')"><div class="module-icon"><i class="fa-solid fa-vial-virus"></i></div><h3>Sustancias y Reactivos</h3><p>Inventario químico clasificado con base en Hojas de Seguridad y rombo NFPA.</p></div>
+        <div class="module-card" onclick="navigate('practicas')"><div class="module-icon"><i class="fa-solid fa-microscope"></i></div><h3>Prácticas Experimentales</h3><p>Registro y seguimiento de actividades y procedimientos académicos realizados.</p></div>
+        <div class="module-card" onclick="navigate('seguridad')"><div class="module-icon"><i class="fa-solid fa-shield-halved"></i></div><h3>Normas de Seguridad</h3><p>Protocolos de contingencia, equipo de protección y lineamientos del laboratorio.</p></div>
+      </div>
+    </section>
+
+    <!-- MATERIALES -->
+    <section id="sec-materiales" class="page-section">
+      <div class="section-header stagger-1">
+        <div class="section-title"><h2><i class="fa-solid fa-boxes-stacked"></i> Inventario de Materiales</h2></div>
+        <div class="controls">
+          <div class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="search-materiales" placeholder="Buscar material..." onkeyup="filterTable('materiales')"></div>
+          <button class="btn-primary admin-only" style="display:none;" onclick="openForm('materiales')"><i class="fa-solid fa-plus"></i> Agregar</button>
+        </div>
+      </div>
+      <div class="table-container stagger-2">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>ID</th><th>Material</th><th>Cantidad</th><th>Estado</th><th>Ubicación</th><th>Descripción</th><th class="admin-only" style="display:none;">Acciones</th></tr></thead>
+            <tbody id="tbody-materiales"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="count-materiales"></span>
+          <div class="pagination" id="pag-materiales"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- REACTIVOS -->
+    <section id="sec-reactivos" class="page-section">
+      <div class="section-header stagger-1">
+        <div class="section-title"><h2><i class="fa-solid fa-vial-virus"></i> Control de Reactivos</h2></div>
+        <div class="controls">
+          <div class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="search-reactivos" placeholder="Buscar reactivo..." onkeyup="filterTable('reactivos')"></div>
+          <button class="btn-primary admin-only" style="display:none;" onclick="openForm('reactivos')"><i class="fa-solid fa-plus"></i> Agregar</button>
+        </div>
+      </div>
+      <div class="table-container stagger-2">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>ID</th><th>Sustancia / Fórmula</th><th>Cant. / Lote</th><th>Caducidad</th><th>Riesgo (SGA)</th><th>Almacenaje</th><th class="admin-only" style="display:none;">Acciones</th></tr></thead>
+            <tbody id="tbody-reactivos"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="count-reactivos"></span>
+          <div class="pagination" id="pag-reactivos"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PRÁCTICAS -->
+    <section id="sec-practicas" class="page-section">
+      <div class="section-header stagger-1">
+        <div class="section-title"><h2><i class="fa-solid fa-microscope"></i> Prácticas Experimentales</h2></div>
+        <div class="controls">
+          <div class="search-bar"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="search-practicas" placeholder="Buscar práctica..." onkeyup="filterTable('practicas')"></div>
+          <button class="btn-primary admin-only" style="display:none;" onclick="openForm('practicas')"><i class="fa-solid fa-plus"></i> Agregar</button>
+        </div>
+      </div>
+      <div class="table-container stagger-2">
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>Práctica</th><th>Materia</th><th>Fecha</th><th>Reactivos/Material</th><th>Observaciones</th><th class="admin-only" style="display:none;">Acciones</th></tr></thead>
+            <tbody id="tbody-practicas"></tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span id="count-practicas"></span>
+          <div class="pagination" id="pag-practicas"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEGURIDAD (MINIMALISTA) -->
+    <section id="sec-seguridad" class="page-section">
+      <div class="section-header stagger-1">
+        <div class="section-title">
+          <h2><i class="fa-solid fa-shield-halved"></i> Normatividad y Seguridad</h2>
+          <p>Reglamentos, guías de almacenaje y protocolos del laboratorio CECyTE.</p>
+        </div>
+      </div>
+
+      <div class="safety-tabs stagger-2">
+        <button class="s-tab active" onclick="switchTab('st-normas', this)">Normas Básicas</button>
+        <button class="s-tab" onclick="switchTab('st-almacen', this)">Código de Colores y Estante</button>
+        <button class="s-tab" onclick="switchTab('st-carpetas', this)">Etiquetado y Carpetas</button>
+        <button class="s-tab" onclick="switchTab('st-residuos', this)">Manejo de Residuos</button>
+      </div>
+
+      <div id="st-normas" class="s-content active">
+        <h4 class="sub-header-safety"><i class="fa-solid fa-user-shield"></i> Protección y Disciplina</h4>
+        <div class="module-grid" style="margin-bottom: 2rem;">
+          <div class="module-card safety-card" onclick="openSafetyModal('equipo')">
+            <div class="module-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-glasses"></i></div><h3>Equipo de Protección</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('autorizacion')">
+            <div class="module-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-ban"></i></div><h3>Sin Autorización</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('disciplina')">
+            <div class="module-icon" style="background:#f3e8ff; color:#9333ea;"><i class="fa-solid fa-chalkboard-user"></i></div><h3>Instrucciones y Disciplina</h3>
+          </div>
+        </div>
+        <h4 class="sub-header-safety"><i class="fa-solid fa-triangle-exclamation"></i> Prevención y Contingencias</h4>
+        <div class="module-grid">
+          <div class="module-card safety-card" onclick="openSafetyModal('alimentos')">
+            <div class="module-icon" style="background:var(--warning-bg); color:var(--warning);"><i class="fa-solid fa-utensils"></i></div><h3>Prohibido Alimentos</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('limpieza')">
+            <div class="module-icon" style="background:var(--success-bg); color:var(--success);"><i class="fa-solid fa-broom"></i></div><h3>Orden y Limpieza</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('accidentes')">
+            <div class="module-icon" style="background:#ffe4e6; color:#e11d48;"><i class="fa-solid fa-kit-medical"></i></div><h3>En Caso de Accidente</h3>
+          </div>
+        </div>
+      </div>
+
+      <div id="st-almacen" class="s-content">
+        <div class="module-grid">
+          <div class="module-card safety-card" onclick="openSafetyModal('colores')">
+            <div class="module-icon" style="background: linear-gradient(135deg, #ef4444, #eab308, #3b82f6); color:white;"><i class="fa-solid fa-fill-drip"></i></div><h3>Código de Colores y Estante</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('estanteria')">
+            <div class="module-icon" style="background:#e0e7ff; color:#4f46e5;"><i class="fa-solid fa-server"></i></div><h3>Reglas de Estantería</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('senaletica')">
+            <div class="module-icon" style="background:#ccfbf1; color:#0d9488;"><i class="fa-solid fa-signs-post"></i></div><h3>Señalética y Áreas</h3>
+          </div>
+        </div>
+      </div>
+
+      <div id="st-carpetas" class="s-content">
+        <div class="module-grid">
+          <div class="module-card safety-card" onclick="openSafetyModal('carpeta1')">
+            <div class="module-icon" style="background:#fef3c7; color:#d97706;"><i class="fa-solid fa-folder-open"></i></div><h3>Operatividad (Carpeta 1)</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('carpeta2')">
+            <div class="module-icon" style="background:#fee2e2; color:#dc2626;"><i class="fa-solid fa-folder-open"></i></div><h3>Seguridad y HDS (Carpeta 2)</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('carpeta3')">
+            <div class="module-icon" style="background:#dbeafe; color:#2563eb;"><i class="fa-solid fa-folder-open"></i></div><h3>Mantenimiento (Carpeta 3)</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('etiquetas')">
+            <div class="module-icon" style="background:#d1fae5; color:#059669;"><i class="fa-solid fa-tags"></i></div><h3>Re-etiquetado Obligatorio</h3>
+          </div>
+        </div>
+      </div>
+
+      <div id="st-residuos" class="s-content">
+        <div class="module-grid">
+          <div class="module-card safety-card" onclick="openSafetyModal('normativa')">
+            <div class="module-icon" style="background:var(--success-bg); color:var(--success);"><i class="fa-solid fa-leaf"></i></div><h3>Normatividad Ambiental</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('neutralizacion')">
+            <div class="module-icon" style="background:var(--info-bg); color:var(--info);"><i class="fa-solid fa-vial-circle-check"></i></div><h3>Neutralización In Situ</h3>
+          </div>
+          <div class="module-card safety-card" onclick="openSafetyModal('pozo')">
+            <div class="module-icon" style="background:var(--warning-bg); color:var(--warning);"><i class="fa-solid fa-water"></i></div><h3>Pozo de Absorción</h3>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ================= MODALES ================= -->
+  
+  <div class="modal-backdrop" id="loginModal" onclick="if(event.target === this) closeModal('loginModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-lock"></i> Autenticación de Administrador</h3>
+        <button class="btn-close" onclick="closeModal('loginModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Contraseña Maestra</label>
+          <input type="password" id="adminPass" placeholder="Ingresa la contraseña">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('loginModal')">Cancelar</button>
+        <button class="btn-primary" onclick="verifyLogin()">Autorizar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="formModal" onclick="if(event.target === this) closeModal('formModal')">
+    <div class="modal-card wide">
+      <div class="modal-header">
+        <h3 id="formTitle">Agregar Elemento</h3>
+        <button class="btn-close" onclick="closeModal('formModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body"><div class="form-grid" id="formFields"></div></div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('formModal')">Cancelar</button>
+        <button class="btn-primary" onclick="saveData()"><i class="fa-solid fa-floppy-disk"></i> Guardar Registro</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="changePassModal" onclick="if(event.target === this) closeModal('changePassModal')">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-key"></i> Cambiar Contraseña</h3>
+        <button class="btn-close" onclick="closeModal('changePassModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group" style="margin-bottom: 1rem;"><label>Contraseña Actual</label><input type="password" id="cp_old"></div>
+        <div class="form-group" style="margin-bottom: 1rem;"><label>Nueva Contraseña</label><input type="password" id="cp_new"></div>
+        <div class="form-group"><label>Confirmar Nueva Contraseña</label><input type="password" id="cp_confirm"></div>
+        <div id="cp_error" style="color: var(--danger); font-size: 0.85rem; margin-top: 10px; display: none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('changePassModal')">Cancelar</button>
+        <button class="btn-primary" onclick="changePassword()"><i class="fa-solid fa-check"></i> Actualizar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="bulkEditorModal" onclick="if(event.target === this) closeModal('bulkEditorModal')">
+    <div class="modal-card wide">
+      <div class="modal-header" style="background: var(--bg-dark); border-bottom: none;">
+        <h3 style="color: white;"><i class="fa-solid fa-table-list" style="color: var(--accent-primary);"></i> Editor Masivo de Datos</h3>
+        <button class="btn-close" style="color: var(--text-muted);" onclick="closeModal('bulkEditorModal')"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-body" style="background: var(--bg-darker); padding-top: 1rem;">
+        <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 1rem;">Agrega, edita o elimina registros. Mantén la estructura de corchetes <code>[]</code> y llaves <code>{}</code>.</p>
+        <div class="editor-tabs">
+          <button class="e-tab active" onclick="switchBulkTab('materiales', this)">Materiales</button>
+          <button class="e-tab" onclick="switchBulkTab('reactivos', this)">Reactivos</button>
+          <button class="e-tab" onclick="switchBulkTab('practicas', this)">Prácticas</button>
+        </div>
+        <textarea id="bulkCodeArea" class="code-area" spellcheck="false"></textarea>
+        <div id="bulkError" class="code-error"><i class="fa-solid fa-triangle-exclamation"></i> Error de sintaxis en el código JSON. Revisa comas, comillas y llaves.</div>
+      </div>
+      <div class="modal-footer" style="background: var(--bg-dark);">
+        <button class="btn-secondary" style="background: transparent; border-color: var(--border-dark); color: white;" onclick="closeModal('bulkEditorModal')">Cerrar</button>
+        <button class="btn-primary" onclick="saveBulkData()"><i class="fa-solid fa-server"></i> Sobrescribir Base de Datos</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="megaSafetyModal" onclick="if(event.target === this) closeModal('megaSafetyModal')">
+    <div class="modal-card mega-modal">
+      <button class="mega-modal-close" onclick="closeModal('megaSafetyModal')"><i class="fa-solid fa-xmark"></i></button>
+      <div class="mega-modal-header" id="megaSafetyHeader"></div>
+      <div class="mega-modal-body" id="megaSafetyBody"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p><strong>CECyTE Plantel 18 "Tehuantepec"</strong> — Sistema de Control de Laboratorio de Ciencias Experimentales.</p>
+    <p style="margin-top: 8px;">Conforme a las normativas de seguridad, operatividad y lineamientos de la SEMARNAT y STPS.</p>
+    <p style="margin-top: 8px;">@yokyznt</p>
+  </footer>
+
+  <!-- LÓGICA JAVASCRIPT -->
+  <script>
+    function getAdminPass() { return localStorage.getItem('cecyte_admin_pass') || 'admin123'; }
+    let isAdmin = false; let currentCategory = ''; let editIndex = null; let currentBulkCategory = 'materiales';
+
+    // BASE DE DATOS MASIVA (Agrupada y Optimizada)
+    const initialDB = {
+      materiales: [
+        { id: "M001", material: "Adaptadores y Eliminadores", cantidad: "10 piezas", estado: "Bueno", ubicacion: "Gabinete Eléctrico", desc: "Fuentes de poder y adaptadores varios" },
+        { id: "M002", material: "Agujas de disección", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Disección y obsorción" },
+        { id: "M003", material: "Alambre cal. 30", cantidad: "5 mts", estado: "Bueno", ubicacion: "Gabinete General", desc: "Material metálico en rollo" },
+        { id: "M004", material: "Anillo con nuez", cantidad: "16 piezas", estado: "Bueno", ubicacion: "Herrajes", desc: "Para soporte universal" },
+        { id: "M005", material: "Balanzas (Granataria y Electrónica)", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Mesa de pesaje", desc: "Medición de precisión" },
+        { id: "M006", material: "Balines", cantidad: "18 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Prácticas de mecánica" },
+        { id: "M007", material: "Baño María Electrónico", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Calentamiento regulado" },
+        { id: "M008", material: "Bisturí (Mangos y hojas)", cantidad: "21 piezas", estado: "Bueno", ubicacion: "Estuche de disección", desc: "Corte biológico" },
+        { id: "M009", material: "Bomba de vacío CEESA", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Mecánica de fluidos" },
+        { id: "M010", material: "Brújula magnética", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Prácticas de magnetismo" },
+        { id: "M011", material: "Buretas (50ml y 100ml)", cantidad: "13 piezas", estado: "Malo", ubicacion: "Cristalería", desc: "Varias dañadas" },
+        { id: "M012", material: "Cajas Petri", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Cultivo bacteriológico" },
+        { id: "M013", material: "Calibrador Vernier / Micrómetro", cantidad: "11 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Medición exacta" },
+        { id: "M014", material: "Cápsulas de porcelana", cantidad: "15 piezas", estado: "Bueno", ubicacion: "Cristalería Térmica", desc: "Evaporación / Combustión" },
+        { id: "M015", material: "Carrito Hall cv015", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Prácticas de dinámica" },
+        { id: "M016", material: "Centrífugas (Combot y Mini)", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Separación de mezclas" },
+        { id: "M017", material: "Colador / Charolas", cantidad: "17 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Procesamiento y contención" },
+        { id: "M018", material: "Cronómetro", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Medición de tiempo" },
+        { id: "M019", material: "Cubre objetos 22x22", cantidad: "2 cajas", estado: "Bueno", ubicacion: "Microscopía", desc: "Preparaciones porta-objetos" },
+        { id: "M020", material: "Cuchara de ebullición", cantidad: "24 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Toma de reactivos y combustión" },
+        { id: "M021", material: "Electrodos (Pb, Cu, Al, Zn)", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Electroquímica", desc: "Placas 8x10cm" },
+        { id: "M022", material: "Embudo de separación", cantidad: "9 piezas", estado: "Regular", ubicacion: "Cristalería", desc: "2 piezas dañadas" },
+        { id: "M023", material: "Equipos didácticos (Calor y Óptica)", cantidad: "3 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Kits de demostración completos" },
+        { id: "M024", material: "Escobillones", cantidad: "11 piezas", estado: "Bueno", ubicacion: "Área de Limpieza", desc: "Lavado de material de vidrio" },
+        { id: "M025", material: "Espátulas", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Manejo de reactivos sólidos" },
+        { id: "M026", material: "Estufa clínica de cultivo", cantidad: "1 pieza", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Incubación bacteriana" },
+        { id: "M027", material: "Filtro de vidrio 30ml", cantidad: "3 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Filtración fina" },
+        { id: "M028", material: "Flexómetro y Reglas", cantidad: "5 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Medición de longitud" },
+        { id: "M029", material: "Focos 2.2", cantidad: "10 piezas", estado: "Bueno", ubicacion: "Electricidad", desc: "Armado de circuitos" },
+        { id: "M030", material: "Frascos (Goteros y Guardado)", cantidad: "117 piezas", estado: "Bueno", ubicacion: "Almacén General", desc: "Almacenaje secundario" },
+        { id: "M031", material: "Gafas / Lentes de seguridad y mascarillas", cantidad: "51 piezas", estado: "Bueno", ubicacion: "EPP", desc: "Equipo de protección personal" },
+        { id: "M032", material: "Gradillas", cantidad: "17 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Soporte de tubos de ensaye" },
+        { id: "M033", material: "Horadador mecánico", cantidad: "1 pieza", estado: "Bueno", ubicacion: "Herramientas", desc: "Corte / Perforación de tapones" },
+        { id: "M034", material: "Imanes (Herradura y Rectangulares)", cantidad: "17 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Campos magnéticos" },
+        { id: "M035", material: "Jeringas 50ml", cantidad: "9 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Inyección de fluidos / Volumen" },
+        { id: "M036", material: "Juego de caimanes", cantidad: "20 piezas", estado: "Bueno", ubicacion: "Electricidad", desc: "Cables con pinzas para circuitos" },
+        { id: "M037", material: "Lancetas", cantidad: "250 piezas", estado: "Bueno", ubicacion: "Biología", desc: "Muestras de sangre" },
+        { id: "M038", material: "Lámina de asbesto", cantidad: "18 piezas", estado: "Bueno", ubicacion: "Material Térmico", desc: "Distribución de calor en tripié" },
+        { id: "M039", material: "Lupas", cantidad: "8 piezas", estado: "Bueno", ubicacion: "Óptica", desc: "Aumento simple" },
+        { id: "M040", material: "Magnesio en cinta", cantidad: "1 paquete", estado: "Bueno", ubicacion: "Metales", desc: "Combustión luminosa" },
+        { id: "M041", material: "Mangueras (Látex y Transparente)", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Gabinete General", desc: "Conexiones de gas y líquidos" },
+        { id: "M042", material: "Matraz aforado (Varios Vol.)", cantidad: "60 piezas", estado: "Bueno", ubicacion: "Cristalería Volumétrica", desc: "Preparación exacta de soluciones" },
+        { id: "M043", material: "Matraz de bola", cantidad: "26 piezas", estado: "Bueno", ubicacion: "Cristalería Térmica", desc: "Calentamiento y ebullición" },
+        { id: "M044", material: "Matraz de destilación", cantidad: "10 piezas", estado: "Bueno", ubicacion: "Cristalería Térmica", desc: "Separación de líquidos" },
+        { id: "M045", material: "Matraz Erlenmeyer (125-500ml)", cantidad: "77 piezas", estado: "Bueno", ubicacion: "Cristalería Térmica", desc: "Titulación y agitación" },
+        { id: "M046", material: "Matraz Kitazato", cantidad: "18 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Filtración al vacío" },
+        { id: "M047", material: "Mecheros (Bunsen y Alcohol)", cantidad: "51 piezas", estado: "Bueno", ubicacion: "Equipos de Calor", desc: "Incluye 1m de mecha de repuesto" },
+        { id: "M048", material: "Microscopios (Binocular, Óptico, Digital)", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Microscopía", desc: "Equipos de alta precisión" },
+        { id: "M049", material: "Modelos Químicos y Kit de Esferas", cantidad: "11 piezas", estado: "Bueno", ubicacion: "Didáctica", desc: "Química orgánica e inorgánica" },
+        { id: "M050", material: "Morteros con pistilo", cantidad: "74 piezas", estado: "Bueno", ubicacion: "Trituración", desc: "Diferentes tamaños" },
+        { id: "M051", material: "Multímetros y Osciloscopio", cantidad: "5 piezas", estado: "Bueno", ubicacion: "Electrónica", desc: "Medición eléctrica / Señales" },
+        { id: "M052", material: "Olla de presión", cantidad: "1 pieza", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Esterilización de material" },
+        { id: "M053", material: "Papel (Filtro, pH, Tornasol)", cantidad: "34 cajas", estado: "Bueno", ubicacion: "Consumibles", desc: "Medición de acidez y separación" },
+        { id: "M054", material: "Parrilla eléctrica redonda", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Equipos Mayores", desc: "Calentamiento sin llama" },
+        { id: "M055", material: "Potenciómetro / Pechímetro de pluma", cantidad: "2 piezas", estado: "Bueno", ubicacion: "Medición", desc: "Medición digital de pH" },
+        { id: "M056", material: "Pelotas de golf", cantidad: "12 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Prácticas de caída libre" },
+        { id: "M057", material: "Perillas de succión", cantidad: "15 piezas", estado: "Regular", ubicacion: "Cristalería Volumétrica", desc: "3 piezas dañadas" },
+        { id: "M058", material: "Pinzas varias (Crisol, Tubo, Universal, Bureta)", cantidad: "125 piezas", estado: "Regular", ubicacion: "Herrajes", desc: "Varias dañadas por desgaste" },
+        { id: "M059", material: "Pipetas (Volumétricas y Serológicas)", cantidad: "47 piezas", estado: "Bueno", ubicacion: "Cristalería Volumétrica", desc: "Transferencia exacta de líquidos" },
+        { id: "M060", material: "Pizetas", cantidad: "11 piezas", estado: "Bueno", ubicacion: "Área de Limpieza", desc: "Lavado con agua destilada" },
+        { id: "M061", material: "Poleas (Simple/Doble/Triple) y Plomada", cantidad: "17 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Mecánica y fuerzas" },
+        { id: "M062", material: "Porta objetos", cantidad: "4 cajas", estado: "Bueno", ubicacion: "Microscopía", desc: "Láminas de cristal para muestras" },
+        { id: "M063", material: "Pósters Didácticos Plastificados", cantidad: "5 piezas", estado: "Bueno", ubicacion: "Didáctica", desc: "Anatomía, ITS, Fotosíntesis" },
+        { id: "M064", material: "Probetas (100ml y 250ml)", cantidad: "20 piezas", estado: "Bueno", ubicacion: "Cristalería Volumétrica", desc: "Medición de volumen" },
+        { id: "M065", material: "Resistencias eléctricas", cantidad: "122 piezas", estado: "Bueno", ubicacion: "Electricidad", desc: "Armado de circuitos" },
+        { id: "M066", material: "Riel de física (1.50m)", cantidad: "7 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Cinemática y movimiento" },
+        { id: "M067", material: "Refrigerante", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Condensación en destilación" },
+        { id: "M068", material: "Sujetadores y Nueces universales", cantidad: "39 piezas", estado: "Bueno", ubicacion: "Herrajes", desc: "Armado de soportes" },
+        { id: "M069", material: "Tapones de hule (Números 2 al 6)", cantidad: "169 piezas", estado: "Malo", ubicacion: "Almacén General", desc: "Mayoría reportados como gastados" },
+        { id: "M070", material: "Termómetros 260°", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Medición Térmica", desc: "Control de temperatura" },
+        { id: "M071", material: "Tijeras curvas 14 cm", cantidad: "6 piezas", estado: "Bueno", ubicacion: "Estuche de disección", desc: "Corte" },
+        { id: "M072", material: "Titrisol", cantidad: "1 pieza", estado: "Bueno", ubicacion: "Gabinete General", desc: "Solución estándar" },
+        { id: "M073", material: "Transportador", cantidad: "5 piezas", estado: "Bueno", ubicacion: "Gabinete de Física", desc: "Medición de ángulos" },
+        { id: "M074", material: "Tripié blanco", cantidad: "10 piezas", estado: "Bueno", ubicacion: "Herrajes", desc: "Soporte para calentamiento" },
+        { id: "M075", material: "Tubos de ensaye (Medianos, 9800, ELC)", cantidad: "316 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Reacciones a pequeña escala" },
+        { id: "M076", material: "Vasos de precipitado (100ml a 800ml)", cantidad: "130 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Contenedor general" },
+        { id: "M077", material: "Vasitos varios / Vaso de Pascal", cantidad: "31 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Presión y almacenamiento" },
+        { id: "M078", material: "Vidrio de reloj", cantidad: "15 piezas", estado: "Bueno", ubicacion: "Cristalería", desc: "Pesaje y cristalización" }
+      ],
+      reactivos: [
+        { id: "R001", reactivo: "Aceite de inmersión", cantidad: "275 ml (4 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R002", reactivo: "Acetato de bario, calcio, magnesio y sodio", cantidad: "400 g (5 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R003", reactivo: "Acetato-Orceína", cantidad: "125 ml (1 frasco)", caducidad: "CADUCADO (Mar 2015)", riesgo: "Tóxico / Irritante", almacen: "Azul" },
+        { id: "R004", reactivo: "Ácido acético", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Corrosivo", almacen: "Blanco (Piso)" },
+        { id: "R005", reactivo: "Ácidos orgánicos (ascórbico, benzoico, bórico, cítrico, salicílico)", cantidad: "1.6 kg (16 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
+        { id: "R006", reactivo: "Ácido clorhídrico 50%", cantidad: "2 L (7 frascos)", caducidad: "N/A", riesgo: "Corrosivo", almacen: "Blanco (Piso)" },
+        { id: "R007", reactivo: "Ácido fosfórico 85%", cantidad: "500 ml (1 frasco)", caducidad: "N/A", riesgo: "Corrosivo", almacen: "Blanco (Piso)" },
+        { id: "R008", reactivo: "Ácido nítrico 50%", cantidad: "2 L (2 frascos)", caducidad: "N/A", riesgo: "Corrosivo / Oxidante", almacen: "Blanco (Piso)" },
+        { id: "R009", reactivo: "Ácido sulfúrico 30% a 90%", cantidad: "2.6 L (4 frascos)", caducidad: "1 lote CADUCADO (Ene 2014)", riesgo: "Corrosivo Severo", almacen: "Blanco (Piso)" },
+        { id: "R010", reactivo: "Acetona", cantidad: "1.5 L (5 frascos)", caducidad: "N/A", riesgo: "Inflamable", almacen: "Rojo" },
+        { id: "R011", reactivo: "Agua destilada", cantidad: "42.5 L (3 botes)", caducidad: "N/A", riesgo: "Inocuo", almacen: "Verde" },
+        { id: "R012", reactivo: "Alcohol etílico 70% y 96°", cantidad: "8 L (4 frascos)", caducidad: "N/A", riesgo: "Inflamable", almacen: "Rojo" },
+        { id: "R013", reactivo: "Alginato de sodio", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R014", reactivo: "Aluminio granular", cantidad: "100 g (1 frasco)", caducidad: "N/A", riesgo: "Inflamable sólido", almacen: "Rojo" },
+        { id: "R015", reactivo: "Azufre (polvo y resublimado)", cantidad: "400 g (10 frascos)", caducidad: "N/A", riesgo: "Inflamable sólido", almacen: "Rojo" },
+        { id: "R016", reactivo: "Colorantes (Bromofenol, Metileno, Fucsina, Sudán, Cristalina)", cantidad: "4 L (7 frascos)", caducidad: "1 lote CADUCADO (Ago 2015)", riesgo: "Tóxico / Irritante", almacen: "Azul" },
+        { id: "R017", reactivo: "Benceno", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Inflamable / Tóxico", almacen: "Rojo" },
+        { id: "R018", reactivo: "Reactivo Benedict", cantidad: "125 ml (1 frasco)", caducidad: "N/A", riesgo: "Tóxico", almacen: "Azul" },
+        { id: "R019", reactivo: "Bicarbonato de sodio y potasio", cantidad: "2.3 kg (7 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R020", reactivo: "Bisulfito de sodio", cantidad: "1.2 kg (4 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
+        { id: "R021", reactivo: "Bórax / Borato de sodio", cantidad: "1.1 kg (2 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R022", reactivo: "Soluciones Buffer / Tampón pH4 y Ref.", cantidad: "4 L (8 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R023", reactivo: "Calcio metálico viruta", cantidad: "75 g (2 frascos)", caducidad: "N/A", riesgo: "Reactivo con agua", almacen: "Amarillo" },
+        { id: "R024", reactivo: "Carbopol y Carbón vegetal", cantidad: "450 g (10 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R025", reactivo: "Carbonatos (Bario, Magnesio, Potasio)", cantidad: "450 g (3 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
+        { id: "R026", reactivo: "Carburo de calcio", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Reactivo con agua", almacen: "Amarillo" },
+        { id: "R027", reactivo: "Cloroformo", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Tóxico / Volátil", almacen: "Azul" },
+        { id: "R028", reactivo: "Cloruros (Cúprico, Al, NH4, Ba, Ca, Sr, Mg, K, Zn)", cantidad: "2.1 kg (26 frascos)", caducidad: "N/A", riesgo: "Irritante / Tóxico", almacen: "Azul" },
+        { id: "R029", reactivo: "Cloruro de sodio", cantidad: "1.8 kg (22 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R030", reactivo: "Cromato de potasio", cantidad: "500 g (1 frasco)", caducidad: "N/A", riesgo: "Oxidante / Tóxico", almacen: "Amarillo" },
+        { id: "R031", reactivo: "Dióxido de manganeso", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Oxidante", almacen: "Amarillo" },
+        { id: "R032", reactivo: "Fenolftaleína", cantidad: "250 ml + 250 g (2 frascos)", caducidad: "N/A", riesgo: "Inflamable (en solución)", almacen: "Rojo" },
+        { id: "R033", reactivo: "Fosfatos (Amonio, Potasio, Sodio)", cantidad: "300 g (3 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R034", reactivo: "Glicerina / Glicerol", cantidad: "1.25 L (2 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R035", reactivo: "Glucosa ANH", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R036", reactivo: "Hidróxidos (Al, Ba, Ca, K, Na, NH4)", cantidad: "4.6 kg + 2 L (31 frascos)", caducidad: "N/A", riesgo: "Corrosivo (Base fuerte)", almacen: "Blanco (Piso)" },
+        { id: "R037", reactivo: "Hierro limadura", cantidad: "200 g (15 frascos)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R038", reactivo: "Lecitina de soya", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R039", reactivo: "Lugol / Yodo resublimado", cantidad: "925 ml + 50 g (5 frascos)", caducidad: "1 lote CADUCADO (Mayo 2019)", riesgo: "Tóxico / Irritante", almacen: "Azul" },
+        { id: "R040", reactivo: "Metanol", cantidad: "6 frascos", caducidad: "N/A", riesgo: "Inflamable / Tóxico", almacen: "Rojo" },
+        { id: "R041", reactivo: "Nitratos (NH4, Ca, Mg, K, Na, Zn)", cantidad: "600 g (6 frascos)", caducidad: "N/A", riesgo: "Oxidante fuerte", almacen: "Amarillo" },
+        { id: "R042", reactivo: "Óxidos (Calcio, Cobre)", cantidad: "200 g (5 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
+        { id: "R043", reactivo: "Permanganato de potasio", cantidad: "100 g (1 frasco)", caducidad: "N/A", riesgo: "Oxidante", almacen: "Amarillo" },
+        { id: "R044", reactivo: "Silicato de sodio", cantidad: "1 L (1 frasco)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
+        { id: "R045", reactivo: "Sulfatos (Al, Cu, Mg, Na, Zn, Fe)", cantidad: "1.1 kg (7 frascos)", caducidad: "N/A", riesgo: "Irritante / Tóxico acuático", almacen: "Verde" },
+        { id: "R046", reactivo: "Tetraborato de sodio", cantidad: "250 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R047", reactivo: "Tiocianato de amonio", cantidad: "100 g (1 frasco)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
+        { id: "R048", reactivo: "Trietanolamina", cantidad: "10 ml (1 frasco)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
+        { id: "R049", reactivo: "Vaselina sólida", cantidad: "500 g (1 frasco)", caducidad: "N/A", riesgo: "Bajo", almacen: "Verde" },
+        { id: "R050", reactivo: "Yoduro de potasio 20%", cantidad: "750 ml (2 frascos)", caducidad: "N/A", riesgo: "Irritante", almacen: "Verde" },
+        { id: "R051", reactivo: "Zinc granalla", cantidad: "750 g (11 frascos)", caducidad: "N/A", riesgo: "Reactivo sólido", almacen: "Amarillo" }
+      ],
+      practicas: [
+        { prac: "Ensaye a la flama", mat: "Química II", fecha: "2026-09-10", rec: "Cloruro de estroncio, Sales", obs: "Identificación de iones metálicos" },
+        { prac: "Combustión del Magnesio", mat: "Química II", fecha: "2026-09-15", rec: "Magnesio cinta, Mechero, Cápsula", obs: "Reacción con Oxígeno" },
+        { prac: "Separación de mezclas", mat: "Química I", fecha: "2026-09-20", rec: "Papel filtro, Embudo, Matraz", obs: "Filtración simple" },
+        { prac: "Tensión superficial", mat: "Física II", fecha: "2026-10-01", rec: "Vasos de precipitado, Agua", obs: "Comprobación de fuerzas" },
+        { prac: "Circuito en serie", mat: "Física II", fecha: "2026-10-05", rec: "Focos 2.2, Caimanes, Pila", obs: "Armado básico" }
+      ]
+    };
+
+    function getDB(table) { const data = localStorage.getItem('cecyte_db_' + table); return data ? JSON.parse(data) : initialDB[table]; }
+    function setDB(table, data) { localStorage.setItem('cecyte_db_' + table, JSON.stringify(data)); }
+
+    // CONFIGURACIÓN DE TABLAS Y PAGINACIÓN
+    const tableConfig = {
+      materiales: { keys: ['id', 'material', 'cantidad', 'estado', 'ubicacion', 'desc'], badgeKey: 'estado' },
+      reactivos: { keys: ['id', 'reactivo', 'cantidad', 'caducidad', 'riesgo', 'almacen'], badgeKey: 'almacen' },
+      practicas: { keys: ['prac', 'mat', 'fecha', 'rec', 'obs'], badgeKey: 'mat' }
+    };
+
+    const rowsPerPage = 10;
+    let currentPage = { materiales: 1, reactivos: 1, practicas: 1 };
+    let currentSearch = { materiales: '', reactivos: '', practicas: '' };
+
+    function navigate(view) {
+      document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+      document.getElementById('sec-' + view).classList.add('active');
+      document.querySelectorAll('.nav-menu a').forEach(a => a.classList.remove('active'));
+      const activeNavLink = document.getElementById('nav-' + view);
+      if (activeNavLink) { activeNavLink.classList.add('active'); }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function switchTab(tabId, btn) {
+      document.querySelectorAll('.s-tab').forEach(b => b.classList.remove('active')); btn.classList.add('active');
+      document.querySelectorAll('.s-content').forEach(c => c.classList.remove('active')); document.getElementById(tabId).classList.add('active');
+    }
+
+    function renderAll() {
+      buildTable('materiales');
+      buildTable('reactivos');
+      buildTable('practicas');
+      document.getElementById('stat-mat').innerText = getDB('materiales').length;
+      document.getElementById('stat-reac').innerText = getDB('reactivos').length;
+      document.getElementById('stat-prac').innerText = getDB('practicas').length;
+    }
+
+    // CONSTRUCTOR DE TABLA CON PAGINACIÓN Y BÚSQUEDA INTEGRADA
+    function buildTable(category) {
+      const db = getDB(category);
+      const conf = tableConfig[category];
+      const tbody = document.getElementById(`tbody-${category}`);
+      if(!tbody) return;
+      
+      const query = currentSearch[category].toLowerCase();
+      
+      // Filtrar manteniendo el índice original para edición/borrado correcto
+      const filteredData = db.map((row, index) => ({ row, originalIndex: index }))
+                             .filter(item => {
+                               if(!query) return true;
+                               return Object.values(item.row).some(val => String(val).toLowerCase().includes(query));
+                             });
+
+      const totalPages = Math.ceil(filteredData.length / rowsPerPage) || 1;
+      if(currentPage[category] > totalPages) currentPage[category] = totalPages;
+
+      const startIndex = (currentPage[category] - 1) * rowsPerPage;
+      const paginatedData = filteredData.slice(startIndex, startIndex + rowsPerPage);
+
+      tbody.innerHTML = '';
+      paginatedData.forEach(item => {
+        const row = item.row;
+        let tr = '<tr>';
+        conf.keys.forEach(k => {
+          let val = row[k] || '';
+          if(k === conf.keys[0]) { tr += `<td class="td-bold">${val}</td>`; } 
+          else if(k === conf.badgeKey) {
+            let color = 'b-info'; const vLow = val.toLowerCase();
+            if(vLow.includes('malo') || vLow.includes('rojo') || vLow.includes('caducado')) color = 'b-danger';
+            if(vLow.includes('regular') || vLow.includes('amarillo')) color = 'b-warning';
+            if(vLow.includes('bueno') || vLow.includes('verde')) color = 'b-success';
+            if(vLow.includes('blanco')) color = 'b-dark';
+            
+            if(val.includes('CADUCADO')) { val = `<span style="color:var(--danger); font-weight:700;">${val}</span>`; }
+            tr += `<td><span class="badge ${color}">${val}</span></td>`;
+          } else { 
+            if(val.includes('CADUCADO')) { val = `<span style="color:var(--danger); font-weight:700;">${val}</span>`; }
+            tr += `<td>${val}</td>`; 
+          }
+        });
+        tr += `<td class="admin-only" style="display:${isAdmin ? 'table-cell' : 'none'};"><div class="action-group"><button class="btn-icon edit" onclick="openForm('${category}', ${item.originalIndex})"><i class="fa-solid fa-pen"></i></button><button class="btn-icon delete" onclick="deleteRecord('${category}', ${item.originalIndex})"><i class="fa-solid fa-trash"></i></button></div></td></tr>`;
+        tbody.innerHTML += tr;
+      });
+      
+      renderPagination(category, filteredData.length, totalPages);
+    }
+
+    function renderPagination(category, totalItems, totalPages) {
+      document.getElementById(`count-${category}`).innerText = `${totalItems} registros encontrados`;
+      const pagContainer = document.getElementById(`pag-${category}`);
+      if(!pagContainer) return;
+      
+      const curr = currentPage[category];
+      pagContainer.innerHTML = `
+        <button class="btn-page" onclick="changePage('${category}', -1)" ${curr <= 1 ? 'disabled' : ''}><i class="fa-solid fa-chevron-left"></i></button>
+        <span class="page-info">Pág. ${curr} de ${totalPages}</span>
+        <button class="btn-page" onclick="changePage('${category}', 1)" ${curr >= totalPages ? 'disabled' : ''}><i class="fa-solid fa-chevron-right"></i></button>
+      `;
+    }
+
+    function changePage(category, delta) {
+      currentPage[category] += delta;
+      buildTable(category);
+    }
+
+    function filterTable(cat) {
+      currentSearch[cat] = document.getElementById('search-' + cat).value;
+      currentPage[cat] = 1; // Regresar a la pág 1 al buscar
+      buildTable(cat);
+    }
+
+    function openModal(id) { document.getElementById(id).classList.add('active'); }
+    function closeModal(id) { document.getElementById(id).classList.remove('active'); }
+
+    // Admin Funcs
+    function verifyLogin() {
+      if(document.getElementById('adminPass').value === getAdminPass()) {
+        isAdmin = true; document.getElementById('adminBanner').style.display = 'flex'; document.getElementById('btnAuth').style.display = 'none';
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = el.tagName === 'TH' || el.tagName === 'TD' ? 'table-cell' : 'inline-flex');
+        closeModal('loginModal'); document.getElementById('adminPass').value = '';
+      } else { alert('Contraseña incorrecta'); }
+    }
+    function logoutAdmin() { isAdmin = false; document.getElementById('adminBanner').style.display = 'none'; document.getElementById('btnAuth').style.display = 'block'; document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none'); }
+    function changePassword() {
+      const oldP = document.getElementById('cp_old').value; const newP = document.getElementById('cp_new').value; const confP = document.getElementById('cp_confirm').value; const err = document.getElementById('cp_error'); err.style.display = 'none';
+      if (oldP !== getAdminPass()) { err.innerText = "La contraseña actual es incorrecta."; err.style.display = 'block'; return; }
+      if (newP.length < 4) { err.innerText = "La nueva contraseña debe tener al menos 4 caracteres."; err.style.display = 'block'; return; }
+      if (newP !== confP) { err.innerText = "Las nuevas contraseñas no coinciden."; err.style.display = 'block'; return; }
+      localStorage.setItem('cecyte_admin_pass', newP); alert('¡Contraseña actualizada exitosamente!');
+      document.getElementById('cp_old').value = ''; document.getElementById('cp_new').value = ''; document.getElementById('cp_confirm').value = ''; closeModal('changePassModal');
+    }
+
+    // Forms
+    const formSchemas = {
+      materiales: [{ id: 'id', label: 'ID', type: 'text' }, { id: 'material', label: 'Material', type: 'text' }, { id: 'cantidad', label: 'Cantidad', type: 'text' }, { id: 'estado', label: 'Estado', type: 'select', opts: ['Bueno','Regular','Malo'] }, { id: 'ubicacion', label: 'Ubicación', type: 'text' }, { id: 'desc', label: 'Descripción', type: 'text' }],
+      reactivos: [{ id: 'id', label: 'ID', type: 'text' }, { id: 'reactivo', label: 'Reactivo', type: 'text' }, { id: 'cantidad', label: 'Cantidad', type: 'text' }, { id: 'caducidad', label: 'Caducidad', type: 'text' }, { id: 'riesgo', label: 'Riesgo / Tipo', type: 'text' }, { id: 'almacen', label: 'Color Almacenaje', type: 'select', opts: ['Verde','Azul','Amarillo','Rojo','Blanco (Piso)','Rayas (Separado)'] }],
+      practicas: [{ id: 'prac', label: 'Nombre Práctica', type: 'text' }, { id: 'mat', label: 'Materia', type: 'text' }, { id: 'fecha', label: 'Fecha', type: 'date' }, { id: 'rec', label: 'Recursos', type: 'text' }, { id: 'obs', label: 'Observaciones', type: 'textarea' }]
+    };
+    function openForm(category, index = null) {
+      currentCategory = category; editIndex = index; const isEdit = index !== null;
+      document.getElementById('formTitle').innerHTML = isEdit ? `<i class="fa-solid fa-pen"></i> Editar Registro` : `<i class="fa-solid fa-plus"></i> Nuevo Registro`;
+      const schema = formSchemas[category]; const data = isEdit ? getDB(category)[index] : {}; let html = '';
+      schema.forEach(field => {
+        let val = data[field.id] || ''; let fullClass = field.type === 'textarea' ? 'full' : '';
+        html += `<div class="form-group ${fullClass}"><label>${field.label}</label>`;
+        if(field.type === 'select') { html += `<select id="inp_${field.id}">`; field.opts.forEach(o => html += `<option ${val===o?'selected':''}>${o}</option>`); html += `</select>`; } 
+        else if(field.type === 'textarea') { html += `<textarea id="inp_${field.id}" rows="2">${val}</textarea>`; } 
+        else { html += `<input type="${field.type}" id="inp_${field.id}" value="${val}">`; }
+        html += `</div>`;
+      });
+      document.getElementById('formFields').innerHTML = html; openModal('formModal');
+    }
+    function saveData() {
+      const schema = formSchemas[currentCategory]; let newObj = {}; schema.forEach(f => { newObj[f.id] = document.getElementById('inp_' + f.id).value; });
+      const db = getDB(currentCategory); if(editIndex !== null) db[editIndex] = newObj; else db.push(newObj);
+      setDB(currentCategory, db); renderAll(); closeModal('formModal');
+    }
+    function deleteRecord(cat, index) { if(confirm('¿Confirmar eliminación definitiva de este registro?')) { const db = getDB(cat); db.splice(index, 1); setDB(cat, db); renderAll(); } }
+
+    function openBulkEditor() { document.getElementById('bulkError').style.display = 'none'; switchBulkTab('materiales', document.querySelector('.e-tab')); openModal('bulkEditorModal'); }
+    function switchBulkTab(category, btnElement) {
+      currentBulkCategory = category; document.querySelectorAll('.e-tab').forEach(btn => btn.classList.remove('active')); if(btnElement) btnElement.classList.add('active');
+      const data = getDB(category); document.getElementById('bulkCodeArea').value = JSON.stringify(data, null, 2); document.getElementById('bulkError').style.display = 'none';
+    }
+    function saveBulkData() {
+      const textData = document.getElementById('bulkCodeArea').value; const errorDiv = document.getElementById('bulkError'); errorDiv.style.display = 'none';
+      try {
+        const parsedData = JSON.parse(textData); if (!Array.isArray(parsedData)) throw new Error("Los datos deben estar encapsulados en un arreglo [ ]");
+        setDB(currentBulkCategory, parsedData); renderAll(); alert('¡Base de datos sobrescrita correctamente!');
+      } catch (err) { errorDiv.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Error de sintaxis: ${err.message}`; errorDiv.style.display = 'block'; }
+    }
+
+    // ================= MEGA MODAL DE SEGURIDAD (CON ILUSTRACIONES) =================
+    const safetyData = {
+      equipo: {
+        title: "Equipo de Protección", icon: "fa-glasses", grad: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+        content: `
+          <div class="art-warning pulse"><i class="fa-solid fa-shield-halved"></i> Obligatorio en Área de Reactivos</div>
+          <p>Usa siempre bata abotonada y equipo de protección personal completo en todo momento dentro del área de reactivos.</p>
+          <div class="art-ppe-grid">
+            <div class="art-ppe-item"><i class="fa-solid fa-glasses"></i><span>Lentes</span></div>
+            <div class="art-ppe-item"><i class="fa-solid fa-shirt"></i><span>Bata</span></div>
+            <div class="art-ppe-item"><i class="fa-solid fa-mitten"></i><span>Guantes</span></div>
+            <div class="art-ppe-item"><i class="fa-solid fa-shoe-prints"></i><span>Calzado</span></div>
+          </div>
+          <ul class="art-list" style="margin-top:2rem;">
+            <li><i class="fa-solid fa-check"></i> Bata blanca abotonada (algodón preferentemente).</li>
+            <li><i class="fa-solid fa-check"></i> Lentes de seguridad (Protección ocular).</li>
+            <li><i class="fa-solid fa-check"></i> Guantes (Nitrilo o látex según la práctica).</li>
+            <li><i class="fa-solid fa-check"></i> Calzado completamente cerrado.</li>
+          </ul>`
+      },
+      autorizacion: {
+        title: "Sin Autorización", icon: "fa-ban", grad: "linear-gradient(135deg, #ef4444, #b91c1c)",
+        content: `
+          <div class="art-flex-center" style="margin-bottom: 2rem;">
+            <div style="font-size: 6rem; color: #ef4444; text-shadow: 0 10px 20px rgba(239,68,68,0.3); animation: pulseAlert 2s infinite; border-radius: 50%;"><i class="fa-solid fa-circle-exclamation"></i></div>
+          </div>
+          <div class="art-warning"><i class="fa-solid fa-triangle-exclamation"></i> Restricción Estricta</div>
+          <p>Queda <strong>estrictamente prohibido</strong> manipular materiales, reactivos químicos o equipos de cristal sin la autorización expresa y supervisión del profesor.</p>
+          <p>Cualquier acceso al área de almacén de reactivos debe estar avalado por el personal responsable del laboratorio.</p>`
+      },
+      disciplina: {
+        title: "Instrucciones y Disciplina", icon: "fa-chalkboard-user", grad: "linear-gradient(135deg, #a855f7, #7e22ce)",
+        content: `<p>El seguimiento de instrucciones es vital para la integridad de todos los alumnos y personal docente en el laboratorio.</p>
+                  <div class="art-quote"><strong>Competencia Genérica (1.5):</strong> Asume las consecuencias de sus comportamientos y decisiones.</div>
+                  <div class="art-quote"><strong>Competencia Disciplinar (14):</strong> Aplica normas de seguridad en el manejo de sustancias, instrumentos y equipo en la realización de actividades de su vida cotidiana.</div>`
+      },
+      alimentos: {
+        title: "Prohibido Alimentos", icon: "fa-utensils", grad: "linear-gradient(135deg, #f59e0b, #b45309)",
+        content: `
+          <div class="art-flex-center" style="margin-bottom: 2rem; gap: 3rem;">
+            <div style="position: relative; font-size: 4rem; color: #94a3b8; display: flex; align-items: center; justify-content: center; width: 90px;">
+              <i class="fa-solid fa-burger"></i>
+              <i class="fa-solid fa-ban" style="position: absolute; color: rgba(239, 68, 68, 0.85); font-size: 6.5rem;"></i>
+            </div>
+            <div style="position: relative; font-size: 4rem; color: #94a3b8; display: flex; align-items: center; justify-content: center; width: 90px;">
+              <i class="fa-solid fa-mug-hot"></i>
+              <i class="fa-solid fa-ban" style="position: absolute; color: rgba(239, 68, 68, 0.85); font-size: 6.5rem;"></i>
+            </div>
+          </div>
+          <div class="art-warning" style="background:#fef3c7; color:#b45309; border-color:#f59e0b; margin-top:2rem;"><i class="fa-solid fa-skull-crossbones"></i> Cero Tolerancia</div>
+          <p>No fumes, no comas ni bebas ningún tipo de líquido dentro de las instalaciones del laboratorio escolar.</p>
+          <p><strong>¿Por qué?</strong> Esta medida es indispensable para evitar la contaminación cruzada o la ingestión accidental de compuestos tóxicos o vapores residuales adheridos a los alimentos.</p>`
+      },
+      limpieza: {
+        title: "Orden y Limpieza", icon: "fa-broom", grad: "linear-gradient(135deg, #10b981, #047857)",
+        content: `
+          <div class="art-flex-center">
+            <div style="font-size: 5rem; color: #10b981; position: relative;"><i class="fa-solid fa-sparkles"></i><i class="fa-solid fa-wand-magic-sparkles" style="position: absolute; right: -40px; top: 20px; font-size: 3rem; color: #047857;"></i></div>
+          </div>
+          <ul class="art-list" style="margin-top: 2rem;">
+            <li><i class="fa-solid fa-spray-can-sparkles"></i> <strong>Antes de iniciar:</strong> Asegúrate de que tu mesa y material estén impecables.</li>
+            <li><i class="fa-solid fa-hands-bubbles"></i> <strong>Durante la práctica:</strong> Mantén tu área de trabajo despejada. No acumules mochilas ni basura.</li>
+            <li><i class="fa-solid fa-trash-can"></i> <strong>Al terminar:</strong> Limpia la zona, lava el instrumental y asegúrate de no dejar residuos experimentales.</li>
+          </ul>`
+      },
+      accidentes: {
+        title: "En Caso de Accidente", icon: "fa-kit-medical", grad: "linear-gradient(135deg, #f43f5e, #be123c)",
+        content: `
+          <div class="art-emergency">
+            <div class="art-shower"><i class="fa-solid fa-shower"></i><div class="art-drop"></div><div class="art-drop"></div><div class="art-drop"></div><div class="art-drop"></div></div>
+            <div class="art-eyewash"><i class="fa-solid fa-eye"></i><i class="fa-solid fa-droplet" style="position:absolute; right:15px; bottom:15px; font-size:1.5rem; color:#38bdf8;"></i></div>
+          </div>
+          <p>La rapidez de reacción es fundamental ante un derrame o salpicadura.</p>
+          <div class="art-warning pulse"><i class="fa-solid fa-bullhorn"></i> Avisa de inmediato al profesor a cargo. No intentes ocultar el incidente.</div>
+          <ul class="art-list">
+            <li><i class="fa-solid fa-shower"></i> <strong>Regadera de Seguridad:</strong> Conoce su ubicación para descontaminación corporal rápida.</li>
+            <li><i class="fa-solid fa-eye-dropper"></i> <strong>Lavaojos de Emergencia:</strong> Utilízalo mínimo por 15 minutos en caso de contacto ocular.</li>
+          </ul>`
+      },
+      colores: {
+        title: "Código de Colores", icon: "fa-fill-drip", grad: "linear-gradient(135deg, #334155, #0f172a)",
+        content: `
+          <div class="art-warning" style="background:#fee2e2; border-color:#ef4444;"><i class="fa-solid fa-skull-crossbones"></i> REGLA DE ORO: ¡NUNCA ALMACENAR POR ORDEN ALFABÉTICO!</div>
+          <div class="shelf-container">
+            <div class="shelf-graphic">
+              <div class="rack">
+                <div class="rack-shelf">
+                  <div class="flask f-green" onclick="updateShelfInfo('verde')"></div>
+                  <div class="flask f-green" onclick="updateShelfInfo('verde')"></div>
+                  <div class="flask f-blue" onclick="updateShelfInfo('azul')"></div>
+                </div>
+                <div class="rack-shelf">
+                  <div class="flask f-yellow" onclick="updateShelfInfo('amarillo')"></div>
+                  <div style="width:40px;"></div>
+                  <div class="flask f-white" onclick="updateShelfInfo('blanco')"></div>
+                  <div class="flask f-stripes" onclick="updateShelfInfo('rayas')"></div>
+                </div>
+                <div class="rack-shelf">
+                  <div class="flask f-red" onclick="updateShelfInfo('rojo')"></div>
+                  <div class="flask f-red" onclick="updateShelfInfo('rojo')"></div>
+                  <div style="color:#475569; font-weight: 800; font-size:0.8rem; letter-spacing:1px; margin-bottom:10px;">ÁCIDOS AL PISO</div>
+                </div>
+              </div>
+            </div>
+            <div class="shelf-info" id="dynamicShelfInfo">
+              <h3 style="color:var(--accent-primary);"><i class="fa-solid fa-hand-pointer"></i> Haz Clic en un Frasco</h3>
+              <p>Selecciona un reactivo en el estante para ver las características de su código de color normativo.</p>
+            </div>
+          </div>
+          <h3 style="margin-top:2rem;">Tabla de Clasificación de Colores</h3>
+          <ul class="art-list" style="margin-top:1rem;">
+            <li><span class="badge" style="background:#f8fafc; color:#1e293b; border:1px solid #ccc;">Blanco</span> Corrosivo. Nocivo para ojos y piel. Separado de combustibles e inflamables.</li>
+            <li><span class="badge" style="background:#eab308; color:white;">Amarillo</span> Reactivo/Oxidante. Reacciona con agua/aire. Separado de inflamables.</li>
+            <li><span class="badge" style="background:#ef4444; color:white;">Rojo</span> Inflamable. Almacenar sólo con otras sustancias inflamables.</li>
+            <li><span class="badge" style="background:#3b82f6; color:white;">Azul</span> Tóxico. Riesgo a la salud si se ingiere/inhala. Área segura.</li>
+            <li><span class="badge" style="background:#22c55e; color:white;">Verde / Gris</span> Riesgo Moderado. Almacenamiento general.</li>
+            <li><span class="badge" style="background:repeating-linear-gradient(45deg, #f8fafc, #f8fafc 4px, #475569 4px, #475569 8px); color:white;">Rayas</span> Incompatible con los de su mismo color. Almacenar separado.</li>
+          </ul>
+        `
+      },
+      estanteria: {
+        title: "Reglas de Estantería", icon: "fa-server", grad: "linear-gradient(135deg, #4f46e5, #312e81)",
+        content: `
+          <div class="art-rack-diagram">
+            <div class="art-rack-level"><i class="fa-solid fa-box-open"></i> Menores de 500ml y Material Ligero</div>
+            <div class="art-rack-level"><i class="fa-solid fa-vial"></i> Reactivos de Uso General (Verde/Azul)</div>
+            <div class="art-rack-level bot"><i class="fa-solid fa-flask-vial"></i> Mayores de 500ml y Ácidos al Piso</div>
+          </div>
+          <ul class="art-list">
+            <li><i class="fa-solid fa-arrow-down"></i> <strong>Recipientes Grandes Abajo:</strong> No colocar en estantes elevados recipientes mayores a medio litro.</li>
+            <li><i class="fa-solid fa-vial"></i> <strong>Ácidos al Piso:</strong> Los ácidos fuertes siempre se colocarán al nivel del piso.</li>
+            <li><i class="fa-solid fa-layer-group"></i> <strong>Separación Estratégica:</strong> Rojo, Blanco y Amarillo siempre en estantes separados.</li>
+            <li><i class="fa-solid fa-screwdriver-wrench"></i> <strong>Fijación Obligatoria:</strong> TODOS los estantes deben estar sujetos a la pared.</li>
+          </ul>`
+      },
+      senaletica: {
+        title: "Señalética y Áreas", icon: "fa-signs-post", grad: "linear-gradient(135deg, #0d9488, #115e59)",
+        content: `<p>Es preponderante colocar señalética de advertencia, precaución y obligación en puntos clave, apoyándose en la normatividad oficial.</p>
+                  <ul class="art-list">
+                    <li><i class="fa-solid fa-map-location-dot"></i> <strong>Áreas Delimitadas:</strong> Área de materiales separada claramente del área de reactivos químicos.</li>
+                    <li><i class="fa-solid fa-faucet-drip"></i> <strong>Instalaciones Vitales:</strong> Tarjas funcionales, regadera de seguridad y lavaojos identificados.</li>
+                    <li><i class="fa-solid fa-fire-flame-simple"></i> <strong>Gas:</strong> Instalación de gas en perfecto estado con llaves de paso señalizadas.</li>
+                    <li><i class="fa-solid fa-book-bookmark"></i> <strong>Normas Aplicables:</strong> Cumplimiento de señalética bajo estándares de la STPS y NOMS vigentes.</li>
+                  </ul>`
+      },
+      carpeta1: {
+        title: "Carpeta 1: Operatividad", icon: "fa-folder-open", grad: "linear-gradient(135deg, #d97706, #92400e)",
+        content: `
+          <div class="art-folders">
+            <div class="art-folder"><span>1</span></div>
+          </div>
+          <div class="art-quote">El Manual de Operatividad es el eje central para el funcionamiento diario del laboratorio del plantel.</div>
+          <ul class="art-list">
+            <li><i class="fa-solid fa-book"></i> Manual de Operatividad del Laboratorio.</li>
+            <li><i class="fa-solid fa-network-wired"></i> Diagrama de flujo detallado del manejo de residuos.</li>
+            <li><i class="fa-solid fa-flask-vial"></i> Manejo y clasificación general de reactivos químicos.</li>
+            <li><i class="fa-solid fa-filter"></i> Pasos específicos para neutralizar residuos.</li>
+            <li><i class="fa-solid fa-map-pin"></i> Ubicación y características del pozo de absorción.</li>
+          </ul>`
+      },
+      carpeta2: {
+        title: "Carpeta 2: Seguridad (HDS)", icon: "fa-folder-open", grad: "linear-gradient(135deg, #dc2626, #991b1b)",
+        content: `
+          <div class="art-folders">
+            <div class="art-folder f-hds"><span>2</span></div>
+          </div>
+          <p>En caso de emergencia médica o química, esta es la primera carpeta que debe ser consultada.</p>
+          <ul class="art-list">
+            <li><i class="fa-solid fa-boxes-stacked"></i> <strong>Inventario de Reactivos:</strong> Lista actualizada de todas las sustancias existentes.</li>
+            <li><i class="fa-solid fa-file-medical"></i> <strong>Hojas de Datos de Seguridad (HDS):</strong> Deben estar completas para CADA reactivo, mostrando el Rombo NFPA y los pictogramas SGA correspondientes.</li>
+          </ul>`
+      },
+      carpeta3: {
+        title: "Carpeta 3: Mantenimiento", icon: "fa-folder-open", grad: "linear-gradient(135deg, #2563eb, #1e40af)",
+        content: `
+          <div class="art-folders">
+            <div class="art-folder f-mant"><span>3</span></div>
+          </div>
+          <p>Lleva el control físico e histórico del equipo de laboratorio y su vida útil.</p>
+          <ul class="art-list">
+            <li><i class="fa-solid fa-clipboard-list"></i> Programa y Bitácora de mantenimiento preventivo y correctivo.</li>
+            <li><i class="fa-solid fa-user-pen"></i> Bitácora de uso general del laboratorio (firmas de ingreso y prácticas).</li>
+            <li><i class="fa-solid fa-microscope"></i> Inventario de materiales y equipo físico.</li>
+            <li><i class="fa-solid fa-book-open-reader"></i> Manuales o instructivos de fábrica del equipo.</li>
+          </ul>`
+      },
+      etiquetas: {
+        title: "Re-etiquetado Obligatorio", icon: "fa-tags", grad: "linear-gradient(135deg, #059669, #064e3b)",
+        content: `<p>Frascos con etiquetas viejas o poco legibles deben ser re-etiquetados con los datos de las HDS. A continuación se muestra la estructura requerida:</p>
+                  <div class="label-mockup">
+                    <div class="label-title">Ácido Clorhídrico <span style="font-size:1rem; color: #64748b;">HCl</span></div>
+                    <div class="label-field"><span>Marca / Proveedor</span><strong>Fermont</strong></div>
+                    <div class="label-field"><span>Lote / Caducidad</span><strong>L-492 / 2027</strong></div>
+                    <div class="label-field"><span>Código de Color</span><strong style="color:#64748b;">BLANCO (Piso)</strong></div>
+                    <div class="label-field"><span>Contenido en Existencia</span><strong>~ 450 ml</strong></div>
+                    <div class="label-field" style="grid-column: 1/-1;"><span>Seguridad</span><strong>SGA Corrosivo | NFPA: 3-0-1-COR</strong></div>
+                    <div class="label-field"><span>Responsable (Re-etiqueta)</span><strong>Docente Titular</strong></div>
+                    <div class="label-field"><span>Fecha</span><strong>20/09/2026</strong></div>
+                  </div>
+                  <p><em>Nota: Si existen frascos con caducidad expirada, aislarlos y anotar "Reactivo Caduco" en la columna de observaciones del inventario.</em></p>`
+      },
+      normativa: {
+        title: "Normatividad Ambiental", icon: "fa-leaf", grad: "linear-gradient(135deg, #16a34a, #14532d)",
+        content: `<div class="art-quote">El cuidado del medio ambiente es una responsabilidad obligatoria en la operación experimental.</div>
+                  <ul class="art-list">
+                    <li><i class="fa-solid fa-gavel"></i> Cumplir con el <strong>Manual de procedimientos para el manejo de desechos químicos in situ</strong>.</li>
+                    <li><i class="fa-solid fa-file-signature"></i> Sujeto a visita y aprobación de la <strong>SEMARNAT</strong>.</li>
+                    <li><i class="fa-solid fa-trash-can-arrow-up"></i> Absolutamente NINGÚN químico puro o mezcla tóxica sin neutralizar puede ser vertido en tarjas comunes.</li>
+                  </ul>`
+      },
+      neutralizacion: {
+        title: "Neutralización In Situ", icon: "fa-vial-circle-check", grad: "linear-gradient(135deg, #0284c7, #075985)",
+        content: `<p>Antes de desechar cualquier sustancia resultante de una práctica, esta debe ser estabilizada.</p>
+                  <ul class="art-list">
+                    <li><i class="fa-solid fa-book"></i> Consultar los <strong>pasos para neutralizar residuos</strong> delineados de manera específica en la Carpeta 1.</li>
+                    <li><i class="fa-solid fa-scale-balanced"></i> Ajustar el pH de soluciones ácidas y básicas hasta alcanzar un punto neutro (pH ~7) antes de su desecho al pozo.</li>
+                  </ul>`
+      },
+      pozo: {
+        title: "Pozo de Absorción", icon: "fa-water", grad: "linear-gradient(135deg, #d97706, #78350f)",
+        content: `<div class="art-warning pulse" style="background:#fef3c7; color:#b45309; border-color:#f59e0b;"><i class="fa-solid fa-triangle-exclamation"></i> Vértice de Residuos Finales</div>
+                  <p>Es indispensable conocer la ubicación exacta y las características estructurales del <strong>pozo de absorción</strong> del plantel.</p>
+                  <p>Asegúrate rigurosamente de que los residuos vertidos en este pozo hayan pasado previamente por el protocolo completo de neutralización In Situ para evitar contaminación de los mantos freáticos.</p>`
+      }
+    };
+
+    function openSafetyModal(key) {
+      const data = safetyData[key]; if(!data) return;
+      const header = document.getElementById('megaSafetyHeader'); header.style.background = data.grad;
+      header.innerHTML = `<i class="fa-solid ${data.icon} mega-modal-icon"></i><h2 class="mega-modal-title">${data.title}</h2>`;
+      document.getElementById('megaSafetyBody').innerHTML = data.content; openModal('megaSafetyModal');
+    }
+
+    function updateShelfInfo(colorCode) {
+      const box = document.getElementById('dynamicShelfInfo'); if(!box) return;
+      const cData = {
+        'blanco': { t: 'Blanco (Corrosivo)', c: '#f8fafc', tc: '#1e293b', d: 'Nocivo para mucosas y piel. Almacenar separado de combustibles e inflamables. Los ácidos SIEMPRE van al nivel del piso.' },
+        'amarillo': { t: 'Amarillo (Reactivo / Oxidante)', c: '#eab308', tc: 'white', d: 'Reacciona violentamente con agua o aire. Almacenar separado de inflamables.' },
+        'rojo': { t: 'Rojo (Inflamable)', c: '#ef4444', tc: 'white', d: 'Almacenar separadamente SÓLO con otras sustancias inflamables.' },
+        'azul': { t: 'Azul (Tóxico)', c: '#3b82f6', tc: 'white', d: 'Riesgo a la salud si se ingiere o inhala. Puede ir en estantes intermedios.' },
+        'verde': { t: 'Verde (Riesgo Moderado)', c: '#22c55e', tc: 'white', d: 'Almacenamiento general. Puede utilizarse como separador físico de otros colores.' },
+        'rayas': { t: 'Rayas (Incompatibles)', c: '#475569', tc: 'white', d: 'Incompatible con reactivos de su mismo color. Requiere almacenamiento aislado.' }
+      };
+      const info = cData[colorCode]; box.style.background = info.c; box.style.color = info.tc;
+      box.innerHTML = `<h3 style="border-bottom-color: rgba(0,0,0,0.1);"><i class="fa-solid fa-flask"></i> Color ${info.t}</h3><p style="color: ${info.tc}; opacity: 0.9; font-size: 1.05rem;">${info.d}</p>`;
+      box.style.transform = 'scale(0.95)'; setTimeout(() => box.style.transform = 'scale(1)', 150);
+    }
+
+    window.onload = renderAll;
+  </script>
+</body>
+</html>
