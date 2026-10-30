@@ -553,3 +553,32 @@
     animation: none;
   }
 }
+
+@media (min-width: 1000px) {
+  .view-head {
+    flex-wrap: nowrap;
+  }
+
+  .view-head > div:first-child {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .view-head .view-actions {
+    flex-wrap: nowrap;
+  }
+
+  .view-head .search {
+    width: min(300px, 100%);
+  }
+
+  .view-title {
+    white-space: nowrap;
+  }
+}
+
+@media (min-width: 1000px) and (max-width: 1199px) {
+  .view-head__art {
+    display: none;
+  }
+}
